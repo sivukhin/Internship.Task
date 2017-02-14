@@ -13,7 +13,8 @@ namespace Internship
                 new ServerOptions {Prefix = "http://127.0.0.1:12345/"},
                 new IServerModule[]
                 {
-                    new HelloWorldModule()
+                    new HelloWorldModule(),
+                    new UpdateStatisticModule(storage), 
                 }))
             {
                 server.StartListen();

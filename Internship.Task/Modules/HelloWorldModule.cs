@@ -1,22 +1,31 @@
 ﻿using System;
-using System.IO;
 using System.Net;
-using System.Reactive.Linq;
+using System.Text.RegularExpressions;
 
 namespace Internship.Modules
 {
-    internal class HelloWorldModule : IServerModule
+    public class HelloWorldModule : IServerModule
     {
-        public IHandlerResult ProcessRequest(HttpListenerRequest request)
+        public IDisposable Subscribe(IObservable<HttpListenerContext> eventStream)
         {
-            return new BaseHandlerResult(HttpStatusCode.OK, $"{request.RawUrl.Substring(1)}, world!");
+            eventStream = eventStream.FilterMethod(HttpMethodEnum.Get);
+            var hello = eventStream
+                .FilterRequestString(new Regex("^/hello$"))
+                .Subscribe(HandleHello);
+            var goodbye = eventStream
+                .FilterRequestString(new Regex("^/goodbye$"))
+                .Subscribe(HandleGoodBye);
+            return hello.DisposeWith(goodbye);
         }
 
-        public IObservable<HttpListenerContext> FilterSubscription(IObservable<HttpListenerContext> eventStream)
+        public IHandlerResult HandleHello(HttpListenerRequest request)
         {
-            return eventStream.Where(context =>
-                context.Request.RawUrl.StartsWith("/hello") ||
-                context.Request.RawUrl.StartsWith("/bye"));
+            return new BaseHandlerResult(HttpStatusCode.OK, "Hello, world!");
+        }
+
+        public IHandlerResult HandleGoodBye(HttpListenerRequest request)
+        {
+            return new BaseHandlerResult(HttpStatusCode.OK, "Good bye, world!");
         }
     }
 }

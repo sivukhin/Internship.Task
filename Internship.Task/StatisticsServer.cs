@@ -18,7 +18,6 @@ namespace Internship
 
         public StatisticsServer(ServerOptions options, IEnumerable<IServerModule> modules)
         {
-            
             this.options = options;
             listenerEventStream = CreateListenerEventStream();
             modulesDisposeTokens = new List<IDisposable>();
@@ -46,7 +45,7 @@ namespace Internship
 
         public IDisposable RegisterModule(IServerModule module)
         {
-            var disposeToken = module.FilterSubscription(this).Subscribe(module.ToObserver());
+            var disposeToken = module.Subscribe(this);
             modulesDisposeTokens.Add(disposeToken);
             return disposeToken;
         }

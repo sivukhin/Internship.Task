@@ -68,6 +68,8 @@
     <Compile Include="Models\ServerInfo.cs" />
     <Compile Include="Modules\HelloWorldModule.cs" />
     <Compile Include="Modules\IServerModule.cs" />
+    <Compile Include="Modules\ObservableHttpListenerShortcuts.cs" />
+    <Compile Include="Modules\UpdateStatisticModule.cs" />
     <Compile Include="Storage\IStatisticStorage.cs" />
     <Compile Include="Storage\SimpleStorage.cs" />
     <Compile Include="Program.cs" />
