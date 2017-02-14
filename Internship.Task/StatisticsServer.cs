@@ -1,29 +1,54 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
-using System.Linq;
 using System.Net;
-using System.Net.Http;
-using System.Security.Policy;
-using System.Threading;
-using System.Threading.Tasks;
-using Newtonsoft.Json;
-
+using System.Reactive.Linq;
+using System.Reactive.Subjects;
+using Internship.Modules;
 
 namespace Internship
 {
-    public class StatisticsServer : IDisposable
+    public class StatisticsServer : IDisposable, IObservable<HttpListenerContext>
     {
-        private ServerOptions options;
         private readonly HttpListener listener = new HttpListener();
-        private Thread listeningThread;
+        private readonly IConnectableObservable<HttpListenerContext> listenerEventStream;
+        private readonly List<IDisposable> modulesDisposeTokens;
+        private readonly ServerOptions options;
+        private IDisposable eventStreamDisposeToken;
         private bool isDisposed;
-        private readonly List<IServerModule> modules;
 
         public StatisticsServer(ServerOptions options, IEnumerable<IServerModule> modules)
         {
+            
             this.options = options;
-            this.modules = modules.ToList();
+            listenerEventStream = CreateListenerEventStream();
+            modulesDisposeTokens = new List<IDisposable>();
+
+            foreach (var module in modules)
+                RegisterModule(module);
+        }
+
+        public void Dispose()
+        {
+            if (isDisposed)
+                return;
+            isDisposed = true;
+            StopListen();
+            listener.Close();
+
+            foreach (var disposeToken in modulesDisposeTokens)
+                disposeToken.Dispose();
+        }
+
+        public IDisposable Subscribe(IObserver<HttpListenerContext> observer)
+        {
+            return listenerEventStream.Subscribe(observer);
+        }
+
+        public IDisposable RegisterModule(IServerModule module)
+        {
+            var disposeToken = module.FilterSubscription(this).Subscribe(module.ToObserver());
+            modulesDisposeTokens.Add(disposeToken);
+            return disposeToken;
         }
 
         public void StartListen()
@@ -34,42 +59,24 @@ namespace Internship
             listener.Prefixes.Add(options.Prefix);
             listener.Start();
 
-            listeningThread = new Thread(Listen) {IsBackground = true, Priority = ThreadPriority.Highest};
-            listeningThread.Start();
+            eventStreamDisposeToken = listenerEventStream.Connect();
         }
 
-        private void Listen()
-        {
-            while (true)
-            {
-                var context = listener.GetContext();
-                DistributeRequest(context);
-            }
-        }
-
-        private void DistributeRequest(HttpListenerContext context)
-        {
-            foreach (var module in modules)
-                if (module.TryProcessRequest(context))
-                    break;
-        }
-        
         public void StopListen()
         {
             if (listener.IsListening)
             {
-                listeningThread.Abort();
+                eventStreamDisposeToken.Dispose();
                 listener.Stop();
             }
         }
 
-        public void Dispose()
+        private IConnectableObservable<HttpListenerContext> CreateListenerEventStream()
         {
-            if (isDisposed)
-                return;
-            isDisposed = true;
-            StopListen();
-            listener.Close();
+            return Observable.FromAsync(listener.GetContextAsync)
+                .Repeat()
+                .Retry()
+                .Publish();
         }
     }
 }
