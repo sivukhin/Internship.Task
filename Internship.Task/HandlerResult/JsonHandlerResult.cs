@@ -4,13 +4,12 @@ using Newtonsoft.Json;
 
 namespace Internship
 {
-    public class JsonHandlerResult<T> : IHandlerResult 
-        where T:class
+    public class JsonHandlerResult : IHandlerResult 
     {
         public HttpStatusCode StatusCode { get; set; }
-        public T Data { get; set; }
+        public object Data { get; set; }
 
-        public JsonHandlerResult(HttpStatusCode statusCode, T data = null)
+        public JsonHandlerResult(HttpStatusCode statusCode, object data = null)
         {
             StatusCode = statusCode;
             Data = data;

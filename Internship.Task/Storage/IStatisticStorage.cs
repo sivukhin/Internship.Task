@@ -7,11 +7,11 @@ namespace Internship.Storage
 {
     public interface IStatisticStorage
     {
-        Task UpdateServerInfo(string serverName, ServerInfo info);
-        Task<ServerInfo> GetServerInfo(string serverName);
+        Task UpdateServerInfo(string serverId, ServerInfo info);
+        Task<ServerInfo> GetServerInfo(string serverId);
         Task<IEnumerable<ServerInfo>> GetAllServersInfo();
 
-        Task UpdateMatchInfo(string serverName, DateTime endTime, MatchInfo matchInfo);
-        Task<MatchInfo> GetMatchInfo(string serverName, DateTime endTime);
+        Task UpdateMatchInfo(string serverId, DateTime endTime, MatchInfo matchInfo);
+        Task<MatchInfo> GetMatchInfo(string serverId, DateTime endTime);
     }
 }

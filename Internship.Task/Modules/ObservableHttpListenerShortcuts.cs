@@ -19,7 +19,6 @@ namespace Internship.Modules
                 ["put"] = HttpMethodEnum.Put,
                 ["post"] = HttpMethodEnum.Post
             };
-        private static Stream requestInputStream;
 
         public static IObservable<HttpListenerContext> FilterMethod(this IObservable<HttpListenerContext> eventStream,
             HttpMethodEnum methods)
@@ -68,6 +67,17 @@ namespace Internship.Modules
                 response.WriteResult(context.Response);
             });
         }
+
+        public static IDisposable SubscribeAsync(this IObservable<HttpListenerContext> eventStream,
+           Func<HttpListenerRequest, Task<IHandlerResult>> handler)
+        {
+            return eventStream.Subscribe(async context =>
+            {
+                var response = await handler(context.Request);
+                response.WriteResult(context.Response);
+            });
+        }
+
 
         public static IDisposable DisposeWith(this IDisposable first, params IDisposable[] others)
         {

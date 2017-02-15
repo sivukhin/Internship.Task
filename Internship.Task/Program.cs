@@ -15,6 +15,7 @@ namespace Internship
                 {
                     new HelloWorldModule(),
                     new UpdateStatisticModule(storage), 
+                    new GetStatisticModule(storage), 
                 }))
             {
                 server.StartListen();

@@ -17,29 +17,29 @@ namespace Internship.Storage
             matchInfo = new Dictionary<Tuple<string, DateTime>, MatchInfo>();
         }
 
-        public Task UpdateServerInfo(string serverName, ServerInfo info)
+        public Task UpdateServerInfo(string serverId, ServerInfo info)
         {
-            serverInfo[serverName] = info;
+            serverInfo[serverId] = info;
             return EmptyTask;
         }
 
-        public Task<ServerInfo> GetServerInfo(string serverName)
+        public Task<ServerInfo> GetServerInfo(string serverId)
         {
             ServerInfo info;
-            serverInfo.TryGetValue(serverName, out info);
+            serverInfo.TryGetValue(serverId, out info);
             return Task.FromResult(info);
         }
 
-        public Task UpdateMatchInfo(string serverName, DateTime endTime, MatchInfo match)
+        public Task UpdateMatchInfo(string serverId, DateTime endTime, MatchInfo match)
         {
-            matchInfo[Tuple.Create(serverName, endTime)] = match;
+            matchInfo[Tuple.Create(serverId, endTime)] = match;
             return EmptyTask;
         }
 
-        public Task<MatchInfo> GetMatchInfo(string serverName, DateTime endTime)
+        public Task<MatchInfo> GetMatchInfo(string serverId, DateTime endTime)
         {
             MatchInfo info;
-            matchInfo.TryGetValue(Tuple.Create(serverName, endTime), out info);
+            matchInfo.TryGetValue(Tuple.Create(serverId, endTime), out info);
             return Task.FromResult(info);
         }
 

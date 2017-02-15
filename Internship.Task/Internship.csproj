@@ -66,6 +66,7 @@
     <Compile Include="Models\MatchInfo.cs" />
     <Compile Include="Models\PlayerStatistic.cs" />
     <Compile Include="Models\ServerInfo.cs" />
+    <Compile Include="Modules\GetStatisticModule.cs" />
     <Compile Include="Modules\HelloWorldModule.cs" />
     <Compile Include="Modules\IServerModule.cs" />
     <Compile Include="Modules\ObservableHttpListenerShortcuts.cs" />
