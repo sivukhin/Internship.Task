@@ -6,6 +6,7 @@ using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using Internship.HandlerResult;
 using Newtonsoft.Json;
 
 namespace Internship.Modules

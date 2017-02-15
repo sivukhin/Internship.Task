@@ -2,7 +2,7 @@
 using System.Net;
 using Newtonsoft.Json;
 
-namespace Internship
+namespace Internship.HandlerResult
 {
     public class JsonHandlerResult : IHandlerResult 
     {

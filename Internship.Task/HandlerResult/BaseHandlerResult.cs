@@ -1,7 +1,7 @@
 ﻿using System.IO;
 using System.Net;
 
-namespace Internship
+namespace Internship.HandlerResult
 {
     public class BaseHandlerResult : IHandlerResult
     {

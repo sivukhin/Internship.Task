@@ -1,6 +1,6 @@
 ﻿using System.Net;
 
-namespace Internship
+namespace Internship.HandlerResult
 {
     public interface IHandlerResult
     {
