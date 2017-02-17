@@ -4,17 +4,15 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{874B2CAA-BF71-4D59-AB46-75008839041F}</ProjectGuid>
-    <OutputType>Exe</OutputType>
+    <ProjectGuid>{C4F185CF-93B1-42CA-AF63-5ABF8838ECA8}</ProjectGuid>
+    <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Internship</RootNamespace>
-    <AssemblyName>Internship</AssemblyName>
+    <RootNamespace>HttpServerCore</RootNamespace>
+    <AssemblyName>HttpServerCore</AssemblyName>
     <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
-    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
@@ -24,7 +22,6 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release\</OutputPath>
@@ -59,35 +56,20 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="HandlerResult\BaseHandlerResult.cs" />
+    <Compile Include="HttpRequest.cs" />
+    <Compile Include="HttpServer.cs" />
+    <Compile Include="HttpServerExtensions.cs" />
     <Compile Include="HttpMethodEnum.cs" />
-    <Compile Include="HandlerResult\IHandlerResult.cs" />
-    <Compile Include="HandlerResult\JsonHandlerResult.cs" />
-    <Compile Include="Models\MatchInfo.cs" />
-    <Compile Include="Models\PlayerStatistic.cs" />
-    <Compile Include="Models\ServerInfo.cs" />
-    <Compile Include="Modules\GetStatisticModule.cs" />
-    <Compile Include="Modules\HelloWorldModule.cs" />
-    <Compile Include="Modules\IServerModule.cs" />
-    <Compile Include="Modules\ObservableHttpListenerShortcuts.cs" />
-    <Compile Include="Modules\UpdateStatisticModule.cs" />
-    <Compile Include="Storage\IStatisticStorage.cs" />
-    <Compile Include="Storage\SimpleStorage.cs" />
-    <Compile Include="Program.cs" />
+    <Compile Include="HttpServerOptions.cs" />
+    <Compile Include="IHttpServer.cs" />
+    <Compile Include="IRequest.cs" />
+    <Compile Include="IResponse.cs" />
+    <Compile Include="IServerModule.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="RequestFilterAttribute.cs" />
-    <Compile Include="ServerOptions.cs" />
-    <Compile Include="StatisticsServer.cs" />
+    <Compile Include="HttpResponse.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="App.config" />
     <None Include="packages.config" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\HttpServerCore\HttpServerCore.csproj">
-      <Project>{C4F185CF-93B1-42CA-AF63-5ABF8838ECA8}</Project>
-      <Name>HttpServerCore</Name>
-    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
