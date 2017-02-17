@@ -1,4 +1,5 @@
 ﻿using System;
+using HttpServerCore;
 using Internship.Modules;
 using Internship.Storage;
 
@@ -9,16 +10,11 @@ namespace Internship
         private static void Main(string[] args)
         {
             var storage = new SimpleStorage();
-            using (var server = new StatisticsServer(
-                new ServerOptions {Prefix = "http://127.0.0.1:12345/"},
-                new IServerModule[]
-                {
-                    new HelloWorldModule(),
-                    new UpdateStatisticModule(storage), 
-                    new GetStatisticModule(storage), 
-                }))
+            using (var server = new HttpServer(
+                new HttpServerOptions {Prefix = "http://127.0.0.1:12345/"},
+                new IServerModule[] { new UpdateStatisticModule(storage), new GetStatisticModule(storage)}))
             {
-                server.StartListen();
+                server.Start();
                 Console.ReadKey(true);
             }
         }

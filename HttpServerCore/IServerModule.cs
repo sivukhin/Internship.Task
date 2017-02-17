@@ -1,7 +1,9 @@
+using System.Threading.Tasks;
+
 namespace HttpServerCore
 {
     public interface IServerModule
     {
-        IRequest ProcessRequest(IRequest request);
+        Task<IRequest> ProcessRequest(IRequest request);
     }
 }

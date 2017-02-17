@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Net;
 using System.Reactive.Concurrency;
 using System.Reactive.Linq;
+using System.Threading.Tasks;
 
 namespace HttpServerCore
 {
@@ -11,7 +12,8 @@ namespace HttpServerCore
         private bool isDisposed;
         private readonly HttpListener listener;
         private readonly HttpServerOptions options;
-        private IObservable<IObservable<IRequest>> requestStream;
+        //TODO: I really need tasks?
+        private IObservable<IObservable<Task<IRequest>>> requestStream;
         private IDisposable stopStreamToken;
 
         public HttpServer(HttpServerOptions options, IEnumerable<IServerModule> modules)
@@ -50,7 +52,8 @@ namespace HttpServerCore
             requestStream = requestStream.Select(
                 innerStream => innerStream
                     .ObserveOn(Scheduler.Default)
-                    .Select(module.ProcessRequest));
+                    //TODO: confusing construction for me...
+                    .Select(async request => await module.ProcessRequest(await request)));
 
             if (started)
                 Start();
@@ -65,7 +68,7 @@ namespace HttpServerCore
             listener.Close();
         }
 
-        private IObservable<IObservable<IRequest>> CreateRequestStream()
+        private IObservable<IObservable<Task<IRequest>>> CreateRequestStream()
         {
             return Observable
                 .FromAsync(listener.GetContextAsync)
@@ -74,7 +77,8 @@ namespace HttpServerCore
                 .Select(context => new HttpRequest(context))
                 .Cast<IRequest>()
                 //TODO: this can be configured in HttpServerOptions
-                .Window(1);
+                .Window(1)
+                .Select(innerStream => innerStream.Select(Task.FromResult));
         }
 
         private void ConfigureListener()
@@ -89,7 +93,7 @@ namespace HttpServerCore
                 .Select(
                     innerStream => innerStream
                         .ObserveOn(Scheduler.Default)
-                        .Subscribe(request => request.SendAttachedResponse()))
+                        .Subscribe(async request => (await request).SendAttachedResponse()))
                 .Publish()
                 .Connect();
         }

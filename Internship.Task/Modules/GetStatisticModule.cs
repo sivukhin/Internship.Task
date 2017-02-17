@@ -6,7 +6,7 @@ using System.Reactive.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
-using Internship.HandlerResult;
+using HttpServerCore;
 using Internship.Storage;
 
 namespace Internship.Modules
@@ -23,43 +23,47 @@ namespace Internship.Modules
             statisticStorage = storage;
         }
 
-        public async Task<IHandlerResult> GetServerInfo(HttpListenerRequest request, string serverId)
+        public async Task<IResponse> GetServerInfo(string serverId)
         {
             var serverInfo = await statisticStorage.GetServerInfo(serverId);
             if (serverInfo == null)
-                return new BaseHandlerResult(HttpStatusCode.NotFound);
-            return new JsonHandlerResult(HttpStatusCode.OK, serverInfo);
+                return new HttpResponse(HttpStatusCode.NotFound);
+            return new JsonHttpResponse(HttpStatusCode.OK, serverInfo);
         }
 
-        public async Task<IHandlerResult> GetAllServersInfo(HttpListenerRequest request)
+        public async Task<IResponse> GetAllServersInfo()
         {
             var allServersInfo = await statisticStorage.GetAllServersInfo();
-            return new JsonHandlerResult(HttpStatusCode.OK, allServersInfo);
+            return new JsonHttpResponse(HttpStatusCode.OK, allServersInfo);
         }
 
-        public async Task<IHandlerResult> GetMatchInfo(HttpListenerRequest request, string serverId, DateTime endTime)
+        public async Task<IResponse> GetMatchInfo(string serverId, DateTime endTime)
         {
             var matchInfo = await statisticStorage.GetMatchInfo(serverId, endTime);
             if (matchInfo == null)
-                return new BaseHandlerResult(HttpStatusCode.NotFound);
-            return new JsonHandlerResult(HttpStatusCode.OK, matchInfo);
+                return new HttpResponse(HttpStatusCode.NotFound);
+            return new JsonHttpResponse(HttpStatusCode.OK, matchInfo);
         }
 
-        public IDisposable Subscribe(IObservable<HttpListenerContext> eventStream)
+        public async Task<IRequest> ProcessRequest(IRequest request)
         {
-            eventStream = eventStream.FilterMethod(HttpMethodEnum.Get);
+            if (request.HttpMethod != HttpMethodEnum.Get)
+                return await Task.FromResult(request);
+            var getServerInfoMatch = request.MatchLocalPath(getServerInfoRegex);
+            if (getServerInfoMatch.Success)
+                return request.AttachResponse(await GetServerInfo(getServerInfoMatch.Groups["serverId"].Value));
 
-            var getServerInfo = eventStream.FilterRequestString(getServerInfoRegex,
-                (request, match) => GetServerInfo(request, match.Groups["serverId"].Value));
+            var getAllServersInfoMatch = request.MatchLocalPath(getAllServersInfoRegex);
+            if (getAllServersInfoMatch.Success)
+                return request.AttachResponse(await GetAllServersInfo());
 
-            var getAllServersInfo = eventStream
-                .FilterRequestString(getAllServersInfoRegex)
-                .SubscribeAsync(GetAllServersInfo);
+            var getMatchInfoMatch = request.MatchLocalPath(getMatchInfoRegex);
+            if (getMatchInfoMatch.Success)
+                return request.AttachResponse(await GetMatchInfo(
+                    getMatchInfoMatch.Groups["serverId"].Value,
+                    DateTime.Parse(getMatchInfoMatch.Groups["endTime"].Value)));
 
-            var getMatchInfo = eventStream.FilterRequestString(getMatchInfoRegex, 
-                (request, match) => GetMatchInfo(request, match.Groups["serverId"].Value, DateTime.Parse(match.Groups["endTime"].Value)));
-
-            return getServerInfo.DisposeWith(getAllServersInfo, getMatchInfo);
+            return await Task.FromResult(request);
         }
     }
 }

@@ -59,25 +59,15 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="HandlerResult\BaseHandlerResult.cs" />
-    <Compile Include="HttpMethodEnum.cs" />
-    <Compile Include="HandlerResult\IHandlerResult.cs" />
-    <Compile Include="HandlerResult\JsonHandlerResult.cs" />
     <Compile Include="Models\MatchInfo.cs" />
     <Compile Include="Models\PlayerStatistic.cs" />
     <Compile Include="Models\ServerInfo.cs" />
     <Compile Include="Modules\GetStatisticModule.cs" />
-    <Compile Include="Modules\HelloWorldModule.cs" />
-    <Compile Include="Modules\IServerModule.cs" />
-    <Compile Include="Modules\ObservableHttpListenerShortcuts.cs" />
     <Compile Include="Modules\UpdateStatisticModule.cs" />
     <Compile Include="Storage\IStatisticStorage.cs" />
     <Compile Include="Storage\SimpleStorage.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="RequestFilterAttribute.cs" />
-    <Compile Include="ServerOptions.cs" />
-    <Compile Include="StatisticsServer.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
