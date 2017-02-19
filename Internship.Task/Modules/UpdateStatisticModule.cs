@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Net;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
@@ -8,10 +9,17 @@ using Internship.Storage;
 
 namespace Internship.Modules
 {
-    public class UpdateStatisticModule : IServerModule
+    public class UpdateStatisticModule : BaseModule
     {
-        private static readonly Regex updateServerRegex = new Regex("^/servers/(?<serverId>.*?)/info");
-        private static readonly Regex addMatchRegex = new Regex("^/servers/(?<serverId>.*?)/matches/(?<endTime>.*?)");
+        protected override IEnumerable<RequestFilter> Filters => new []
+        {
+            new RequestFilter(HttpMethodEnum.Put, new Regex("^/servers/(?<serverId>.*?)/info"), 
+                (request, match) => UpdateServerInfo(request, match.Groups["serverId"].Value)),
+            
+            new RequestFilter(HttpMethodEnum.Put, new Regex("^/servers/(?<serverId>.*?)/matches/(?<endTime>.*?)"), 
+                (request, match) => AddMatchStatistic(request, match.Groups["serverId"].Value, DateTime.Parse(match.Groups["endTime"].Value)))
+        };
+
         private readonly IStatisticStorage statisticStorage;
 
         public UpdateStatisticModule(IStatisticStorage storage)
@@ -36,24 +44,6 @@ namespace Internship.Modules
                 return new HttpResponse(HttpStatusCode.BadRequest);
             await statisticStorage.UpdateMatchInfo(serverId, endTime, matchInfo);
             return new HttpResponse(HttpStatusCode.OK);
-        }
-
-        public async Task<IRequest> ProcessRequest(IRequest request)
-        {
-            if (request.HttpMethod != HttpMethodEnum.Put)
-                return await Task.FromResult(request);
-
-            var updateServerMatch = request.MatchLocalPath(updateServerRegex);
-            if (updateServerMatch.Success)
-                return request.AttachResponse(await UpdateServerInfo(request, updateServerMatch.Groups["serverId"].Value));
-
-            var addMatchMatch = request.MatchLocalPath(addMatchRegex);
-            if (addMatchMatch.Success)
-                return request.AttachResponse(await AddMatchStatistic(request,
-                    addMatchMatch.Groups["serverId"].Value,
-                    DateTime.Parse(addMatchMatch.Groups["endTime"].Value)));
-
-            return await Task.FromResult(request);
         }
     }
 }
