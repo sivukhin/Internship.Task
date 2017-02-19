@@ -31,8 +31,7 @@ namespace HttpServerCore
                 return;
             ConfigureListener();
             listener.Start();
-            StartRequestStream();
-            stopStreamToken = requestStream.Publish().Connect();
+            stopStreamToken = StartRequestStream();
         }
 
         public void Stop()
@@ -45,8 +44,8 @@ namespace HttpServerCore
 
         public void RegisterModule(IServerModule module)
         {
-            bool started = listener.IsListening;
-            if (started)
+            var wasStarted = listener.IsListening;
+            if (wasStarted)
                 Stop();
 
             requestStream = requestStream.Select(
@@ -55,7 +54,7 @@ namespace HttpServerCore
                     //TODO: confusing construction for me...
                     .Select(async request => await module.ProcessRequest(await request)));
 
-            if (started)
+            if (wasStarted)
                 Start();
         }
 
@@ -74,8 +73,7 @@ namespace HttpServerCore
                 .FromAsync(listener.GetContextAsync)
                 .Repeat()
                 .Retry()
-                .Select(context => new HttpRequest(context))
-                .Cast<IRequest>()
+                .Select(context => (IRequest)new HttpRequest(context))
                 //TODO: this can be configured in HttpServerOptions
                 .Window(1)
                 .Select(innerStream => innerStream.Select(Task.FromResult));
@@ -87,9 +85,9 @@ namespace HttpServerCore
             listener.Prefixes.Add(options.Prefix);
         }
 
-        private void StartRequestStream()
+        private IDisposable StartRequestStream()
         {
-            stopStreamToken = requestStream
+            return requestStream
                 .Select(
                     innerStream => innerStream
                         .ObserveOn(Scheduler.Default)
