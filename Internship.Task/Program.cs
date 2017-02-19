@@ -11,7 +11,7 @@ namespace Internship
         {
             var storage = new SimpleStorage();
             using (var server = new HttpServer(
-                new HttpServerOptions {Prefix = "http://127.0.0.1:12345/"},
+                new HttpServerOptions {Prefix = "http://localhost:12345/"},
                 new IServerModule[] { new UpdateStatisticModule(storage), new GetStatisticModule(storage)}))
             {
                 server.Start();

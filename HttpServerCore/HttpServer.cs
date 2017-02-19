@@ -29,8 +29,8 @@ namespace HttpServerCore
         {
             if (listener.IsListening)
                 return;
-            ConfigureListener();
             listener.Start();
+            ConfigureListener();
             stopStreamToken = StartRequestStream();
         }
 
@@ -88,12 +88,10 @@ namespace HttpServerCore
         private IDisposable StartRequestStream()
         {
             return requestStream
-                .Select(
+                .Subscribe(
                     innerStream => innerStream
                         .ObserveOn(Scheduler.Default)
-                        .Subscribe(async request => (await request).SendAttachedResponse()))
-                .Publish()
-                .Connect();
+                        .Subscribe(async request => (await request).SendAttachedResponse()));
         }
 
         private void StopRequestStream()
