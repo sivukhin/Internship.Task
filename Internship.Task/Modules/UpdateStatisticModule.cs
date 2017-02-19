@@ -5,9 +5,9 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using HttpServerCore;
 using Internship.Models;
-using Internship.Storage;
+using StatisticServer.Storage;
 
-namespace Internship.Modules
+namespace StatisticServer.Modules
 {
     public class UpdateStatisticModule : BaseModule
     {

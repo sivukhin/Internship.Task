@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Internship.Models;
 
-namespace Internship.Storage
+namespace StatisticServer.Storage
 {
     public class SimpleStorage : IStatisticStorage
     {

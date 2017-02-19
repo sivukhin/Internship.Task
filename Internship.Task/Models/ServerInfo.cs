@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-namespace Internship.Models
+namespace StatisticServer.Models
 {
     //TODO: serversInfo now without endpoint
     public class ServerInfo

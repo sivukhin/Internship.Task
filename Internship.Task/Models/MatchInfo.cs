@@ -1,6 +1,7 @@
 using System.Collections.Generic;
+using Internship.Models;
 
-namespace Internship.Models
+namespace StatisticServer.Models
 {
     public class MatchInfo
     {

@@ -7,8 +7,8 @@
     <ProjectGuid>{874B2CAA-BF71-4D59-AB46-75008839041F}</ProjectGuid>
     <OutputType>Exe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Internship</RootNamespace>
-    <AssemblyName>Internship</AssemblyName>
+    <RootNamespace>StatisticServer</RootNamespace>
+    <AssemblyName>StatisticServer</AssemblyName>
     <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>

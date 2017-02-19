@@ -1,15 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Net;
-using System.Reactive.Linq;
-using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using HttpServerCore;
-using Internship.Storage;
+using Internship.Modules;
+using StatisticServer.Storage;
 
-namespace Internship.Modules
+namespace StatisticServer.Modules
 {
     public class GetStatisticModule : BaseModule
     {

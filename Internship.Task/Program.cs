@@ -3,7 +3,7 @@ using HttpServerCore;
 using Internship.Modules;
 using Internship.Storage;
 
-namespace Internship
+namespace StatisticServer
 {
     internal class Program
     {

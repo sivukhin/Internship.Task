@@ -1,4 +1,4 @@
-namespace Internship.Models
+namespace StatisticServer.Models
 {
     public class PlayerStatistic
     {
