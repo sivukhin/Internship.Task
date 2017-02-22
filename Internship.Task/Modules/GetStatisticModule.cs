@@ -4,7 +4,6 @@ using System.Net;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using HttpServerCore;
-using Internship.Modules;
 using StatisticServer.Storage;
 
 namespace StatisticServer.Modules

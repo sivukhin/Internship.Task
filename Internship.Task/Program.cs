@@ -1,7 +1,7 @@
 ﻿using System;
 using HttpServerCore;
-using Internship.Modules;
-using Internship.Storage;
+using StatisticServer.Modules;
+using StatisticServer.Storage;
 
 namespace StatisticServer
 {

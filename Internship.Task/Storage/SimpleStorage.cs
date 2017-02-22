@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Internship.Models;
+using StatisticServer.Models;
 
 namespace StatisticServer.Storage
 {

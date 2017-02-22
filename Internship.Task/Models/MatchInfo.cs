@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using Internship.Models;
 
 namespace StatisticServer.Models
 {
