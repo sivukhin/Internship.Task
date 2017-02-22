@@ -9,6 +9,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HttpServerCore", "HttpServe
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HttpServerCore.Tests", "HttpServerCore.Tests\HttpServerCore.Tests.csproj", "{9D6CC456-7BA8-488A-83AB-A7AE1A91971E}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StatisticServer.Tests", "StatisticServer.Tests\StatisticServer.Tests.csproj", "{FE3C0F97-AB83-448A-B68A-39761DB97A04}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +29,10 @@ Global
 		{9D6CC456-7BA8-488A-83AB-A7AE1A91971E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9D6CC456-7BA8-488A-83AB-A7AE1A91971E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9D6CC456-7BA8-488A-83AB-A7AE1A91971E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FE3C0F97-AB83-448A-B68A-39761DB97A04}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FE3C0F97-AB83-448A-B68A-39761DB97A04}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FE3C0F97-AB83-448A-B68A-39761DB97A04}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FE3C0F97-AB83-448A-B68A-39761DB97A04}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -18,17 +18,40 @@ namespace HttpServerCore
             StatusCode = statusCode;
             Content = content;
         }
+
+        public override string ToString()
+        {
+            return $"HttpResponse {{ StatusCode = {StatusCode}, Content = {Content} }}";
+        }
+
+        protected bool Equals(HttpResponse other)
+        {
+            return StatusCode == other.StatusCode && string.Equals(Content, other.Content);
+        }
+
+        public override bool Equals(object obj)
+        {
+            if (ReferenceEquals(null, obj)) return false;
+            if (ReferenceEquals(this, obj)) return true;
+            if (obj.GetType() != GetType()) return false;
+            return Equals((HttpResponse)obj);
+        }
+
+        public override int GetHashCode()
+        {
+            unchecked
+            {
+                return ((int)StatusCode * 397) ^ (Content?.GetHashCode() ?? 0);
+            }
+        }
     }
 
-    public class JsonHttpResponse : IResponse
+    public class JsonHttpResponse: HttpResponse
     {
-        public HttpStatusCode StatusCode { get; set; }
-        public string Content { get; set; }
-
-        public JsonHttpResponse(HttpStatusCode statusCode, object data)
+        public JsonHttpResponse(HttpStatusCode statusCode, object data) :
+            base(statusCode, HttpServerExtensions.Serialize(data))
         {
-            StatusCode = statusCode;
-            Content = HttpServerExtensions.Serialize(data);
+            
         }
     }
 }
