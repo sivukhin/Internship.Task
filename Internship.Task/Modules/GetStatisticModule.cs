@@ -12,13 +12,13 @@ namespace StatisticServer.Modules
     {
         protected override IEnumerable<RequestFilter> Filters => new[]
         {
-            new RequestFilter(HttpMethodEnum.Get, new Regex("^/servers/(?<serverId>.*?)/info"), 
+            new RequestFilter(HttpMethodEnum.Get, new Regex("^/servers/(?<serverId>.*?)/info$"), 
                 (request, match) => GetServerInfo(match.Groups["serverId"].Value)),
 
-            new RequestFilter(HttpMethodEnum.Get, new Regex("^/servers/info"), 
+            new RequestFilter(HttpMethodEnum.Get, new Regex("^/servers/info$"), 
                 request => GetAllServersInfo()),
 
-            new RequestFilter(HttpMethodEnum.Get, new Regex("^/servers/(?<serverId>.*?)/matches/(?<endTime>.*?)"), 
+            new RequestFilter(HttpMethodEnum.Get, new Regex("^/servers/(?<serverId>.*?)/matches/(?<endTime>.*?)$"), 
                 (request, match) => GetMatchInfo(match.Groups["serverId"].Value, DateTime.Parse(match.Groups["endTime"].Value))),  
         };
 

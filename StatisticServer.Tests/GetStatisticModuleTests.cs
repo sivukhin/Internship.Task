@@ -17,9 +17,8 @@ namespace StatisticServer.Tests
     [TestFixture]
     public class GetStatisticModuleTests : BaseModuleTests
     {
-        protected List<ServerInfo> registredServers;
-        protected IStatisticStorage storage;
-        protected GetStatisticModule Module => new GetStatisticModule(storage);
+        private List<ServerInfo> registredServers;
+        private GetStatisticModule Module => new GetStatisticModule(storage);
 
         [SetUp]
         public void SetUp()
@@ -32,12 +31,7 @@ namespace StatisticServer.Tests
             A.CallTo(() => storage.GetServerInfo(A<string>._)).Returns((ServerInfo)null);
         }
 
-        public void AddMatch(string serverId, DateTime endTime, MatchInfo matchInfo)
-        {
-            A.CallTo(() => storage.GetMatchInfo(serverId, endTime)).Returns(matchInfo);
-        }
-
-        public void AddServer(string serverId, ServerInfo serverInfo)
+        public override void AddServer(string serverId, ServerInfo serverInfo)
         {
             A.CallTo(() => storage.GetServerInfo(serverId)).Returns(serverInfo);
             registredServers.Add(serverInfo);
@@ -81,7 +75,7 @@ namespace StatisticServer.Tests
         }
 
         [Test]
-        public async Task ModuleReturnsNotFound_WhenNoMatchFound()
+        public async Task ModuleReturnsNotFound_WhenNoMatchesFound()
         {
             AddServer(Host1, Server1);
 
@@ -91,7 +85,7 @@ namespace StatisticServer.Tests
         }
 
         [Test]
-        public async Task ModuleReturnsNotFound_WhenNoServerFound()
+        public async Task ModuleReturnsNotFound_WhenNoServersFound()
         {
             var response = await Module.GetMatchInfo(Host1, DateTime1);
 

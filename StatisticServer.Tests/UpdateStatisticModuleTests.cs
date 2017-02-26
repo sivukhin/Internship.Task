@@ -17,8 +17,7 @@ namespace StatisticServer.Tests
     [TestFixture]
     public class UpdateStatisticModuleTests : BaseModuleTests
     {
-        protected IStatisticStorage storage;
-        protected UpdateStatisticModule Module => new UpdateStatisticModule(storage);
+        private UpdateStatisticModule Module => new UpdateStatisticModule(storage);
 
         [SetUp]
         public void SetUp()
@@ -52,11 +51,22 @@ namespace StatisticServer.Tests
         }
 
         [Test]
-        public async Task ModuleReturnBadRequest_WhenUpdateMatch_ForUnknownServer()
+        public async Task ModuleReturnBadRequest_ForMatchOnUnknownServer()
         {
             var response = await Module.AddMatchStatistic(CreateRequest(""), Host1, DateTime1);
 
             response.Should().Be(new HttpResponse(HttpStatusCode.BadRequest));
+        }
+
+        [Test]
+        public async Task ModuleAddNewMatchStatistic()
+        {
+            AddServer(Host1, Server1);
+            var response = await Module
+                .AddMatchStatistic(CreateRequest(HttpServerExtensions.Serialize(Server1)), Host1, DateTime1);
+
+            A.CallTo(() => storage.UpdateMatchInfo(Host1, DateTime1, A<MatchInfo>._)).MustHaveHappened();
+            response.Should().Be(new HttpResponse(HttpStatusCode.OK));
         }
     }
 }

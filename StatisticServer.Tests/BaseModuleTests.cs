@@ -14,6 +14,8 @@ namespace StatisticServer.Tests
 {
     public abstract class BaseModuleTests
     {
+        protected IStatisticStorage storage;
+
         protected string Host1 = "host1-1";
         protected string Host2 = "host2-2";
 
@@ -57,6 +59,16 @@ namespace StatisticServer.Tests
             var request = A.Fake<IRequest>();
             A.CallTo(() => request.Content).Returns(content);
             return request;
+        }
+
+        public virtual void AddServer(string serverId, ServerInfo serverInfo)
+        {
+            A.CallTo(() => storage.GetServerInfo(serverId)).Returns(serverInfo);
+        }
+
+        public void AddMatch(string serverId, DateTime endTime, MatchInfo matchInfo)
+        {
+            A.CallTo(() => storage.GetMatchInfo(serverId, endTime)).Returns(matchInfo);
         }
     }
 }

@@ -64,7 +64,9 @@
     <Compile Include="Models\ServerInfo.cs" />
     <Compile Include="Modules\BaseModule.cs" />
     <Compile Include="Modules\GetStatisticModule.cs" />
+    <Compile Include="Modules\ReportsModule.cs" />
     <Compile Include="Modules\RequestFilter.cs" />
+    <Compile Include="Modules\StatsModule.cs" />
     <Compile Include="Modules\UpdateStatisticModule.cs" />
     <Compile Include="Storage\IStatisticStorage.cs" />
     <Compile Include="Storage\SimpleStorage.cs" />
