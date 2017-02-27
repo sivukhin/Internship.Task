@@ -1,7 +1,8 @@
-namespace StatisticServer.Models
+namespace DataCore
 {
-    public class PlayerStatistic
+    public class PlayerInfo
     {
+        public int PlayerId { get; set; }
         public string Name { get; set; }
         public int Frags { get; set; }
         public int Kills { get; set; }

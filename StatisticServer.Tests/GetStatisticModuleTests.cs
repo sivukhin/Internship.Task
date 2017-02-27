@@ -4,11 +4,11 @@ using System.Linq;
 using System.Net;
 using System.Text;
 using System.Threading.Tasks;
+using DataCore;
 using FakeItEasy;
 using FluentAssertions;
 using HttpServerCore;
 using NUnit.Framework;
-using StatisticServer.Models;
 using StatisticServer.Modules;
 using StatisticServer.Storage;
 

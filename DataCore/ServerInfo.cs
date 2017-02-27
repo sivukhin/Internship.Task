@@ -1,17 +1,18 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace StatisticServer.Models
+namespace DataCore
 {
     //TODO: serversInfo now without endpoint
     public class ServerInfo
     {
-        public string Name { get; set; }
-        public List<string> GameModes { get; set; }
+        public virtual string ServerId { get; set; }
+        public virtual string Name { get; set; }
+        public virtual IList<GameMode> GameModes { get; set; }
 
         protected bool Equals(ServerInfo other)
         {
-            return string.Equals(Name, other.Name) && GameModes.SequenceEqual(other.GameModes);
+            return string.Equals(ServerId, other.ServerId);
         }
 
         public override bool Equals(object obj)
@@ -24,10 +25,7 @@ namespace StatisticServer.Models
 
         public override int GetHashCode()
         {
-            unchecked
-            {
-                return (Name?.GetHashCode() ?? 0) * 397;
-            }
+            return ServerId?.GetHashCode() ?? 0;
         }
     }
 }

@@ -3,10 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using DataCore;
 using FakeItEasy;
 using HttpServerCore;
 using NUnit.Framework;
-using StatisticServer.Models;
 using StatisticServer.Modules;
 using StatisticServer.Storage;
 
@@ -22,18 +22,25 @@ namespace StatisticServer.Tests
         protected DateTime DateTime1 => new DateTime(2016);
         protected DateTime DateTime2 => new DateTime(2017);
 
-        protected ServerInfo Server1 => new ServerInfo {Name = "server1", GameModes = new List<string> {"A", "B"}};
-        protected ServerInfo Server2 = new ServerInfo {Name = "server2", GameModes = new List<string> {"1", "2", "3"}};
-        protected PlayerStatistic Player1 => new PlayerStatistic {Deaths = 1, Frags = 5, Kills = 5, Name = "player1"};
-        protected PlayerStatistic Player2 => new PlayerStatistic { Deaths = 0, Frags = 10, Kills = 10, Name = "player2" };
+        protected GameMode Mode1 => new GameMode("1");
+        protected GameMode Mode2 => new GameMode("2");
+        protected GameMode Mode3 => new GameMode("3");
+
+        protected GameMode ModeA => new GameMode("A");
+        protected GameMode ModeB => new GameMode("B");
+
+        protected ServerInfo Server1 => new ServerInfo {ServerId = Host1, Name = "server1", GameModes = new List<GameMode> {ModeA, ModeB}};
+        protected ServerInfo Server2 => new ServerInfo {ServerId = Host2, Name = "server2", GameModes = new List<GameMode> {Mode1, Mode2, Mode3}};
+        protected PlayerInfo Player1 => new PlayerInfo {Deaths = 1, Frags = 5, Kills = 5, Name = "player1"};
+        protected PlayerInfo Player2 => new PlayerInfo { Deaths = 0, Frags = 10, Kills = 10, Name = "player2" };
 
         protected MatchInfo Match1 => new MatchInfo
         {
             ElapsedTime = 1.0,
             FragLimit = 10,
-            GameMode = "A",
+            GameMode = ModeA,
             Map = "map1",
-            Scoreboard = new List<PlayerStatistic>
+            Scoreboard = new List<PlayerInfo>
             {
                 Player2,
                 Player1
@@ -45,9 +52,9 @@ namespace StatisticServer.Tests
         {
             ElapsedTime = 2.0,
             FragLimit = 20,
-            GameMode = "2",
+            GameMode = Mode2,
             Map = "map2",
-            Scoreboard = new List<PlayerStatistic>
+            Scoreboard = new List<PlayerInfo>
             {
                 Player1
             },

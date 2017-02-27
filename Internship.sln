@@ -11,6 +11,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HttpServerCore.Tests", "Htt
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StatisticServer.Tests", "StatisticServer.Tests\StatisticServer.Tests.csproj", "{FE3C0F97-AB83-448A-B68A-39761DB97A04}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DataCore", "DataCore\DataCore.csproj", "{2F4D5C39-9F99-4B04-8B45-FB04879F4C56}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DatabaseCore", "DatabaseCore\DatabaseCore.csproj", "{AB926B40-D6E8-4FF5-97F7-D06BEE013476}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -33,6 +37,14 @@ Global
 		{FE3C0F97-AB83-448A-B68A-39761DB97A04}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{FE3C0F97-AB83-448A-B68A-39761DB97A04}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{FE3C0F97-AB83-448A-B68A-39761DB97A04}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2F4D5C39-9F99-4B04-8B45-FB04879F4C56}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2F4D5C39-9F99-4B04-8B45-FB04879F4C56}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2F4D5C39-9F99-4B04-8B45-FB04879F4C56}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2F4D5C39-9F99-4B04-8B45-FB04879F4C56}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AB926B40-D6E8-4FF5-97F7-D06BEE013476}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AB926B40-D6E8-4FF5-97F7-D06BEE013476}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AB926B40-D6E8-4FF5-97F7-D06BEE013476}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AB926B40-D6E8-4FF5-97F7-D06BEE013476}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
