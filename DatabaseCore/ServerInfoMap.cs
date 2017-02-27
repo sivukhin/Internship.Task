@@ -9,7 +9,7 @@ namespace DatabaseCore
         {
             Id(info => info.ServerId);
             Map(info => info.Name);
-            HasMany(info => info.GameModes).Cascade.SaveUpdate();
+            HasMany(info => info.GameModes).Cascade.SaveUpdate().Not.LazyLoad();
         }
     }
 }

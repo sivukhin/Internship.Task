@@ -26,8 +26,9 @@ namespace DatabaseCore
 
         private static void BuildSchema(Configuration configuration)
         {
+            //TODO: Pass options from CLI 
             if (File.Exists(dbFilePath))
-                File.Delete(dbFilePath); //TODO: Always delete old database!
+                return;
             new SchemaExport(configuration).Create(false, true);
         }
     }

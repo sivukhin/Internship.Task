@@ -82,6 +82,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="JsonTransformer.cs" />
     <Compile Include="Modules\BaseModule.cs" />
     <Compile Include="Modules\GetStatisticModule.cs" />
     <Compile Include="Modules\ReportsModule.cs" />

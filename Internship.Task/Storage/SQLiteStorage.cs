@@ -20,13 +20,14 @@ namespace StatisticServer.Storage
         public Task UpdateServerInfo(string serverId, ServerInfo info)
         {
             info.ServerId = serverId;
+    
             using (var session = sessionsFactory.OpenSession())
             using (var transaction = session.BeginTransaction())
             {
                 session.SaveOrUpdate(info);
                 transaction.Commit();
+                return EmptyTask;
             }
-            return EmptyTask;
         }
 
         public Task<ServerInfo> GetServerInfo(string serverId)

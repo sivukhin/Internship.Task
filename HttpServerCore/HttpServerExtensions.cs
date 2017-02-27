@@ -7,6 +7,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
 namespace HttpServerCore
 {
@@ -62,7 +63,7 @@ namespace HttpServerCore
             using (var stream = new MemoryStream(Encoding.UTF8.GetBytes(data)))
                 return stream.ParseFromJson<T>();
         }
-
+        
         public static T ParseFromJson<T>(this Stream inputStream)
         {
             var serializer = new JsonSerializer();

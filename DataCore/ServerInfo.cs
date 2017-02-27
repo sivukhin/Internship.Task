@@ -1,16 +1,26 @@
 using System.Collections.Generic;
 using System.Linq;
+using Newtonsoft.Json;
 
 namespace DataCore
 {
-    //TODO: serversInfo now without endpoint
     public class ServerInfo
     {
         public virtual string ServerId { get; set; }
         public virtual string Name { get; set; }
         public virtual IList<GameMode> GameModes { get; set; }
 
-        protected bool Equals(ServerInfo other)
+        public ServerInfo() { }
+
+        [JsonConstructor]
+        public ServerInfo(string serverId, string name, IEnumerable<string> gameModes)
+        {
+            ServerId = serverId;
+            Name = name;
+            GameModes = gameModes.Select(mode => new GameMode(mode)).ToList();
+        }
+
+        private bool Equals(ServerInfo other)
         {
             return string.Equals(ServerId, other.ServerId);
         }
