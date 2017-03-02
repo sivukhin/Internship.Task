@@ -82,7 +82,6 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="JsonTransformer.cs" />
     <Compile Include="Modules\BaseModule.cs" />
     <Compile Include="Modules\GetStatisticModule.cs" />
     <Compile Include="Modules\ReportsModule.cs" />
@@ -94,6 +93,7 @@
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Storage\SQLiteStorage.cs" />
+    <Compile Include="Storage\StatVariable.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
@@ -111,6 +111,10 @@
     <ProjectReference Include="..\HttpServerCore\HttpServerCore.csproj">
       <Project>{C4F185CF-93B1-42CA-AF63-5ABF8838ECA8}</Project>
       <Name>HttpServerCore</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\StatCore\StatCore.csproj">
+      <Project>{1F440635-69C1-4F77-A656-E20F7C98A2EB}</Project>
+      <Name>StatCore</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
