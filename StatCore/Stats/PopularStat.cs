@@ -43,13 +43,13 @@ namespace StatCore.Stats
             var oldCount = resultCount[value];
             countSet.Remove(Tuple.Create(oldCount, value));
             resultCount[value]--;
-            if (oldCount > 0)
+            if (oldCount > 1)
                 countSet.Add(Tuple.Create(oldCount - 1, value));
             else
                 resultCount.TryRemove(value, out oldCount);
         }
 
-        public IEnumerable<TResult> Value => countSet.TakeFirst(MaxSize).Select(pair => pair.Item2);
+        public IEnumerable<TResult> Value => countSet.TakeLast(MaxSize).Select(pair => pair.Item2);
         public bool IsEmpty => countSet.Count == 0;
     }
 }

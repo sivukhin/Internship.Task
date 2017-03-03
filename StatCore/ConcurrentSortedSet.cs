@@ -52,6 +52,14 @@ namespace StatCore
             }
         }
 
+        public IEnumerable<T> TakeLast(int count)
+        {
+            lock (setLock)
+            {
+                return set.Reverse().Take(count).ToList();
+            }
+        }
+
         public IEnumerable<T> TakeFirst(int count)
         {
             lock (setLock)

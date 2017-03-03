@@ -5,10 +5,13 @@ namespace StatCore.Stats
 {
     public class BaseGroupedStat<TTarget, TResult, TGroup> : IStat<TTarget, TResult>
     {
-        protected Func<TTarget, TGroup> grouper;
-        protected Func<IStat<TTarget, TResult>> initialStat;
-        protected IStat<TResult, TResult> baseStat;
+        private readonly IStat<TResult, TResult> baseStat;
+        private readonly Func<TTarget, TGroup> grouper;
         private readonly ConcurrentDictionary<TGroup, IStat<TTarget, TResult>> groupValues;
+        private readonly Func<IStat<TTarget, TResult>> initialStat;
+        public TResult Value => baseStat.Value;
+        public bool IsEmpty => baseStat.IsEmpty;
+
         protected BaseGroupedStat(
             Func<TTarget, TGroup> grouper,
             Func<IStat<TTarget, TResult>> initialStat,
@@ -54,18 +57,16 @@ namespace StatCore.Stats
 
         private void DeleteFromGroup(IStat<TTarget, TResult> groupStat, TTarget item)
         {
-            baseStat.Add(groupStat.Value);
+            baseStat.Delete(groupStat.Value);
             groupStat.Delete(item);
             if (!groupStat.IsEmpty)
-                baseStat.Delete(groupStat.Value);
+                baseStat.Add(groupStat.Value);
         }
-        public TResult Value => baseStat.Value;
-        public bool IsEmpty => baseStat.IsEmpty;
     }
 
     public class GroupedAverageStat<TTarget, TGroup> : BaseGroupedStat<TTarget, double, TGroup>
     {
-        public GroupedAverageStat(Func<TTarget, TGroup> grouper, Func<IStat<TTarget, double>> initialStat) : 
+        public GroupedAverageStat(Func<TTarget, TGroup> grouper, Func<IStat<TTarget, double>> initialStat) :
             base(grouper, initialStat, new AverageStat<double>(i => i))
         {
         }
@@ -73,7 +74,7 @@ namespace StatCore.Stats
 
     public class GroupedMaxStat<TTarget, TResult, TGroup> : BaseGroupedStat<TTarget, TResult, TGroup>
     {
-        public GroupedMaxStat(Func<TTarget, TGroup> grouper, Func<IStat<TTarget, TResult>> initialStat) : 
+        public GroupedMaxStat(Func<TTarget, TGroup> grouper, Func<IStat<TTarget, TResult>> initialStat) :
             base(grouper, initialStat, new MaxStat<TResult, TResult>(i => i))
         {
         }
