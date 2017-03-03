@@ -54,6 +54,8 @@
   <ItemGroup>
     <Compile Include="DatabaseSessions.cs" />
     <Compile Include="GameModeMap.cs" />
+    <Compile Include="MatchInfoMap.cs" />
+    <Compile Include="PlayerInfoMap.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ServerInfoMap.cs" />
   </ItemGroup>

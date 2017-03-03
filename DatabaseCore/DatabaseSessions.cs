@@ -20,6 +20,8 @@ namespace DatabaseCore
                 .Database(SQLiteConfiguration.Standard.UsingFile(dbFilePath))
                 .Mappings(configuration => configuration.FluentMappings.Add<GameModeMap>())
                 .Mappings(configuration => configuration.FluentMappings.Add<ServerInfoMap>())
+                .Mappings(configuration => configuration.FluentMappings.Add<PlayerInfoMap>())
+                .Mappings(configuration => configuration.FluentMappings.Add<MatchInfoMap>())
                 .ExposeConfiguration(BuildSchema)
                 .BuildSessionFactory();
         }
@@ -28,7 +30,7 @@ namespace DatabaseCore
         {
             //TODO: Pass options from CLI 
             if (File.Exists(dbFilePath))
-                return;
+                return;//File.Delete(dbFilePath);
             new SchemaExport(configuration).Create(false, true);
         }
     }

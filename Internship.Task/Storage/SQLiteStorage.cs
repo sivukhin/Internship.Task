@@ -12,10 +12,31 @@ namespace StatisticServer.Storage
     {
         private static Task EmptyTask => Task.FromResult(0);
         private ISessionFactory sessionsFactory;
+        private IServerStatisticProvider serverStatisticProvider;
+
         public SQLiteStorage(ISessionFactory sessionsFactory)
         {
             this.sessionsFactory = sessionsFactory;
+            serverStatisticProvider = new ServerStatisticProvider();
+            InitStatisticsProviders();
         }
+
+        private void InitStatisticsProviders()
+        {
+            InitServerStatisticsProvider();
+        }
+
+        private void InitServerStatisticsProvider()
+        {
+            using (var session = sessionsFactory.OpenSession())
+            {
+                foreach (var match in session.QueryOver<MatchInfo>().List())
+                {
+                    serverStatisticProvider.Add(match);
+                }
+            }
+        }
+
 
         public Task UpdateServerInfo(string serverId, ServerInfo info)
         {
@@ -61,7 +82,12 @@ namespace StatisticServer.Storage
                 matchInfo.EndTime = endTime;
                 using (var transaction = session.BeginTransaction())
                 {
+                    var oldMatchInfo = session.Get<MatchInfo>(matchInfo.MatchId);
+                    if (oldMatchInfo != null)
+                        serverStatisticProvider.Delete(oldMatchInfo);
+
                     session.SaveOrUpdate(matchInfo);
+                    serverStatisticProvider.Add(matchInfo);
                     transaction.Commit();
                 }
             }
@@ -80,6 +106,11 @@ namespace StatisticServer.Storage
                     return Task.FromResult<MatchInfo>(null);
                 return Task.FromResult(matchInfo);
             }
+        }
+
+        public Task<ServerStatistic> GetServerStatistics(string serverId)
+        {
+            return Task.FromResult(serverStatisticProvider[serverId]);
         }
     }
 }

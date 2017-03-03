@@ -43,6 +43,11 @@ namespace StatisticServer.Storage
             return Task.FromResult(info);
         }
 
+        public Task<ServerStatistic> GetServerStatistics(string serverId)
+        {
+            throw new NotImplementedException();
+        }
+
         public Task<IEnumerable<ServerInfo>> GetAllServersInfo()
         {
             return Task.FromResult((IEnumerable<ServerInfo>)serverInfo.Values);
