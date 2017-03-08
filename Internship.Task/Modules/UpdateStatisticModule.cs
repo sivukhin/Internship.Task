@@ -5,12 +5,17 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using DataCore;
 using HttpServerCore;
+using Newtonsoft.Json;
+using NLog;
 using StatisticServer.Storage;
 
 namespace StatisticServer.Modules
 {
     public class UpdateStatisticModule : BaseModule
     {
+        private ILogger logger;
+        protected override ILogger Logger => logger ?? (logger = LogManager.GetCurrentClassLogger());
+
         protected override IEnumerable<RequestFilter> Filters => new []
         {
             new RequestFilter(HttpMethodEnum.Put, new Regex("^/servers/(?<serverId>.*?)/info$"), 
@@ -29,7 +34,15 @@ namespace StatisticServer.Modules
 
         public async Task<IResponse> UpdateServerInfo(IRequest request, string serverId)
         {
-            var serverInfo = request.Content.ParseFromJson<ServerInfo>();
+            ServerInfo serverInfo;
+            try
+            {
+                serverInfo = request.Content.ParseFromJson<ServerInfo>();
+            }
+            catch (JsonSerializationException e)
+            {
+                throw new InvalidQueryException($"Invalid json format for update module: {request.Content}", e);
+            }
             await statisticStorage.UpdateServerInfo(serverId, serverInfo);
             return new HttpResponse(HttpStatusCode.OK);
         }
@@ -37,7 +50,15 @@ namespace StatisticServer.Modules
         public async Task<IResponse> AddMatchStatistic(IRequest request, string serverId,
             DateTime endTime)
         {
-            var matchInfo = request.Content.ParseFromJson<MatchInfo>();
+            MatchInfo matchInfo;
+            try
+            {
+                matchInfo = request.Content.ParseFromJson<MatchInfo>();
+            }
+            catch (JsonSerializationException e)
+            {
+                throw new InvalidQueryException($"Invalid json format for update module: {request.Content}", e);
+            }
 
             var serverInfo = await statisticStorage.GetServerInfo(serverId);
             if (serverInfo == null)

@@ -4,6 +4,7 @@ using System.Net;
 using System.Reactive.Concurrency;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
+using NLog;
 
 namespace HttpServerCore
 {
@@ -16,8 +17,12 @@ namespace HttpServerCore
         private IObservable<IObservable<Task<IRequest>>> requestStream;
         private IDisposable stopStreamToken;
 
+        private Logger logger = LogManager.GetCurrentClassLogger();
+
         public HttpServer(HttpServerOptions options, IEnumerable<IServerModule> modules)
         {
+            logger.Info("Initialize HttpServer");
+
             this.options = options;
             listener = new HttpListener();
             requestStream = CreateRequestStream();
@@ -32,6 +37,8 @@ namespace HttpServerCore
             listener.Start();
             ConfigureListener();
             stopStreamToken = StartRequestStream();
+
+            logger.Info("HttpServer started");
         }
 
         public void Stop()
@@ -40,10 +47,14 @@ namespace HttpServerCore
                 return;
             listener.Stop();
             StopRequestStream();
+
+            logger.Info("HttpServer stopped");
         }
 
         public void RegisterModule(IServerModule module)
         {
+            logger.Info("Register module {0}", module);
+
             var wasStarted = listener.IsListening;
             if (wasStarted)
                 Stop();
@@ -74,6 +85,7 @@ namespace HttpServerCore
                 .Repeat()
                 .Retry()
                 .Select(context => (IRequest)new HttpRequest(context))
+                .Do(request => logger.Trace("New request {0}", request))
                 //TODO: this can be configured in HttpServerOptions
                 .Window(1)
                 .Select(innerStream => innerStream.Select(Task.FromResult));
@@ -91,7 +103,12 @@ namespace HttpServerCore
                 .Subscribe(
                     innerStream => innerStream
                         .ObserveOn(Scheduler.Default)
-                        .Subscribe(async request => (await request).SendAttachedResponse()));
+                        .Subscribe(async request =>
+                        {
+                            var result = await request;
+                            logger.Trace("Request {0} processed", result);
+                            result.SendAttachedResponse();
+                        }));
         }
 
         private void StopRequestStream()

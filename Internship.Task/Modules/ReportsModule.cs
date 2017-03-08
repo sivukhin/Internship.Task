@@ -5,12 +5,16 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using HttpServerCore;
+using NLog;
 
 namespace StatisticServer.Modules
 {
     public class ReportsModule : BaseModule
     {
         private int DefaultCountParameter => 5;
+        private ILogger logger;
+        protected override ILogger Logger => logger ?? (logger = LogManager.GetCurrentClassLogger());
+
         protected override IEnumerable<RequestFilter> Filters => new[]
         {
             new RequestFilter(HttpMethodEnum.Get, new Regex(@"^/reports/recent-matches(?<count>/.*)?$"), 

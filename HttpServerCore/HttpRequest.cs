@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -14,6 +15,16 @@ namespace HttpServerCore
         public HttpMethodEnum HttpMethod => context.Request.HttpMethod.ToEnum();
         public string Content { get; private set; }
         public IResponse Response { get; set; }
+
+        //TODO: for informative logs
+        public string[] AcceptTypes => context.Request.AcceptTypes;
+        public Encoding ContentEncoding => context.Request.ContentEncoding;
+        public string ContentType => context.Request.ContentType;
+        public long ContentLength => context.Request.ContentLength64;
+        public CookieCollection Cookies => context.Request.Cookies;
+        public NameValueCollection Headers => context.Request.Headers;
+        public NameValueCollection QueryString => context.Request.QueryString;
+        public Version ProtocolVersion => context.Request.ProtocolVersion;
 
         private readonly HttpListenerContext context;
 
@@ -39,6 +50,11 @@ namespace HttpServerCore
                 Response = defaultResponse;
             Response.WriteToListenerResponse(context.Response);
             context.Response.Close();
+        }
+
+        public override string ToString()
+        {
+            return $"HttpRequest({Url}, {HttpMethod}, \"{Content}\")";
         }
     }
 }

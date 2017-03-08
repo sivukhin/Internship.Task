@@ -4,12 +4,16 @@ using System.Net;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using HttpServerCore;
+using NLog;
 using StatisticServer.Storage;
 
 namespace StatisticServer.Modules
 {
     public class GetStatisticModule : BaseModule
     {
+        private ILogger logger;
+        protected override ILogger Logger => logger ?? (logger = LogManager.GetCurrentClassLogger());
+
         protected override IEnumerable<RequestFilter> Filters => new[]
         {
             new RequestFilter(HttpMethodEnum.Get, new Regex("^/servers/(?<serverId>.*?)/info$"), 

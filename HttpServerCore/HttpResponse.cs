@@ -21,7 +21,7 @@ namespace HttpServerCore
 
         public override string ToString()
         {
-            return $"HttpResponse {{ StatusCode = {StatusCode}, Content = {Content} }}";
+            return $"HttpResponse({StatusCode}, \"{Content}\")";
         }
 
         protected bool Equals(HttpResponse other)
@@ -44,6 +44,7 @@ namespace HttpServerCore
                 return ((int)StatusCode * 397) ^ (Content?.GetHashCode() ?? 0);
             }
         }
+
     }
 
     public class JsonHttpResponse: HttpResponse

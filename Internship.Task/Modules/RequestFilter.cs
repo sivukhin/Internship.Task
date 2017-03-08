@@ -2,16 +2,20 @@
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using HttpServerCore;
+using NLog;
 
 namespace StatisticServer.Modules
 {
     public class RequestFilter
     {
-        private HttpMethodEnum AllowedMethods { get; set; }
-        private Regex UrlPattern { get; set; }
-        private Func<IRequest, Match, Task<IResponse>> RequestTransform { get; set; }
+        private readonly Logger logger = LogManager.GetCurrentClassLogger();
+        public HttpMethodEnum AllowedMethods { get; }
+        public Regex UrlPattern { get; }
 
-        public RequestFilter(HttpMethodEnum allowedMethods, Regex urlPattern, Func<IRequest, Task<IResponse>> requestTransform)
+        private Func<IRequest, Match, Task<IResponse>> RequestTransform { get; }
+
+        public RequestFilter(HttpMethodEnum allowedMethods, Regex urlPattern,
+            Func<IRequest, Task<IResponse>> requestTransform)
         {
             AllowedMethods = allowedMethods;
             UrlPattern = urlPattern;
@@ -28,15 +32,24 @@ namespace StatisticServer.Modules
 
         public async Task<IRequest> FilterRequest(IRequest request)
         {
+            logger.Trace("Process request: {0}", new {Filter = this, Request = request});
+
             if (!AllowedMethods.HasFlag(request.HttpMethod))
                 return await Task.FromResult(request);
             var match = request.MatchLocalPath(UrlPattern);
             if (match.Success)
             {
+                logger.Trace("Accept request: {0}", new {Filter = this, Request = request});
                 var response = await RequestTransform(request, match);
+                logger.Trace("Generate response: {0}", new {Request = request, Response = response});
                 return request.AttachResponse(response);
             }
             return await Task.FromResult(request);
+        }
+
+        public override string ToString()
+        {
+            return $"Filter({AllowedMethods}, {UrlPattern})";
         }
     }
 }

@@ -5,17 +5,22 @@ using System.Text;
 using System.Threading.Tasks;
 using DataCore;
 using NHibernate;
+using NLog;
 
 namespace StatisticServer.Storage
 {
     public class SQLiteStorage : IStatisticStorage
     {
+        private static Logger logger = LogManager.GetCurrentClassLogger();
+
         private static Task EmptyTask => Task.FromResult(0);
         private ISessionFactory sessionsFactory;
         private IServerStatisticProvider serverStatisticProvider;
 
         public SQLiteStorage(ISessionFactory sessionsFactory)
         {
+            logger.Info("Initialize SQLite storage");
+
             this.sessionsFactory = sessionsFactory;
             serverStatisticProvider = new ServerStatisticProvider();
             InitStatisticsProviders();
@@ -28,6 +33,7 @@ namespace StatisticServer.Storage
 
         private void InitServerStatisticsProvider()
         {
+            logger.Info("Initialize server statistics from database");
             using (var session = sessionsFactory.OpenSession())
             {
                 foreach (var match in session.QueryOver<MatchInfo>().List())
@@ -37,11 +43,11 @@ namespace StatisticServer.Storage
             }
         }
 
-
         public Task UpdateServerInfo(string serverId, ServerInfo info)
         {
             info.ServerId = serverId;
-    
+            logger.Trace("Update information about server {0}", info);
+
             using (var session = sessionsFactory.OpenSession())
             using (var transaction = session.BeginTransaction())
             {
@@ -53,6 +59,8 @@ namespace StatisticServer.Storage
 
         public Task<ServerInfo> GetServerInfo(string serverId)
         {
+            logger.Trace("Retrive information about server {0}", new {ServerId = serverId});
+
             using (var session = sessionsFactory.OpenSession())
             using (session.BeginTransaction())
             {
@@ -63,6 +71,8 @@ namespace StatisticServer.Storage
 
         public Task<IEnumerable<ServerInfo>> GetAllServersInfo()
         {
+            logger.Trace("Retrieve information about all servers");
+
             using (var session = sessionsFactory.OpenSession())
             using (session.BeginTransaction())
             {
@@ -72,6 +82,9 @@ namespace StatisticServer.Storage
 
         public Task UpdateMatchInfo(string serverId, DateTime endTime, MatchInfo matchInfo)
         {
+            logger.Trace("Update information about match {0}",
+                new {ServerId = serverId, EndTime = endTime, MatchInfo = matchInfo});
+
             using (var session = sessionsFactory.OpenSession())
             {
                 var hostServer = session.Get<ServerInfo>(serverId);
@@ -96,6 +109,8 @@ namespace StatisticServer.Storage
 
         public Task<MatchInfo> GetMatchInfo(string serverId, DateTime endTime)
         {
+            logger.Trace("Retrieve information about match {0}", new {ServerId = serverId, EndTime = endTime});
+
             using (var session = sessionsFactory.OpenSession())
             {
                 var hostServer = session.Get<ServerInfo>(serverId);
@@ -110,6 +125,8 @@ namespace StatisticServer.Storage
 
         public Task<ServerStatistic> GetServerStatistics(string serverId)
         {
+            logger.Trace("Retrieve statistics for server {0}", new {ServerId = serverId});
+
             return Task.FromResult(serverStatisticProvider[serverId]);
         }
     }
