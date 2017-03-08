@@ -21,7 +21,7 @@ namespace StatCore
 
         public static IStat<TTarget, TResult> Max<TResult>(Func<TTarget, TResult> selector)
         {
-            return new MaxStat<TTarget, TResult>(selector);
+            return new MinMaxStat<TTarget, TResult>(selector).Select(minMax => minMax.Item2);
         }
 
         public static IStat<TTarget, double> Average(Func<TTarget, double> initialStat)

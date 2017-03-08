@@ -3,17 +3,24 @@ using System.Collections.Concurrent;
 
 namespace StatCore.Stats
 {
-    public class MaxStat<TTarget, TResult> : IStat<TTarget, TResult>
+    public class MinMaxStat<TTarget, TResult> : IStat<TTarget, Tuple<TResult, TResult>>
     {
-        private readonly Func<TTarget, TResult> selector;
+        private readonly Tuple<TResult, TResult> defaultValue = Tuple.Create(default(TResult), default(TResult));
         private readonly ConcurrentDictionary<TResult, int> resultCounter;
         private readonly ConcurrentSortedSet<TResult> resultSet;
-        public MaxStat(Func<TTarget, TResult> selector)
+        private readonly Func<TTarget, TResult> selector;
+
+        public Tuple<TResult, TResult> Value { get; private set; }
+        public bool IsEmpty => resultCounter.IsEmpty;
+
+        public MinMaxStat(Func<TTarget, TResult> selector)
         {
             this.selector = selector;
             resultCounter = new ConcurrentDictionary<TResult, int>();
             resultSet = new ConcurrentSortedSet<TResult>();
+            UpdateValue();
         }
+
         public void Add(TTarget item)
         {
             var result = selector(item);
@@ -24,7 +31,7 @@ namespace StatCore.Stats
             }
             else
                 resultCounter[result] += 1;
-            Value = resultSet.Max;
+            UpdateValue();
         }
 
         public void Delete(TTarget item)
@@ -39,10 +46,12 @@ namespace StatCore.Stats
             int x;
             resultCounter.TryRemove(result, out x);
             resultSet.Remove(result);
-            Value = resultSet.Count == 0 ? default(TResult) : resultSet.Max;
+            UpdateValue();
         }
 
-        public TResult Value { get; private set; }
-        public bool IsEmpty => resultCounter.IsEmpty;
+        private void UpdateValue()
+        {
+            Value = resultSet.Count == 0 ? defaultValue : Tuple.Create(resultSet.Min, resultSet.Max);
+        }
     }
 }

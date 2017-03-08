@@ -11,7 +11,7 @@ namespace StatCore.Tests.Stats
         [SetUp]
         public void SetUp()
         {
-            stat = new MaxStat<int, int>(i => i);
+            stat = new MinMaxStat<int, int>(i => i).Select(minMax => minMax.Item2);
         }
 
         private static readonly TestCaseData[] maxStatTests = {

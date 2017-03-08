@@ -58,7 +58,12 @@ namespace StatCore
 
         public GroupStat<TTarget, TResult, TGroup> Max<TResult>(Func<TTarget, TResult> selector)
         {
-            return Calc(() => new MaxStat<TTarget, TResult>(selector));
+            return Calc(() => new MinMaxStat<TTarget, TResult>(selector).Select(minMax => minMax.Item2));
+        }
+
+        public GroupStat<TTarget, TResult, TGroup> Min<TResult>(Func<TTarget, TResult> selector)
+        {
+            return Calc(() => new MinMaxStat<TTarget, TResult>(selector).Select(minMax => minMax.Item1));
         }
 
         public GroupStat<TTarget, TResult, TGroup> MaxByGroup<TResult, TMaxGroup>(

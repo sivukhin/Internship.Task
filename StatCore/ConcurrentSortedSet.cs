@@ -27,9 +27,16 @@ namespace StatCore
             get
             {
                 lock (setLock)
-                {
                     return set.Max;
-                }
+            }
+        }
+
+        public T Min
+        {
+            get
+            {
+                lock (setLock)
+                    return set.Min;
             }
         }
 

@@ -75,7 +75,7 @@ namespace StatCore.Stats
     public class GroupedMaxStat<TTarget, TResult, TGroup> : BaseGroupedStat<TTarget, TResult, TGroup>
     {
         public GroupedMaxStat(Func<TTarget, TGroup> grouper, Func<IStat<TTarget, TResult>> initialStat) :
-            base(grouper, initialStat, new MaxStat<TResult, TResult>(i => i))
+            base(grouper, initialStat, new MinMaxStat<TResult, TResult>(i => i).Select(minMax => minMax.Item2))
         {
         }
     }

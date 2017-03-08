@@ -48,7 +48,7 @@
     <Compile Include="StatFor.cs" />
     <Compile Include="ConcurrentSortedSet.cs" />
     <Compile Include="Stats\IStat.cs" />
-    <Compile Include="Stats\MaxStat.cs" />
+    <Compile Include="Stats\MinMaxStat.cs" />
     <Compile Include="Stats\PopularStat.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="StatExtensions.cs" />
