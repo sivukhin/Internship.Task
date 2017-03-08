@@ -19,6 +19,11 @@ namespace StatCore
             return new CounterStat<TTarget>(initialValue);
         }
 
+        public static IStat<TTarget, TResult> Min<TResult>(Func<TTarget, TResult> selector)
+        {
+            return new MinMaxStat<TTarget, TResult>(selector).Select(minMax => minMax.Item1);
+        }
+
         public static IStat<TTarget, TResult> Max<TResult>(Func<TTarget, TResult> selector)
         {
             return new MinMaxStat<TTarget, TResult>(selector).Select(minMax => minMax.Item2);

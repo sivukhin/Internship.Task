@@ -36,9 +36,11 @@ namespace StatisticServer.Storage
             StatFor<MatchInfo>.Group(match => match.HostServer.ServerId)
                 .MaxByGroup(match => match.EndTime.Date, () => StatFor<MatchInfo>.Count());
 
-        private readonly GroupStat<MatchInfo, double, string> averageMatchesPerDay =
-            StatFor<MatchInfo>.Group(match => match.HostServer.ServerId)
-                .AverageByGroup(match => match.EndTime.Date, () => StatFor<MatchInfo>.Count().Select(i => (double)i));
+        private readonly IStat<MatchInfo, DateTime> firstDayWithMatch =
+            StatFor<MatchInfo>.Min(match => match.EndTime.Date);
+
+        private readonly IStat<MatchInfo, DateTime> lastDayWithMatch =
+            StatFor<MatchInfo>.Max(match => match.EndTime.Date);
 
         private readonly GroupStat<MatchInfo, int, string> maximumPopulation =
             StatFor<MatchInfo>.Group(match => match.HostServer.ServerId).Max(match => match.Scoreboard.Count);
@@ -59,7 +61,8 @@ namespace StatisticServer.Storage
         {
             totalMatchesPlayed.Add(match);
             maximumMatchesPerDay.Add(match);
-            averageMatchesPerDay.Add(match);
+            firstDayWithMatch.Add(match);
+            lastDayWithMatch.Add(match);
             maximumPopulation.Add(match);
             averagePopulation.Add(match);
             top5GameModes.Add(match);
@@ -70,7 +73,8 @@ namespace StatisticServer.Storage
         {
             totalMatchesPlayed.Delete(match);
             maximumMatchesPerDay.Delete(match);
-            averageMatchesPerDay.Delete(match);
+            firstDayWithMatch.Delete(match);
+            lastDayWithMatch.Delete(match);
             maximumPopulation.Delete(match);
             averagePopulation.Delete(match);
             top5GameModes.Delete(match);
@@ -81,7 +85,7 @@ namespace StatisticServer.Storage
         {
             TotalMatchesPlayed = totalMatchesPlayed[serverId],
             MaximumMatchesPerDay = maximumMatchesPerDay[serverId],
-            AverageMatchesPerDay = averageMatchesPerDay[serverId],
+            AverageMatchesPerDay = (int)(totalMatchesPlayed[serverId] / (lastDayWithMatch.Value - firstDayWithMatch.Value).Days),
             MaximumPopulation = maximumPopulation[serverId],
             Top5GameModes = top5GameModes[serverId],
             Top5Maps = top5Maps[serverId],
