@@ -93,12 +93,13 @@
     <Compile Include="Modules\RequestFilter.cs" />
     <Compile Include="Modules\StatsModule.cs" />
     <Compile Include="Modules\UpdateStatisticModule.cs" />
+    <Compile Include="Storage\BaseStatisticsProvider.cs" />
     <Compile Include="Storage\IStatisticStorage.cs" />
     <Compile Include="Storage\SimpleStorage.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Storage\SQLiteStorage.cs" />
-    <Compile Include="Storage\StatVariable.cs" />
+    <Compile Include="Storage\ServerStatisticsProvider.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />

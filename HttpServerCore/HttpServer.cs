@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Net;
 using System.Reactive.Concurrency;
 using System.Reactive.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using NLog;
 
@@ -17,7 +18,7 @@ namespace HttpServerCore
         private IObservable<IObservable<Task<IRequest>>> requestStream;
         private IDisposable stopStreamToken;
 
-        private Logger logger = LogManager.GetCurrentClassLogger();
+        private readonly Logger logger = LogManager.GetCurrentClassLogger();
 
         public HttpServer(HttpServerOptions options, IEnumerable<IServerModule> modules)
         {
@@ -45,8 +46,10 @@ namespace HttpServerCore
         {
             if (!listener.IsListening)
                 return;
-            listener.Stop();
             StopRequestStream();
+            Console.WriteLine("Stopped request stream");
+            listener.Stop();
+            Console.WriteLine("Stopped http listenere");
 
             logger.Info("HttpServer stopped");
         }
@@ -62,7 +65,6 @@ namespace HttpServerCore
             requestStream = requestStream.Select(
                 innerStream => innerStream
                     .ObserveOn(Scheduler.Default)
-                    //TODO: confusing construction for me...
                     .Select(async request => await module.ProcessRequest(await request)));
 
             if (wasStarted)
@@ -76,6 +78,7 @@ namespace HttpServerCore
             isDisposed = true;
             Stop();
             listener.Close();
+            Console.WriteLine("Closed http listenere");
         }
 
         private IObservable<IObservable<Task<IRequest>>> CreateRequestStream()
@@ -105,9 +108,16 @@ namespace HttpServerCore
                         .ObserveOn(Scheduler.Default)
                         .Subscribe(async request =>
                         {
-                            var result = await request;
-                            logger.Trace("Request {0} processed", result);
-                            result.SendAttachedResponse();
+                            try
+                            {
+                                var result = await request;
+                                logger.Trace("Request {0} processed", result);
+                                result.SendAttachedResponse();
+                            }
+                            catch (Exception e)
+                            {
+                                logger.Warn(e, "Unhandled exception");
+                            }
                         }));
         }
 
