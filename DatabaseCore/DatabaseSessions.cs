@@ -31,7 +31,7 @@ namespace DatabaseCore
             //TODO: Pass options from CLI 
             if (File.Exists(dbFilePath))
                 return;//File.Delete(dbFilePath);
-            new SchemaExport(configuration).Create(false, true);
+            new SchemaExport(configuration).Create(true, true);
         }
     }
 }

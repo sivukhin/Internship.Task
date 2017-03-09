@@ -35,6 +35,10 @@ namespace StatisticServer.Modules
             {
                 Logger.Info("Invalid query: {0}", e);
             }
+            catch (Exception e)
+            {
+                Logger.Error(e, "Unhandled module exception");
+            }
             return await Task.FromResult(request);
         }
     }

@@ -36,10 +36,12 @@ namespace StatisticServer.Storage
             logger.Info("Initialize server statistics from database");
             using (var session = sessionsFactory.OpenSession())
             {
-                foreach (var match in session.QueryOver<MatchInfo>().List())
+                var matches = session.QueryOver<MatchInfo>().List();
+                foreach (var match in matches)
                 {
                     serverStatisticProvider.Add(match);
                 }
+                logger.Info($"Successfully processed {matches.Count} match entries");
             }
         }
 

@@ -4,7 +4,7 @@ using StatCore.Stats;
 
 namespace StatCore
 {
-    public class GroupStat<TTarget, TResult, TGroup>
+    public class GroupStat<TTarget, TResult, TGroup> : IStatStorage<TTarget>
     {
         private readonly Func<TTarget, TGroup> grouper;
         private readonly Func<IStat<TTarget, TResult>> initialStat;
