@@ -17,11 +17,16 @@ namespace StatisticServer.Modules
 
         protected override IEnumerable<RequestFilter> Filters => new[]
         {
-            new RequestFilter(HttpMethodEnum.Get, new Regex(@"^/reports/recent-matches(?<count>/.*)?$"), 
+            new RequestFilter(HttpMethodEnum.Get, 
+                new Regex(@"^/reports/recent-matches(?<count>/.*)?$", RegexOptions.Compiled), 
                 HandleRecentMatchesQuery), 
-            new RequestFilter(HttpMethodEnum.Get, new Regex(@"^/reports/best-players(?<count>/.*)$"), 
+            new RequestFilter(
+                HttpMethodEnum.Get, 
+                new Regex(@"^/reports/best-players(?<count>/.*)$", RegexOptions.Compiled), 
                 HandleBestPlayersQuery), 
-            new RequestFilter(HttpMethodEnum.Get, new Regex(@"^/reporst/popular-servers(?<count>/.*)$"), 
+            new RequestFilter(
+                HttpMethodEnum.Get, 
+                new Regex(@"^/reporst/popular-servers(?<count>/.*)$", RegexOptions.Compiled), 
                 HandlePopularServersQuery), 
         };
 
