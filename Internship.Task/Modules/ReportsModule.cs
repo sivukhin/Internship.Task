@@ -11,7 +11,9 @@ namespace StatisticServer.Modules
 {
     public class ReportsModule : BaseModule
     {
-        private int DefaultCountParameter => 5;
+        private readonly int DefaultCountParameter = 5;
+        private int MinCountParameter = 0;
+        private int MaxCountParameter = 50;
         private ILogger logger;
         protected override ILogger Logger => logger ?? (logger = LogManager.GetCurrentClassLogger());
 
@@ -38,9 +40,26 @@ namespace StatisticServer.Modules
             return result;
         }
 
+        private int FitInBound(int value, int lowerBound, int upperBound)
+        {
+            if (value < lowerBound)
+                return lowerBound;
+            if (value > upperBound)
+                return upperBound;
+            return value;
+        }
+
+        private int FilterCountParameter(Group group)
+        {
+            return FitInBound(
+                ParseIntegerGroupOrDefault(group, DefaultCountParameter), 
+                MinCountParameter,
+                MaxCountParameter);
+        }
+
         private Task<IResponse> HandlePopularServersQuery(IRequest request, Match match)
         {
-            var serversCount = ParseIntegerGroupOrDefault(match.Groups["count"], DefaultCountParameter);
+            var serversCount = FilterCountParameter(match.Groups["count"]);
             return GetPopularServers(serversCount);
         }
 
@@ -51,7 +70,7 @@ namespace StatisticServer.Modules
 
         private Task<IResponse> HandleBestPlayersQuery(IRequest request, Match match)
         {
-            var playersCount = ParseIntegerGroupOrDefault(match.Groups["count"], DefaultCountParameter);
+            var playersCount = FilterCountParameter(match.Groups["count"]);
             return GetBestPlayers(playersCount);
         }
 
@@ -62,7 +81,7 @@ namespace StatisticServer.Modules
 
         private Task<IResponse> HandleRecentMatchesQuery(IRequest request, Match match)
         {
-            int matchCount = ParseIntegerGroupOrDefault(match.Groups["count"], DefaultCountParameter);
+            var matchCount = FilterCountParameter(match.Groups["count"]);
             return GetRecentMatches(matchCount);
         }
 

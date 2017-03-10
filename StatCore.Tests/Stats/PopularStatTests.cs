@@ -17,7 +17,7 @@ namespace StatCore.Tests.Stats
         [SetUp]
         public  void SetUp()
         {
-            stat = new PopularStat<string, string>(3, s => s);
+            stat = new PopularStat<string>(3);
         }
 
         [Test]

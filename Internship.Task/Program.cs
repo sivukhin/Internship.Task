@@ -25,14 +25,16 @@ namespace StatisticServer
             logger.Info("Application started");
             try
             {
-                var storage = new SQLiteStorage(DatabaseSessions.CreateSessionFactory());
+                var serverStatistics = new ServerStatisticStorage();
+                var playerStatistics = new PlayerStatisticStorage();
+                var storage = new SQLiteStorage(DatabaseSessions.CreateSessionFactory(), serverStatistics, playerStatistics);
                 using (var server = new HttpServer(
                     new HttpServerOptions {Prefix = "http://localhost:12345/"},
                     new IServerModule[]
                     {
                         new UpdateStatisticModule(storage),
                         new GetStatisticModule(storage),
-                        new StatsModule(storage),
+                        new StatsModule(serverStatistics, playerStatistics),
                     }))
                 {
                     server.Start();

@@ -6,12 +6,12 @@ using StatCore.Stats;
 
 namespace StatisticServer.Storage
 {
-    public abstract class BaseStatisticsProvider<TTarget>
+    public abstract class BaseStatisticStorage<TTarget>
     {
         private readonly IList<IStatStorage<TTarget>> stats;
         protected static DataIdentity<TTarget> Info => new DataIdentity<TTarget>();
 
-        protected BaseStatisticsProvider()
+        protected BaseStatisticStorage()
         {
             stats = GetType()
                 .GetFields(BindingFlags.NonPublic | BindingFlags.Instance)

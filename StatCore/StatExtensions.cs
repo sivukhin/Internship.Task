@@ -96,19 +96,17 @@ namespace StatCore
             return connection.Select(x => (double)x).Average();
         }
 
-        public static IStat<TIn, IEnumerable<TStat>> Popular<TIn, TOut, TStat>(
+        public static IStat<TIn, IEnumerable<TOut>> Popular<TIn, TOut>(
             this IConnectableStat<TIn, TOut> connection,
-            int maxSize,
-            Func<TOut, TStat> selector) where TStat : IComparable
+            int maxSize) where TOut : IComparable
         {
-            return connection.ConnectTo(new PopularStat<TOut, TStat>(maxSize, selector));
+            return connection.ConnectTo(new PopularStat<TOut>(maxSize));
         }
 
-        public static IStat<TIn, TStat> Favorite<TIn, TOut, TStat>(
-            this IConnectableStat<TIn, TOut> connection,
-            Func<TOut, TStat> selector) where TStat : IComparable
+        public static IStat<TIn, TOut> Favorite<TIn, TOut>(
+            this IConnectableStat<TIn, TOut> connection) where TOut : IComparable
         {
-            return connection.Popular(1, selector).Select(seq => seq.SingleOrDefault());
+            return connection.Popular(1).Select(seq => seq.SingleOrDefault());
         }
 
         public static IConnectableStat<TIn, TOut> Split<TIn, TMid, TOut, TSplit>(

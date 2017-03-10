@@ -28,23 +28,29 @@ namespace StatisticServer.Modules
                 (request, match) => GetFullPlayerStatstic(match.Groups["name"].Value)),
         };
 
-        private readonly IStatisticStorage statisticStorage;
-        public StatsModule(IStatisticStorage storage)
+        private readonly IServerStatisticStorage serverStatistics;
+        private readonly IPlayerStatisticStorage playerStatistics;
+
+        public StatsModule(IServerStatisticStorage serverStatistics, IPlayerStatisticStorage playerStatistics)
         {
-            statisticStorage = storage;
+            this.serverStatistics = serverStatistics;
+            this.playerStatistics = playerStatistics;
         }
 
-        private async Task<IResponse> GetFullServerStatistic(string serverId)
+        private Task<IResponse> GetFullServerStatistic(string serverId)
         {
-            var serverStatistics = await statisticStorage.GetServerStatistics(serverId);
-            if (serverStatistics == null)
-                return new HttpResponse(HttpStatusCode.NotFound);
-            return new JsonHttpResponse(HttpStatusCode.OK, serverStatistics);
+            var statistics = serverStatistics.GetStatistics(serverId);
+            if (statistics == null)
+                return Task.FromResult<IResponse>(new HttpResponse(HttpStatusCode.NotFound));
+            return Task.FromResult<IResponse>(new JsonHttpResponse(HttpStatusCode.OK, statistics));
         }
 
         private Task<IResponse> GetFullPlayerStatstic(string playerName)
         {
-            throw new NotImplementedException();
+            var statistics = playerStatistics.GetStatistics(playerName);
+            if (statistics == null)
+                return Task.FromResult<IResponse>(new HttpResponse(HttpStatusCode.NotFound));
+            return Task.FromResult<IResponse>(new JsonHttpResponse(HttpStatusCode.OK, statistics));
         }
     }
 }

@@ -5,51 +5,47 @@ using System.Linq;
 
 namespace StatCore.Stats
 {
-    public class PopularStat<TTarget, TResult> : IStat<TTarget, IEnumerable<TResult>> where TResult : IComparable
+    public class PopularStat<T> : IStat<T, IEnumerable<T>> where T : IComparable
     {
-        private ConcurrentSortedSet<Tuple<int, TResult>> countSet;
-        private ConcurrentDictionary<TResult, int> resultCount;
-        private Func<TTarget, TResult> selector;
+        private ConcurrentSortedSet<Tuple<int, T>> countSet;
+        private ConcurrentDictionary<T, int> resultCount;
         private int MaxSize { get; set; }
-        public PopularStat(int maxSize, Func<TTarget, TResult> selector)
+        public PopularStat(int maxSize)
         {
-            countSet = new ConcurrentSortedSet<Tuple<int, TResult>>();
-            resultCount = new ConcurrentDictionary<TResult, int>();
+            countSet = new ConcurrentSortedSet<Tuple<int, T>>();
+            resultCount = new ConcurrentDictionary<T, int>();
             MaxSize = maxSize;
-            this.selector = selector;
         }
-        public void Add(TTarget item)
+        public void Add(T item)
         {
-            var value = selector(item);
-            if (!resultCount.ContainsKey(value))
+            if (!resultCount.ContainsKey(item))
             {
-                resultCount[value] = 1;
-                countSet.Add(Tuple.Create(1, value));
+                resultCount[item] = 1;
+                countSet.Add(Tuple.Create(1, item));
             }
             else
             {
-                var oldCount = resultCount[value];
-                countSet.Remove(Tuple.Create(oldCount, value));
-                countSet.Add(Tuple.Create(oldCount + 1, value));
-                resultCount[value]++;
+                var oldCount = resultCount[item];
+                countSet.Remove(Tuple.Create(oldCount, item));
+                countSet.Add(Tuple.Create(oldCount + 1, item));
+                resultCount[item]++;
             }
         }
 
-        public void Delete(TTarget item)
+        public void Delete(T item)
         {
-            var value = selector(item);
-            if (!resultCount.ContainsKey(value))
+            if (!resultCount.ContainsKey(item))
                 return;
-            var oldCount = resultCount[value];
-            countSet.Remove(Tuple.Create(oldCount, value));
-            resultCount[value]--;
+            var oldCount = resultCount[item];
+            countSet.Remove(Tuple.Create(oldCount, item));
+            resultCount[item]--;
             if (oldCount > 1)
-                countSet.Add(Tuple.Create(oldCount - 1, value));
+                countSet.Add(Tuple.Create(oldCount - 1, item));
             else
-                resultCount.TryRemove(value, out oldCount);
+                resultCount.TryRemove(item, out oldCount);
         }
 
-        public IEnumerable<TResult> Value => countSet.TakeLast(MaxSize).Select(pair => pair.Item2);
+        public IEnumerable<T> Value => countSet.TakeLast(MaxSize).Select(pair => pair.Item2);
         public bool IsEmpty => countSet.Count == 0;
     }
 }

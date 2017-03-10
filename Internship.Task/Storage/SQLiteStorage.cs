@@ -14,17 +14,17 @@ namespace StatisticServer.Storage
         private static Logger logger = LogManager.GetCurrentClassLogger();
 
         private static Task EmptyTask => Task.FromResult(0);
-        private ISessionFactory sessionsFactory;
-        private IServerStatisticProvider serverStatisticProvider;
-        private IPlayerStatisticsProvider playerStatisticsProvider;
+        private readonly ISessionFactory sessionsFactory;
+        private readonly IServerStatisticStorage serverStatisticStorage;
+        private readonly IPlayerStatisticStorage playerStatisticStorage;
 
-        public SQLiteStorage(ISessionFactory sessionsFactory)
+        public SQLiteStorage(ISessionFactory sessionsFactory, IServerStatisticStorage serverStatisticStorage, IPlayerStatisticStorage playerStatisticStorage)
         {
             logger.Info("Initialize SQLite storage");
 
             this.sessionsFactory = sessionsFactory;
-            serverStatisticProvider = new ServerStatisticProvider();
-            playerStatisticsProvider = new PlayerStatisticsProvider();
+            this.serverStatisticStorage = serverStatisticStorage;
+            this.playerStatisticStorage = playerStatisticStorage;
             InitStatisticsProviders();
         }
 
@@ -42,11 +42,11 @@ namespace StatisticServer.Storage
                 int processedMatches = 0, processedPlayers = 0;
                 foreach (var match in matches)
                 {
-                    serverStatisticProvider.Add(match);
+                    serverStatisticStorage.Add(match);
                     processedMatches++;
                     foreach (var player in match.Scoreboard)
                     {
-                        playerStatisticsProvider.Add(player);
+                        playerStatisticStorage.Add(player);
                         processedPlayers++;
                     }
                 }
@@ -109,10 +109,10 @@ namespace StatisticServer.Storage
                 {
                     var oldMatchInfo = session.Get<MatchInfo>(matchInfo.MatchId);
                     if (oldMatchInfo != null)
-                        serverStatisticProvider.Delete(oldMatchInfo);
+                        serverStatisticStorage.Delete(oldMatchInfo);
 
                     session.SaveOrUpdate(matchInfo);
-                    serverStatisticProvider.Add(matchInfo);
+                    serverStatisticStorage.Add(matchInfo);
                     transaction.Commit();
                 }
             }
@@ -133,13 +133,6 @@ namespace StatisticServer.Storage
                     return Task.FromResult<MatchInfo>(null);
                 return Task.FromResult(matchInfo);
             }
-        }
-
-        public Task<ServerStatistic> GetServerStatistics(string serverId)
-        {
-            logger.Trace("Retrieve statistics for server {0}", new {ServerId = serverId});
-
-            return Task.FromResult(serverStatisticProvider[serverId]);
         }
     }
 }
