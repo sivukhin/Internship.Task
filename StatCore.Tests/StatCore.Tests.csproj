@@ -55,8 +55,6 @@
     <Compile Include="BaseStatTest.cs" />
     <Compile Include="Event.cs" />
     <Compile Include="Stats\AverageStatTests.cs" />
-    <Compile Include="Stats\GroupedAverageStatTests.cs" />
-    <Compile Include="Stats\GroupedMaxStatTests.cs" />
     <Compile Include="Stats\MaxStatTests.cs" />
     <Compile Include="ParamsTestCaseData.cs" />
     <Compile Include="Stats\CounterStatTests.cs" />

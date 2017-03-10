@@ -95,6 +95,7 @@
     <Compile Include="Modules\UpdateStatisticModule.cs" />
     <Compile Include="Storage\BaseStatisticsProvider.cs" />
     <Compile Include="Storage\IStatisticStorage.cs" />
+    <Compile Include="Storage\PlayerStatisticsProvider.cs" />
     <Compile Include="Storage\SimpleStorage.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

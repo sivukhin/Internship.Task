@@ -47,9 +47,7 @@ namespace HttpServerCore
             if (!listener.IsListening)
                 return;
             StopRequestStream();
-            Console.WriteLine("Stopped request stream");
             listener.Stop();
-            Console.WriteLine("Stopped http listenere");
 
             logger.Info("HttpServer stopped");
         }
@@ -78,7 +76,6 @@ namespace HttpServerCore
             isDisposed = true;
             Stop();
             listener.Close();
-            Console.WriteLine("Closed http listenere");
         }
 
         private IObservable<IObservable<Task<IRequest>>> CreateRequestStream()

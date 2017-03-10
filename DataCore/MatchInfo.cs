@@ -30,6 +30,5 @@ namespace DataCore
             ElapsedTime = elapsedTime;
             Scoreboard = scoreboard;
         }
-
     }
 }

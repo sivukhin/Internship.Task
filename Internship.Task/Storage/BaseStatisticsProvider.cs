@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using StatCore.DataFlow;
 using StatCore.Stats;
 
 namespace StatisticServer.Storage
@@ -8,6 +9,8 @@ namespace StatisticServer.Storage
     public abstract class BaseStatisticsProvider<TTarget>
     {
         private readonly IList<IStatStorage<TTarget>> stats;
+        protected static DataIdentity<TTarget> Info => new DataIdentity<TTarget>();
+
         protected BaseStatisticsProvider()
         {
             stats = GetType()

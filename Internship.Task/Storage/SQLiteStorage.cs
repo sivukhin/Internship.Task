@@ -16,6 +16,7 @@ namespace StatisticServer.Storage
         private static Task EmptyTask => Task.FromResult(0);
         private ISessionFactory sessionsFactory;
         private IServerStatisticProvider serverStatisticProvider;
+        private IPlayerStatisticsProvider playerStatisticsProvider;
 
         public SQLiteStorage(ISessionFactory sessionsFactory)
         {
@@ -23,6 +24,7 @@ namespace StatisticServer.Storage
 
             this.sessionsFactory = sessionsFactory;
             serverStatisticProvider = new ServerStatisticProvider();
+            playerStatisticsProvider = new PlayerStatisticsProvider();
             InitStatisticsProviders();
         }
 
@@ -37,11 +39,19 @@ namespace StatisticServer.Storage
             using (var session = sessionsFactory.OpenSession())
             {
                 var matches = session.QueryOver<MatchInfo>().List();
+                int processedMatches = 0, processedPlayers = 0;
                 foreach (var match in matches)
                 {
                     serverStatisticProvider.Add(match);
+                    processedMatches++;
+                    foreach (var player in match.Scoreboard)
+                    {
+                        playerStatisticsProvider.Add(player);
+                        processedPlayers++;
+                    }
                 }
-                logger.Info($"Successfully processed {matches.Count} match entries");
+                logger.Info($"Successfully processed {processedMatches} match entries");
+                logger.Info($"Successfully processed {processedPlayers} players entries");
             }
         }
 

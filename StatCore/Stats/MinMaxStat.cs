@@ -3,25 +3,25 @@ using System.Collections.Concurrent;
 
 namespace StatCore.Stats
 {
-    public class MinMaxStat<TTarget, TResult> : IStat<TTarget, Tuple<TResult, TResult>>
+    public class MinMaxStat<TIn, TOut> : IStat<TIn, Tuple<TOut, TOut>>
     {
-        private readonly Tuple<TResult, TResult> defaultValue = Tuple.Create(default(TResult), default(TResult));
-        private readonly ConcurrentDictionary<TResult, int> resultCounter;
-        private readonly ConcurrentSortedSet<TResult> resultSet;
-        private readonly Func<TTarget, TResult> selector;
+        private readonly Tuple<TOut, TOut> defaultValue = Tuple.Create(default(TOut), default(TOut));
+        private readonly ConcurrentDictionary<TOut, int> resultCounter;
+        private readonly ConcurrentSortedSet<TOut> resultSet;
+        private Func<TIn, TOut> selector;
 
-        public Tuple<TResult, TResult> Value { get; private set; }
+        public Tuple<TOut, TOut> Value { get; private set; }
         public bool IsEmpty => resultCounter.IsEmpty;
 
-        public MinMaxStat(Func<TTarget, TResult> selector)
+        public MinMaxStat(Func<TIn, TOut> selector)
         {
             this.selector = selector;
-            resultCounter = new ConcurrentDictionary<TResult, int>();
-            resultSet = new ConcurrentSortedSet<TResult>();
+            resultCounter = new ConcurrentDictionary<TOut, int>();
+            resultSet = new ConcurrentSortedSet<TOut>();
             UpdateValue();
         }
 
-        public void Add(TTarget item)
+        public void Add(TIn item)
         {
             var result = selector(item);
             if (!resultCounter.ContainsKey(result))
@@ -34,7 +34,7 @@ namespace StatCore.Stats
             UpdateValue();
         }
 
-        public void Delete(TTarget item)
+        public void Delete(TIn item)
         {
             var result = selector(item);
             if (!resultCounter.ContainsKey(result))

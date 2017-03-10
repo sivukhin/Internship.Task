@@ -4,6 +4,7 @@ using System.Text;
 using System.Threading.Tasks;
 using DataCore;
 using StatCore;
+using StatCore.DataFlow;
 using StatCore.Stats;
 
 namespace StatisticServer.Storage
@@ -28,38 +29,44 @@ namespace StatisticServer.Storage
 
     public class ServerStatisticProvider : BaseStatisticsProvider<MatchInfo>, IServerStatisticProvider
     {
-        private readonly GroupStat<MatchInfo, int, string> totalMatchesPlayed =
-            StatFor<MatchInfo>.Group(match => match.HostServer.ServerId).Count();
+        private static GroupedStat<MatchInfo, T, string> CreateStat<T>
+            (Func<DataIdentity<MatchInfo>, IStat<MatchInfo, T>> statFactory)
+        {
+            return new GroupedStat<MatchInfo, T, string>(server => server.HostServer.ServerId, () => statFactory(Info));
+        }
 
-        private readonly GroupStat<MatchInfo, int, string> maximumMatchesPerDay =
-            StatFor<MatchInfo>.Group(match => match.HostServer.ServerId)
-                .MaxByGroup(match => match.EndTime.Date, () => StatFor<MatchInfo>.Count());
+        private readonly GroupedStat<MatchInfo, int, string> totalMatchesPlayed =
+            CreateStat(match => match.Count());
 
-        private readonly IStat<MatchInfo, DateTime> firstDayWithMatch =
-            StatFor<MatchInfo>.Min(match => match.EndTime.Date);
+        private readonly GroupedStat<MatchInfo, int, string> maximumMatchesPerDay =
+            CreateStat(match => match.Split(info => info.EndTime.Date, splitted => splitted.Count()).Max());
 
-        private readonly IStat<MatchInfo, DateTime> lastDayWithMatch =
-            StatFor<MatchInfo>.Max(match => match.EndTime.Date);
+        private readonly IStat<MatchInfo, DateTime> firstDayWithMatch = Info.Min(match => match.EndTime.Date);
 
-        private readonly GroupStat<MatchInfo, int, string> maximumPopulation =
-            StatFor<MatchInfo>.Group(match => match.HostServer.ServerId).Max(match => match.Scoreboard.Count);
+        private readonly IStat<MatchInfo, DateTime> lastDayWithMatch = Info.Max(match => match.EndTime.Date);
 
-        private readonly GroupStat<MatchInfo, double, string> averagePopulation =
-            StatFor<MatchInfo>.Group(match => match.HostServer.ServerId).Average(match => match.Scoreboard.Count);
+        private readonly GroupedStat<MatchInfo, int, string> maximumPopulation =
+            CreateStat(match => match.Max(info => info.Scoreboard.Count));
 
-        private readonly GroupStat<MatchInfo, IEnumerable<string>, string> top5GameModes =
-            StatFor<MatchInfo>.Group(match => match.HostServer.ServerId)
-                .Popular(5, match => match.GameMode.ModeName);
+        private readonly GroupedStat<MatchInfo, double, string> averagePopulation =
+            CreateStat(match => match.Average(info => info.Scoreboard.Count));
 
-        private readonly GroupStat<MatchInfo, IEnumerable<string>, string> top5Maps =
-            StatFor<MatchInfo>.Group(match => match.HostServer.ServerId)
-                .Popular(5, match => match.Map);
+        private readonly GroupedStat<MatchInfo, IEnumerable<string>, string> top5GameModes =
+            CreateStat(match => match.Popular(5, info => info.GameMode.ModeName));
 
-        public ServerStatistic this[string serverId] => new ServerStatistic
+        private readonly GroupedStat<MatchInfo, IEnumerable<string>, string> top5Maps =
+            CreateStat(match => match.Popular(5, info => info.Map));
+
+        public double AverageMatchesPerDay(string serverId)
+        {
+            return 1.0 * totalMatchesPlayed[serverId] / ((lastDayWithMatch.Value - firstDayWithMatch.Value).Days + 1);
+        }
+
+        public ServerStatistic this[string serverId] => totalMatchesPlayed[serverId] == 0 ? null : new ServerStatistic
         {
             TotalMatchesPlayed = totalMatchesPlayed[serverId],
             MaximumMatchesPerDay = maximumMatchesPerDay[serverId],
-            AverageMatchesPerDay = (int)(totalMatchesPlayed[serverId] / ((lastDayWithMatch.Value - firstDayWithMatch.Value).Days + 1)),
+            AverageMatchesPerDay = AverageMatchesPerDay(serverId),
             MaximumPopulation = maximumPopulation[serverId],
             Top5GameModes = top5GameModes[serverId],
             Top5Maps = top5Maps[serverId],

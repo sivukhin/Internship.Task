@@ -37,6 +37,8 @@ namespace StatisticServer.Modules
         private async Task<IResponse> GetFullServerStatistic(string serverId)
         {
             var serverStatistics = await statisticStorage.GetServerStatistics(serverId);
+            if (serverStatistics == null)
+                return new HttpResponse(HttpStatusCode.NotFound);
             return new JsonHttpResponse(HttpStatusCode.OK, serverStatistics);
         }
 

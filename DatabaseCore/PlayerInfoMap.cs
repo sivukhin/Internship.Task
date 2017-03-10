@@ -17,6 +17,9 @@ namespace DatabaseCore
             Map(info => info.Deaths);
             Map(info => info.Frags);
             Map(info => info.Kills);
+            References(info => info.BaseMatch);
+            Map(info => info.ScoreboardPercent);
+            
         }
     }
 }

@@ -36,7 +36,8 @@ namespace StatisticServer
                     }))
                 {
                     server.Start();
-                    Console.ReadKey(true);
+                    while (true)
+                        Console.ReadKey(true);
                 }
             }
             catch (Exception exception)
