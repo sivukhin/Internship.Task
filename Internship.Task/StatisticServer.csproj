@@ -96,7 +96,7 @@
     <Compile Include="Storage\BaseStatisticStorage.cs" />
     <Compile Include="Storage\IStatisticStorage.cs" />
     <Compile Include="Storage\PlayerStatisticStorage.cs" />
-    <Compile Include="Storage\ReportsStorage.cs" />
+    <Compile Include="Storage\ReportStorage.cs" />
     <Compile Include="Storage\SimpleStorage.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

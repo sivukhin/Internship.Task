@@ -45,6 +45,8 @@
     <Compile Include="DataFlow\DataFilter.cs" />
     <Compile Include="DataFlow\DataIdentity.cs" />
     <Compile Include="DataFlow\DataSplitter.cs" />
+    <Compile Include="Report.cs" />
+    <Compile Include="ReportOption.cs" />
     <Compile Include="Stats\CounterStat.cs" />
     <Compile Include="GroupedStat.cs" />
     <Compile Include="Stats\AverageStat.cs" />
@@ -58,6 +60,7 @@
     <Compile Include="DataFlow\DataTransformer.cs" />
     <Compile Include="Stats\StatTransformer.cs" />
     <Compile Include="Stats\SumStat.cs" />
+    <Compile Include="Stats\TopStat.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

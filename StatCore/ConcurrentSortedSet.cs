@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace StatCore
@@ -12,6 +13,25 @@ namespace StatCore
         {
             set = new SortedSet<T>();
             setLock = new object();
+        }
+
+        public ConcurrentSortedSet(IComparer<T> comparer)
+        {
+            set = new SortedSet<T>(comparer);
+            setLock = new object();
+        }
+
+        public ConcurrentSortedSet(Func<T, T, int> comparer) : this(Comparer<T>.Create((x, y) => comparer(x, y)))
+        {
+        }
+
+        public ConcurrentSortedSet(Func<T, T, bool> lessComparer) : this(Comparer<T>.Create((x, y) =>
+        {
+            if (lessComparer(x, y))
+                return -1;
+            return lessComparer(y, x) ? 1 : 0;
+        }))
+        {
         }
 
         public void Add(T value)
@@ -48,6 +68,14 @@ namespace StatCore
                 {
                     return set.Count;
                 }
+            }
+        }
+
+        public bool Contains(T value)
+        {
+            lock (setLock)
+            {
+                return set.Contains(value);
             }
         }
 

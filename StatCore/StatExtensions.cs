@@ -117,5 +117,24 @@ namespace StatCore
             return connection.ConnectTo(new DataSplitter<TMid, TSplit, TOut>(selector, statFactory));
         }
 
+        public static IStat<TIn, IEnumerable<TOut>> Top<TIn, TOut>(
+            this IConnectableStat<TIn, TOut> connection,
+            int maxSize,
+            Func<TOut, TOut, bool> comparer)
+        {
+            return connection.ConnectTo(new TopStat<TOut>(maxSize, comparer));
+        }
+
+        public static IStat<TIn, IEnumerable<TOut>> Report<TIn, TOut>(this IConnectableStat<TIn, TOut> connection,
+            int maxSize,
+            Func<TOut, TOut, bool> lessComparer,
+            ReportOption option = ReportOption.StoreOnlyTheBest)
+        {
+            if (option == ReportOption.StoreOnlyTheBest)
+                return connection.ConnectTo(new Report<TOut>(maxSize, lessComparer));
+            if (option == ReportOption.StoreAllData)
+                return connection.ConnectTo(new FullReport<TOut>(maxSize, lessComparer));
+            throw new ArgumentException($"Unrecognized ReportOption: {option}");
+        }
     }
 }

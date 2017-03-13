@@ -19,7 +19,7 @@ namespace StatisticServer.Storage
         public IEnumerable<string> Top5GameModes { get; set; }
         public IEnumerable<string> Top5Maps { get; set; }
     }
-
+    
     public interface IServerStatisticStorage
     {
         ServerStatistic GetStatistics(string serverId);
