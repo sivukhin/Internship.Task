@@ -6,6 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using DataCore;
+using Remotion.Linq.Utilities;
 using StatCore;
 using StatCore.DataFlow;
 using StatCore.Stats;
@@ -28,7 +29,7 @@ namespace StatisticServer.Storage
     }
     public class ReportStorage : IAggregateReportStorage
     {
-        public const int MaxReportSize = 50;
+        private const int MaxReportSize = 50;
         private IStat<MatchInfo, IEnumerable<MatchInfo>> recentMatches;
         private IStat<ServerInfo, IEnumerable<ServerInfo>> popularServers;
         private IStat<PlayerInfo, IEnumerable<PlayerInfo>> bestPlayers;
@@ -44,23 +45,24 @@ namespace StatisticServer.Storage
 
         private void InitReports()
         {
-            recentMatches = new DataIdentity<MatchInfo>().Report(MaxReportSize, (m1, m2) => m1.EndTime > m2.EndTime);
-            popularServers = new DataIdentity<ServerInfo>().Report(MaxReportSize, (s1, s2) =>
-            {
-                var firstPopularity = serverStatisticStorage.GetStatistics(s1.Name).AverageMatchesPerDay;
-                var secondPopularity = serverStatisticStorage.GetStatistics(s2.Name).AverageMatchesPerDay;
-                return firstPopularity > secondPopularity;
-            });
+            recentMatches = new DataIdentity<MatchInfo>().Report(MaxReportSize, m => m.EndTime, (m1, m2) => m1.MatchId < m2.MatchId);
+            popularServers = new DataIdentity<ServerInfo>().Report(MaxReportSize,
+                s => serverStatisticStorage.GetStatistics(s.Name).AverageMatchesPerDay,
+                (s1, s2) => string.Compare(s1.ServerId, s2.ServerId, StringComparison.Ordinal) == -1);
+
             bestPlayers = new DataIdentity<PlayerInfo>().Where(p =>
             {
                 var playerStat = playerStatisticStorage.GetStatistics(p.Name);
                 return playerStat.KillToDeathRatio != null && playerStat.TotalMatchesPlayed >= 10;
-            }).Report(MaxReportSize, (p1, p2) =>
+            })
+            .Report(MaxReportSize, p =>
             {
-                var firstPlayerStat = playerStatisticStorage.GetStatistics(p1.Name);
-                var secondPlayerStat = playerStatisticStorage.GetStatistics(p2.Name);
-                return firstPlayerStat.KillToDeathRatio > secondPlayerStat.KillToDeathRatio;
-            });
+                var killToDeathRatio = playerStatisticStorage.GetStatistics(p.Name).KillToDeathRatio;
+                if (killToDeathRatio != null)
+                    return killToDeathRatio.Value;
+                throw new ArgumentEmptyException($"{nameof(killToDeathRatio)} must be not null");
+            },
+            (p1, p2) => p1.PlayerId < p2.PlayerId);
         }
 
         public void Add(ServerInfo serverInfo)

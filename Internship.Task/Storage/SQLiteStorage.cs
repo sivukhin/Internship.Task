@@ -17,14 +17,20 @@ namespace StatisticServer.Storage
         private readonly ISessionFactory sessionsFactory;
         private readonly IServerStatisticStorage serverStatisticStorage;
         private readonly IPlayerStatisticStorage playerStatisticStorage;
+        private readonly IAggregateReportStorage reportStorage;
 
-        public SQLiteStorage(ISessionFactory sessionsFactory, IServerStatisticStorage serverStatisticStorage, IPlayerStatisticStorage playerStatisticStorage)
+        public SQLiteStorage(
+            ISessionFactory sessionsFactory, 
+            IServerStatisticStorage serverStatisticStorage, 
+            IPlayerStatisticStorage playerStatisticStorage, 
+            IAggregateReportStorage reportStorage)
         {
             logger.Info("Initialize SQLite storage");
 
             this.sessionsFactory = sessionsFactory;
             this.serverStatisticStorage = serverStatisticStorage;
             this.playerStatisticStorage = playerStatisticStorage;
+            this.reportStorage = reportStorage;
             InitStatisticsProviders();
         }
 
@@ -109,14 +115,27 @@ namespace StatisticServer.Storage
                 {
                     var oldMatchInfo = session.Get<MatchInfo>(matchInfo.MatchId);
                     if (oldMatchInfo != null)
-                        serverStatisticStorage.Delete(oldMatchInfo);
-
+                        DeleteMatch(oldMatchInfo);
+                    InsertMatch(matchInfo);
                     session.SaveOrUpdate(matchInfo);
-                    serverStatisticStorage.Add(matchInfo);
                     transaction.Commit();
                 }
             }
             return EmptyTask;
+        }
+
+        private void DeleteMatch(MatchInfo matchInfo)
+        {
+            serverStatisticStorage.Delete(matchInfo);
+            foreach (var player in matchInfo.Scoreboard)
+                playerStatisticStorage.Delete(player);
+        }
+
+        private void InsertMatch(MatchInfo matchInfo)
+        {
+            serverStatisticStorage.Add(matchInfo);
+            foreach (var player in matchInfo.Scoreboard)
+                playerStatisticStorage.Add(player);
         }
 
         public Task<MatchInfo> GetMatchInfo(string serverId, DateTime endTime)

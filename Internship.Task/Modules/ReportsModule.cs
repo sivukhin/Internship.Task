@@ -1,21 +1,30 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using DataCore;
 using HttpServerCore;
 using NLog;
+using StatisticServer.Storage;
 
 namespace StatisticServer.Modules
 {
     public class ReportsModule : BaseModule
     {
+        private readonly IAggregateReportStorage reportStorage;
         private readonly int DefaultCountParameter = 5;
         private int MinCountParameter = 0;
         private int MaxCountParameter = 50;
         private ILogger logger;
         protected override ILogger Logger => logger ?? (logger = LogManager.GetCurrentClassLogger());
+
+        public ReportsModule(IAggregateReportStorage reportStorage)
+        {
+            this.reportStorage = reportStorage;
+        }
 
         protected override IEnumerable<RequestFilter> Filters => new[]
         {
@@ -24,11 +33,11 @@ namespace StatisticServer.Modules
                 HandleRecentMatchesQuery), 
             new RequestFilter(
                 HttpMethodEnum.Get, 
-                new Regex(@"^/reports/best-players(?<count>/.*)$", RegexOptions.Compiled), 
+                new Regex(@"^/reports/best-players(?<count>/.*)?$", RegexOptions.Compiled), 
                 HandleBestPlayersQuery), 
             new RequestFilter(
                 HttpMethodEnum.Get, 
-                new Regex(@"^/reporst/popular-servers(?<count>/.*)$", RegexOptions.Compiled), 
+                new Regex(@"^/reports/popular-servers(?<count>/.*)?$", RegexOptions.Compiled), 
                 HandlePopularServersQuery), 
         };
 
@@ -65,7 +74,8 @@ namespace StatisticServer.Modules
 
         private Task<IResponse> GetPopularServers(int serversCount)
         {
-            throw new NotImplementedException();
+            IResponse response = new JsonHttpResponse(HttpStatusCode.OK, ((IReportStorage<ServerInfo>)reportStorage).Report(serversCount));
+            return Task.FromResult(response);
         }
 
         private Task<IResponse> HandleBestPlayersQuery(IRequest request, Match match)
@@ -76,7 +86,8 @@ namespace StatisticServer.Modules
 
         private Task<IResponse> GetBestPlayers(int playersCount)
         {
-            throw new NotImplementedException();
+            IResponse response = new JsonHttpResponse(HttpStatusCode.OK, ((IReportStorage<PlayerInfo>)reportStorage).Report(playersCount));
+            return Task.FromResult(response);
         }
 
         private Task<IResponse> HandleRecentMatchesQuery(IRequest request, Match match)
@@ -87,7 +98,8 @@ namespace StatisticServer.Modules
 
         private Task<IResponse> GetRecentMatches(int matchCount)
         {
-            throw new NotImplementedException();
+            IResponse response = new JsonHttpResponse(HttpStatusCode.OK, ((IReportStorage<MatchInfo>)reportStorage).Report(matchCount));
+            return Task.FromResult(response);
         }
     }
 }

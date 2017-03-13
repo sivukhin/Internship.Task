@@ -125,16 +125,12 @@ namespace StatCore
             return connection.ConnectTo(new TopStat<TOut>(maxSize, comparer));
         }
 
-        public static IStat<TIn, IEnumerable<TOut>> Report<TIn, TOut>(this IConnectableStat<TIn, TOut> connection,
+        public static IStat<TIn, IEnumerable<TOut>> Report<TIn, TOut, TFeature>(this IConnectableStat<TIn, TOut> connection,
             int maxSize,
-            Func<TOut, TOut, bool> lessComparer,
-            ReportOption option = ReportOption.StoreOnlyTheBest)
+            Func<TOut, TFeature> featureSelector,
+            Func<TOut, TOut, bool> lessComparer) where TFeature : IComparable
         {
-            if (option == ReportOption.StoreOnlyTheBest)
-                return connection.ConnectTo(new Report<TOut>(maxSize, lessComparer));
-            if (option == ReportOption.StoreAllData)
-                return connection.ConnectTo(new FullReport<TOut>(maxSize, lessComparer));
-            throw new ArgumentException($"Unrecognized ReportOption: {option}");
+            return connection.ConnectTo(new Report<TOut, TFeature>(maxSize, featureSelector, lessComparer));
         }
     }
 }

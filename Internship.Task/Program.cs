@@ -27,7 +27,8 @@ namespace StatisticServer
             {
                 var serverStatistics = new ServerStatisticStorage();
                 var playerStatistics = new PlayerStatisticStorage();
-                var storage = new SQLiteStorage(DatabaseSessions.CreateSessionFactory(), serverStatistics, playerStatistics);
+                var reportStorage = new ReportStorage(serverStatistics, playerStatistics);
+                var storage = new SQLiteStorage(DatabaseSessions.CreateSessionFactory(), serverStatistics, playerStatistics, reportStorage);
                 using (var server = new HttpServer(
                     new HttpServerOptions {Prefix = "http://localhost:12345/"},
                     new IServerModule[]
@@ -35,6 +36,7 @@ namespace StatisticServer
                         new UpdateStatisticModule(storage),
                         new GetStatisticModule(storage),
                         new StatsModule(serverStatistics, playerStatistics),
+                        new ReportsModule(reportStorage), 
                     }))
                 {
                     server.Start();
