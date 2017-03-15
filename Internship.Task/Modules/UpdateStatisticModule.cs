@@ -57,7 +57,7 @@ namespace StatisticServer.Modules
             MatchInfo matchInfo;
             try
             {
-                matchInfo = request.Content.ParseFromJson<MatchInfo>();
+                matchInfo = request.Content.ParseFromJson<MatchInfo>().InitPlayers();
             }
             catch (JsonSerializationException e)
             {

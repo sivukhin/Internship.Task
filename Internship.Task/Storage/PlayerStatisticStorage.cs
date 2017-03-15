@@ -58,7 +58,7 @@ namespace StatisticServer.Storage
             CreateStat(player => player.Split(info => info.BaseMatch.HostServer.ServerId, splitted => splitted.Existence()).Count());
 
         private readonly GroupedStat<PlayerInfo, string, string> favoriteGameMode =
-            CreateStat(player => player.Select(info => info.BaseMatch.GameMode.ModeName).Favorite());
+            CreateStat(player => player.Select(info => info.BaseMatch.GameMode).Favorite());
 
         private readonly GroupedStat<PlayerInfo, double, string> averageScoreboardPercent =
             CreateStat(player => player.Select(info => info.ScoreboardPercent).Average());

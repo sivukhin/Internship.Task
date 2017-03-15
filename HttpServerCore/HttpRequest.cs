@@ -16,16 +16,6 @@ namespace HttpServerCore
         public string Content { get; private set; }
         public IResponse Response { get; set; }
 
-        //TODO: for informative logs
-        public string[] AcceptTypes => context.Request.AcceptTypes;
-        public Encoding ContentEncoding => context.Request.ContentEncoding;
-        public string ContentType => context.Request.ContentType;
-        public long ContentLength => context.Request.ContentLength64;
-        public CookieCollection Cookies => context.Request.Cookies;
-        public NameValueCollection Headers => context.Request.Headers;
-        public NameValueCollection QueryString => context.Request.QueryString;
-        public Version ProtocolVersion => context.Request.ProtocolVersion;
-
         private readonly HttpListenerContext context;
 
         //TODO: set defaultResponse via some options?

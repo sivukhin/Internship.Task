@@ -52,7 +52,7 @@ namespace StatisticServer.Storage
             CreateStat(match => match.Average(info => info.Scoreboard.Count));
 
         private readonly GroupedStat<MatchInfo, IEnumerable<string>, string> top5GameModes =
-            CreateStat(match => match.Select(info => info.GameMode.ModeName).Popular(5));
+            CreateStat(match => match.Select(info => info.GameMode).Popular(5));
 
         private readonly GroupedStat<MatchInfo, IEnumerable<string>, string> top5Maps =
             CreateStat(match => match.Select(info => info.Map).Popular(5));
@@ -64,8 +64,6 @@ namespace StatisticServer.Storage
 
         public ServerStatistic GetStatistics(string serverId)
         {
-            if (totalMatchesPlayed[serverId] == 0)
-                return null;
             return new ServerStatistic
             {
                 TotalMatchesPlayed = totalMatchesPlayed[serverId],

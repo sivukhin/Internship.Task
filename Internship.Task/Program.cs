@@ -28,7 +28,11 @@ namespace StatisticServer
                 var serverStatistics = new ServerStatisticStorage();
                 var playerStatistics = new PlayerStatisticStorage();
                 var reportStorage = new ReportStorage(serverStatistics, playerStatistics);
-                var storage = new SQLiteStorage(DatabaseSessions.CreateSessionFactory(), serverStatistics, playerStatistics, reportStorage);
+                var storage = new SQLiteStorage(
+                    DatabaseSessions.CreateSessionFactory(), 
+                    serverStatistics, 
+                    playerStatistics, 
+                    reportStorage);
                 using (var server = new HttpServer(
                     new HttpServerOptions {Prefix = "http://localhost:12345/"},
                     new IServerModule[]

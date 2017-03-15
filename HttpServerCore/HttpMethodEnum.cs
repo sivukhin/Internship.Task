@@ -2,7 +2,6 @@
 
 namespace HttpServerCore
 {
-    [Flags]
     public enum HttpMethodEnum
     {
         Put,

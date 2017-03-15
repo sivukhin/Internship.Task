@@ -111,15 +111,11 @@ namespace StatisticServer.Storage
 
                 matchInfo.HostServer = hostServer;
                 matchInfo.EndTime = endTime;
-                using (var transaction = session.BeginTransaction())
-                {
-                    var oldMatchInfo = session.Get<MatchInfo>(matchInfo.MatchId);
-                    if (oldMatchInfo != null)
-                        DeleteMatch(oldMatchInfo);
-                    InsertMatch(matchInfo);
-                    session.SaveOrUpdate(matchInfo);
-                    transaction.Commit();
-                }
+                var oldMatchInfo = session.Get<MatchInfo>(matchInfo.MatchId);
+                if (oldMatchInfo != null)
+                    DeleteMatch(oldMatchInfo);
+                InsertMatch(matchInfo);
+                session.SaveOrUpdate(matchInfo);
             }
             return EmptyTask;
         }
@@ -129,6 +125,13 @@ namespace StatisticServer.Storage
             serverStatisticStorage.Delete(matchInfo);
             foreach (var player in matchInfo.Scoreboard)
                 playerStatisticStorage.Delete(player);
+            Task.Factory.StartNew(() => reportStorage.Update(matchInfo))
+                .ContinueWith(_ => reportStorage.Update(matchInfo.HostServer))
+                .ContinueWith(_ =>
+                {
+                    foreach (var player in matchInfo.Scoreboard)
+                        reportStorage.Update(player);
+                });
         }
 
         private void InsertMatch(MatchInfo matchInfo)
@@ -136,6 +139,13 @@ namespace StatisticServer.Storage
             serverStatisticStorage.Add(matchInfo);
             foreach (var player in matchInfo.Scoreboard)
                 playerStatisticStorage.Add(player);
+            Task.Factory.StartNew(() => reportStorage.Update(matchInfo))
+                .ContinueWith(_ => reportStorage.Update(matchInfo.HostServer))
+                .ContinueWith(_ =>
+                {
+                    foreach (var player in matchInfo.Scoreboard)
+                        reportStorage.Update(player);
+                });
         }
 
         public Task<MatchInfo> GetMatchInfo(string serverId, DateTime endTime)

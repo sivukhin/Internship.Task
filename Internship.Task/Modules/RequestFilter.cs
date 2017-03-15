@@ -34,7 +34,7 @@ namespace StatisticServer.Modules
         {
             logger.Trace("Process request: {0}", new {Filter = this, Request = request});
 
-            if (!AllowedMethods.HasFlag(request.HttpMethod))
+            if (AllowedMethods != request.HttpMethod)
                 return await Task.FromResult(request);
             var match = request.MatchLocalPath(UrlPattern);
             if (match.Success)
