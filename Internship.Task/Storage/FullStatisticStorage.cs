@@ -40,7 +40,14 @@ namespace StatisticServer.Storage
         private async Task InitServerStatisticsProvider()
         {
             logger.Info("Initialize server statistics from database");
-            int processedMatches = 0, processedPlayers = 0;
+            int processedMatches = 0, processedPlayers = 0, processedServers = 0;
+            foreach (var server in await statisticStorage.GetAllServersInfo())
+            {
+                InsertServer(server);
+                processedServers++;
+            }
+            logger.Info($"Successfully processed {processedServers} servers entries");
+
             foreach (var match in await statisticStorage.GetAllMatchesInfo())
             {
                 InsertMatch(match);
@@ -56,7 +63,13 @@ namespace StatisticServer.Storage
             info.Id = serverId;
             logger.Trace("Update information about server {0}", info);
 
+            InsertServer(info);
             await statisticStorage.UpdateServerInfo(serverId, info);
+        }
+
+        private void InsertServer(ServerInfo info)
+        {
+            Task.Factory.StartNew(() => reportStorage.Update(info));
         }
 
         public async Task<ServerInfo> GetServerInfo(string serverId)
@@ -66,11 +79,11 @@ namespace StatisticServer.Storage
             return await statisticStorage.GetServerInfo(serverId);
         }
 
-        public async Task<IEnumerable<ServerInfo>> GetAllServersInfo()
+        public Task<IEnumerable<ServerInfo>> GetAllServersInfo()
         {
             logger.Trace("Retrieve information about all servers");
 
-            return await statisticStorage.GetAllServersInfo();
+            return Task.FromResult(reportStorage.AllServers());
         }
 
         public async Task UpdateMatchInfo(string serverId, DateTime endTime, MatchInfo matchInfo)

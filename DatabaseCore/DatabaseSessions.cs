@@ -13,15 +13,7 @@ namespace DatabaseCore
     {
         public Server_ById()
         {
-            Map = servers => servers.Select(s => new {ServerId = s.Id});
-        }
-    }
-
-    public class Match_ById : AbstractIndexCreationTask<MatchInfo>
-    {
-        public Match_ById()
-        {
-            Map = matches => matches.Select(m => new {ServerId = m.HostServer.Id, m.EndTime});
+            Map = servers => servers.Select(s => new {s.Id});
         }
     }
 
@@ -35,6 +27,7 @@ namespace DatabaseCore
                 UseEmbeddedHttpServer = true,
             };
             store = store.Initialize();
+            new Server_ById().Execute(store);
             return store;
         }
     }   

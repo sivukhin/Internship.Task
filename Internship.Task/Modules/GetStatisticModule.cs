@@ -20,7 +20,7 @@ namespace StatisticServer.Modules
         {
             new RequestFilter(
                 HttpMethodEnum.Get, 
-                new Regex("^/servers/(?<serverId>[^/]?)/info$", RegexOptions.Compiled), 
+                new Regex("^/servers/(?<serverId>[^/]*)/info$", RegexOptions.Compiled), 
                 (request, match) => GetServerInfo(match.Groups["serverId"].Value)),
 
             new RequestFilter(

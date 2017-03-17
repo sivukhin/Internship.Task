@@ -23,7 +23,6 @@ namespace StatisticServer.Modules
 
         public async Task<IRequest> ProcessRequest(IRequest request)
         {
-//            Logger.Info("Get request: {0}", request);
             if (filters == null)
                 filters = Filters.ToList();
             try

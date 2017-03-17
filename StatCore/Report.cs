@@ -47,6 +47,11 @@ namespace StatCore
 
         }
 
+        public Report(Func<T, TFeature> featureSelector, Func<T, T, bool> lessComparer) :
+            this(-1, featureSelector, lessComparer)
+        {
+        }
+
         private void TryUpdate(T item)
         {
             var newFeature = featureSelector(item);
@@ -71,7 +76,16 @@ namespace StatCore
             TryUpdate(item);
         }
 
-        public IEnumerable<T> Value => itemSet.TakeLast(maxSize).Select(pair => pair.Item2);
+        public IEnumerable<T> Value
+        {
+            get
+            {
+                if (maxSize != -1)
+                    return itemSet.TakeLast(maxSize).Select(pair => pair.Item2);
+                return itemSet.TakeFirst(itemSet.Count).Select(pair => pair.Item2);
+            }
+        }
+
         public bool IsEmpty => itemSet.Count == 0;
     }
 }

@@ -74,7 +74,7 @@ namespace StatisticServer.Modules
 
         private Task<IResponse> GetPopularServers(int serversCount)
         {
-            IResponse response = new JsonHttpResponse(HttpStatusCode.OK, ((IReportStorage<ServerInfo>)reportStorage).Report(serversCount));
+            IResponse response = new JsonHttpResponse(HttpStatusCode.OK, reportStorage.PopularServers(serversCount));
             return Task.FromResult(response);
         }
 
@@ -86,7 +86,7 @@ namespace StatisticServer.Modules
 
         private Task<IResponse> GetBestPlayers(int playersCount)
         {
-            IResponse response = new JsonHttpResponse(HttpStatusCode.OK, ((IReportStorage<PlayerInfo>)reportStorage).Report(playersCount));
+            IResponse response = new JsonHttpResponse(HttpStatusCode.OK, reportStorage.BestPlayers(playersCount));
             return Task.FromResult(response);
         }
 
@@ -98,7 +98,7 @@ namespace StatisticServer.Modules
 
         private Task<IResponse> GetRecentMatches(int matchCount)
         {
-            IResponse response = new JsonHttpResponse(HttpStatusCode.OK, ((IReportStorage<MatchInfo>)reportStorage).Report(matchCount));
+            IResponse response = new JsonHttpResponse(HttpStatusCode.OK, reportStorage.RecentMatches(matchCount));
             return Task.FromResult(response);
         }
     }

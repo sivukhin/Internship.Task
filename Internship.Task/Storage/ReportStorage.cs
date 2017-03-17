@@ -16,7 +16,6 @@ namespace StatisticServer.Storage
     public interface IReportStorage<T>
     {
         void Update(T item);
-        IEnumerable<T> Report(int size);
     }
 
     public interface IAggregateReportStorage : 
@@ -24,8 +23,13 @@ namespace StatisticServer.Storage
         IReportStorage<MatchInfo>,
         IReportStorage<PlayerInfo>
     {
-        
+        IEnumerable<ServerInfo> PopularServers(int size);
+        IEnumerable<MatchInfo> RecentMatches(int size);
+        IEnumerable<PlayerInfo> BestPlayers(int size);
+        IEnumerable<ServerInfo> AllServers();
     }
+
+
     public class ReportStorage : IAggregateReportStorage
     {
         private Logger logger = LogManager.GetCurrentClassLogger();
@@ -34,6 +38,7 @@ namespace StatisticServer.Storage
         private IStat<MatchInfo, IEnumerable<MatchInfo>> recentMatches;
         private IStat<ServerInfo, IEnumerable<ServerInfo>> popularServers;
         private IStat<PlayerInfo, IEnumerable<PlayerInfo>> bestPlayers;
+        private IStat<ServerInfo, IEnumerable<ServerInfo>> allServers;
         private readonly IServerStatisticStorage serverStatisticStorage;
         private readonly IPlayerStatisticStorage playerStatisticStorage;
 
@@ -52,6 +57,7 @@ namespace StatisticServer.Storage
             popularServers = new DataIdentity<ServerInfo>().Report(MaxReportSize,
                 s => serverStatisticStorage.GetStatistics(s.Name).AverageMatchesPerDay,
                 (s1, s2) => string.Compare(s1.Id, s2.Id, StringComparison.Ordinal) == -1);
+            allServers = new DataIdentity<ServerInfo>().Report(s => s.Id, (s1, s2) => String.Compare(s1.Id, s2.Id, StringComparison.Ordinal) == -1);
 
             bestPlayers = new DataIdentity<PlayerInfo>().Where(p =>
             {
@@ -71,6 +77,7 @@ namespace StatisticServer.Storage
         public void Update(ServerInfo serverInfo)
         {
             logger.Info("Update reports with server: {0}", serverInfo);
+            allServers.Add(serverInfo);
             popularServers.Add(serverInfo);
         }
 
@@ -86,13 +93,16 @@ namespace StatisticServer.Storage
             recentMatches.Add(matchInfo);
         }
         
-        IEnumerable<ServerInfo> IReportStorage<ServerInfo>.Report(int size) =>
+        public IEnumerable<ServerInfo> PopularServers(int size) =>
             popularServers.Value.Take(size).ToList();
-        
-        IEnumerable<PlayerInfo> IReportStorage<PlayerInfo>.Report(int size) =>
+
+        public IEnumerable<ServerInfo> AllServers() =>
+            allServers.Value.ToList();
+
+        public IEnumerable<PlayerInfo> BestPlayers(int size) =>
             bestPlayers.Value.Take(size).ToList();
 
-        IEnumerable<MatchInfo> IReportStorage<MatchInfo>.Report(int size) =>
+        public IEnumerable<MatchInfo> RecentMatches(int size) =>
             recentMatches.Value.Take(size).ToList();
     }
 }
