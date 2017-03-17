@@ -1,3 +1,4 @@
+using System.Runtime.Serialization;
 using Newtonsoft.Json;
 using NHibernate.Util;
 
@@ -12,11 +13,12 @@ namespace DataCore
         public int Deaths { get; set; }
 
         [JsonIgnore]
+        [IgnoreDataMember]
         public MatchInfo BaseMatch { get; set; }
         [JsonIgnore]
         public double ScoreboardPercent { get; set; }
         [JsonIgnore]
-        public bool AreWinner => BaseMatch.Scoreboard.First() == this;
+        public bool AreWinner { get;set; }
 
         private bool Equals(PlayerInfo other)
         {

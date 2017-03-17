@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using DatabaseCore;
 using DataCore;
@@ -61,12 +62,24 @@ namespace StatisticServer.Storage
         {
             using (var session = store.OpenAsyncSession())
             {
+                var existed = await GetMatchInfo(serverId, endTime);
+                if (existed != null)
+                    matchInfo.Id = existed.Id;
+                await session.StoreAsync(matchInfo);
+                await session.SaveChangesAsync();
             }
         }
 
-        public Task<MatchInfo> GetMatchInfo(string serverId, DateTime endTime)
+        public async Task<MatchInfo> GetMatchInfo(string serverId, DateTime endTime)
         {
-            throw new NotImplementedException();
+            using (var session = store.OpenAsyncSession())
+            {
+                return await session
+                    .Query<Match_ByIdAndTime.Result, Match_ByIdAndTime>()
+                    .Where(m => m.ServerId == serverId && m.EndTime == endTime)
+                    .OfType<MatchInfo>()
+                    .FirstOrDefaultAsync();
+            }
         }
 
         public Task<IEnumerable<MatchInfo>> GetAllMatchesInfo()

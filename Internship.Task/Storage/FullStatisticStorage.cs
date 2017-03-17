@@ -91,9 +91,13 @@ namespace StatisticServer.Storage
             logger.Trace("Update information about match {0}",
                 new {ServerId = serverId, EndTime = endTime, MatchInfo = matchInfo});
 
+            var server = await statisticStorage.GetServerInfo(serverId);
+            if (server == null)
+                return;
+            matchInfo.HostServer = server;
             var oldMatchInfo = await statisticStorage.GetMatchInfo(serverId, endTime);
             if (oldMatchInfo != null)
-                DeleteMatch(oldMatchInfo);
+                DeleteMatch(oldMatchInfo.InitPlayers(endTime));
             InsertMatch(matchInfo);
             await statisticStorage.UpdateMatchInfo(serverId, endTime, matchInfo);
         }

@@ -7,7 +7,7 @@ namespace DataCore
 {
     public class MatchInfo
     {
-        public int MatchId { get; set; }
+        public string Id { get; set; }
         public ServerInfo HostServer { get; set; }
         public string Map { get; set; }
         public string GameMode { get; set; }
@@ -19,11 +19,13 @@ namespace DataCore
 
         public MatchInfo() { }
 
-        public virtual MatchInfo InitPlayers()
+        public virtual MatchInfo InitPlayers(DateTime endTime)
         {
+            EndTime = endTime;
             for (int i = 0; i < Scoreboard.Count; i++)
             {
                 Scoreboard[i].BaseMatch = this;
+                Scoreboard[i].AreWinner = i == 0;
                 Scoreboard[i].ScoreboardPercent = (Scoreboard.Count == 1 ? 100 : 100.0 * i / (Scoreboard.Count - 1));
             }
             return this;
@@ -31,10 +33,7 @@ namespace DataCore
 
         private bool Equals(MatchInfo other)
         {
-            return MatchId == other.MatchId && Equals(HostServer, other.HostServer) && string.Equals(Map, other.Map) &&
-                   Equals(GameMode, other.GameMode) && FragLimit == other.FragLimit && TimeLimit == other.TimeLimit &&
-                   ElapsedTime.Equals(other.ElapsedTime) && EndTime.Equals(other.EndTime) &&
-                   Scoreboard.SequenceEqual(other.Scoreboard);
+            return Equals(HostServer.Id, other.HostServer.Id) && EndTime.Equals(other.EndTime);
         }
 
         public override bool Equals(object obj)
@@ -49,15 +48,8 @@ namespace DataCore
         {
             unchecked
             {
-                var hashCode = MatchId;
-                hashCode = (hashCode * 397) ^ (HostServer?.GetHashCode() ?? 0);
-                hashCode = (hashCode * 397) ^ (Map?.GetHashCode() ?? 0);
-                hashCode = (hashCode * 397) ^ (GameMode?.GetHashCode() ?? 0);
-                hashCode = (hashCode * 397) ^ FragLimit;
-                hashCode = (hashCode * 397) ^ TimeLimit;
-                hashCode = (hashCode * 397) ^ ElapsedTime.GetHashCode();
+                var hashCode = HostServer?.Id.GetHashCode() ?? 0;
                 hashCode = (hashCode * 397) ^ EndTime.GetHashCode();
-                hashCode = (hashCode * 397) ^ (Scoreboard?.GetHashCode() ?? 0);
                 return hashCode;
             }
         }

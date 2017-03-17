@@ -17,6 +17,19 @@ namespace DatabaseCore
         }
     }
 
+    public class Match_ByIdAndTime : AbstractIndexCreationTask<MatchInfo>
+    {
+        public class Result
+        {
+            public string ServerId { get; set; }
+            public DateTime EndTime { get; set; }
+        }
+        public Match_ByIdAndTime()
+        {
+            Map = matches => matches.Select(m => new {ServerId = m.HostServer.Id, EndTime = m.EndTime});
+        }
+    }
+
     public static class DatabaseConnection
     {
         public static IDocumentStore GetStore()
@@ -28,6 +41,7 @@ namespace DatabaseCore
             };
             store = store.Initialize();
             new Server_ById().Execute(store);
+            new Match_ByIdAndTime().Execute(store);
             return store;
         }
     }   

@@ -53,7 +53,7 @@ namespace StatisticServer.Storage
         {
             logger.Info("Initialize reports");
 
-            recentMatches = new DataIdentity<MatchInfo>().Report(MaxReportSize, m => m.EndTime, (m1, m2) => m1.MatchId < m2.MatchId);
+            recentMatches = new DataIdentity<MatchInfo>().Report(MaxReportSize, m => m.EndTime, (m1, m2) => m1.EndTime < m2.EndTime);
             popularServers = new DataIdentity<ServerInfo>().Report(MaxReportSize,
                 s => serverStatisticStorage.GetStatistics(s.Name).AverageMatchesPerDay,
                 (s1, s2) => string.Compare(s1.Id, s2.Id, StringComparison.Ordinal) == -1);
