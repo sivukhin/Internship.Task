@@ -8,15 +8,15 @@ namespace DataCore
 {
     public class ServerInfo
     {
-        public virtual string ServerId { get; set; }
-        public virtual string Name { get; set; }
-        public virtual IList<string> GameModes { get; set; }
+        public string Id { get; set; }
+        public string Name { get; set; }
+        public IList<string> GameModes { get; set; }
 
         public ServerInfo() { }
 
         private bool Equals(ServerInfo other)
         {
-            return string.Equals(ServerId, other.ServerId);
+            return string.Equals(Id, other.Id);
         }
 
         public override bool Equals(object obj)
@@ -29,7 +29,7 @@ namespace DataCore
 
         public override int GetHashCode()
         {
-            return ServerId?.GetHashCode() ?? 0;
+            return Id?.GetHashCode() ?? 0;
         }
     }
 }

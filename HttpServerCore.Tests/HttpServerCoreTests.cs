@@ -97,18 +97,5 @@ namespace HttpServerCore.Tests
 
             callOrder.ShouldBeEquivalentTo(new[] {1, 2}, options => options.WithStrictOrdering());
         }
-
-        [Test]
-        public void ServerCanRegiserModule()
-        {
-            var registredFake = CreateFakeModule();
-            Prepare(defaultModule);
-            server.RegisterModule(registredFake);
-            server.Start();
-
-            client.Execute(new RestRequest("/", Method.GET));
-
-            A.CallTo(() => registredFake.ProcessRequest(A<IRequest>._)).MustHaveHappened();
-        }
     }
 }

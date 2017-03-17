@@ -7,15 +7,15 @@ namespace DataCore
 {
     public class MatchInfo
     {
-        public virtual int MatchId { get; set; }
-        public virtual ServerInfo HostServer { get; set; }
-        public virtual string Map { get; set; }
-        public virtual string GameMode { get; set; }
-        public virtual int FragLimit { get; set; }
-        public virtual int TimeLimit { get; set; }
-        public virtual double ElapsedTime { get; set; }
-        public virtual DateTime EndTime { get; set; }
-        public virtual IList<PlayerInfo> Scoreboard { get; set; }
+        public int MatchId { get; set; }
+        public ServerInfo HostServer { get; set; }
+        public string Map { get; set; }
+        public string GameMode { get; set; }
+        public int FragLimit { get; set; }
+        public int TimeLimit { get; set; }
+        public double ElapsedTime { get; set; }
+        public DateTime EndTime { get; set; }
+        public IList<PlayerInfo> Scoreboard { get; set; }
 
         public MatchInfo() { }
 
@@ -29,7 +29,7 @@ namespace DataCore
             return this;
         }
 
-        protected bool Equals(MatchInfo other)
+        private bool Equals(MatchInfo other)
         {
             return MatchId == other.MatchId && Equals(HostServer, other.HostServer) && string.Equals(Map, other.Map) &&
                    Equals(GameMode, other.GameMode) && FragLimit == other.FragLimit && TimeLimit == other.TimeLimit &&

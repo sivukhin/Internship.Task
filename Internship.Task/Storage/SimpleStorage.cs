@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using DataCore;
 
@@ -41,6 +42,11 @@ namespace StatisticServer.Storage
             MatchInfo info;
             matchInfo.TryGetValue(Tuple.Create(serverId, endTime), out info);
             return Task.FromResult(info);
+        }
+
+        public Task<IEnumerable<MatchInfo>> GetAllMatchesInfo()
+        {
+            return Task.FromResult(matchInfo.Values.AsEnumerable());
         }
 
         public Task<ServerStatistic> GetServerStatistics(string serverId)

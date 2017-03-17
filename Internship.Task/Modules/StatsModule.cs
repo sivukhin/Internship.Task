@@ -20,11 +20,11 @@ namespace StatisticServer.Modules
         {
             new RequestFilter(
                 HttpMethodEnum.Get, 
-                new Regex("^/servers/(?<serverId>.*?)/stats$", RegexOptions.Compiled), 
+                new Regex("^/servers/(?<serverId>[^/]*)/stats$", RegexOptions.Compiled), 
                 (request, match) => GetFullServerStatistic(match.Groups["serverId"].Value)),
             new RequestFilter(
                 HttpMethodEnum.Get, 
-                new Regex("^/players/(?<name>.*?)/stats$", RegexOptions.Compiled), 
+                new Regex("^/players/(?<name>[^/]*)/stats$", RegexOptions.Compiled), 
                 (request, match) => GetFullPlayerStatstic(match.Groups["name"].Value)),
         };
 

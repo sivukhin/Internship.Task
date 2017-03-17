@@ -32,7 +32,7 @@ namespace StatisticServer.Storage
         private static GroupedStat<MatchInfo, T, string> CreateStat<T>
             (Func<DataIdentity<MatchInfo>, IStat<MatchInfo, T>> statFactory)
         {
-            return new GroupedStat<MatchInfo, T, string>(server => server.HostServer.ServerId, () => statFactory(Info));
+            return new GroupedStat<MatchInfo, T, string>(server => server.HostServer.Id, () => statFactory(Info));
         }
 
         private readonly GroupedStat<MatchInfo, int, string> totalMatchesPlayed =

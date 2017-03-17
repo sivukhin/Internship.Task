@@ -55,7 +55,7 @@ namespace StatisticServer.Storage
             CreateStat(player => player.Select(info => info.BaseMatch.HostServer.Name).Favorite());
 
         private readonly GroupedStat<PlayerInfo, int, string> uniqueServers =
-            CreateStat(player => player.Split(info => info.BaseMatch.HostServer.ServerId, splitted => splitted.Existence()).Count());
+            CreateStat(player => player.Split(info => info.BaseMatch.HostServer.Id, splitted => splitted.Existence()).Count());
 
         private readonly GroupedStat<PlayerInfo, string, string> favoriteGameMode =
             CreateStat(player => player.Select(info => info.BaseMatch.GameMode).Favorite());

@@ -39,7 +39,13 @@ namespace HttpServerCore
             if (Response == null)
                 Response = defaultResponse;
             Response.WriteToListenerResponse(context.Response);
-            context.Response.Close();
+        }
+
+        public async Task SendAttachedResponseAsync()
+        {
+            if (Response == null)
+                Response = defaultResponse;
+            await Response.WriteToListenerResponseAsync(context.Response);
         }
 
         public override string ToString()

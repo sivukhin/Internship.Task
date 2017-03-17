@@ -21,11 +21,6 @@ namespace HttpServerCore
                 ["post"] = HttpMethodEnum.Post
             };
 
-        public static bool IsResponded(this IRequest request)
-        {
-            return request.Response != null;
-        }
-
         public static string Serialize(object data)
         {
             var serializer = new JsonSerializer();
@@ -48,8 +43,18 @@ namespace HttpServerCore
         public static void WriteToListenerResponse(this IResponse response, HttpListenerResponse listenerResponse)
         {
             listenerResponse.StatusCode = (int)response.StatusCode;
-            using (var responseStream = new StreamWriter(listenerResponse.OutputStream))
-                responseStream.Write(response.Content);
+            var contentBytes = Encoding.UTF8.GetBytes(response.Content);
+            listenerResponse.ContentLength64 = contentBytes.Length;
+            listenerResponse.Close(contentBytes, false);
+        }
+
+        public static async Task WriteToListenerResponseAsync(this IResponse response, HttpListenerResponse listenerResponse)
+        {
+            listenerResponse.StatusCode = (int)response.StatusCode;
+            var contentBytes = Encoding.UTF8.GetBytes(response.Content);
+            listenerResponse.ContentLength64 = contentBytes.Length;
+            await listenerResponse.OutputStream.WriteAsync(contentBytes, 0, contentBytes.Length);
+            listenerResponse.Close();
         }
 
         public static IRequest AttachResponse(this IRequest request, IResponse response)

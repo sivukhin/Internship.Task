@@ -18,14 +18,14 @@ namespace StatisticServer.Modules
     {
         protected abstract ILogger Logger { get; }
 
-        private IEnumerable<RequestFilter> filters { get; set; }
+        private List<RequestFilter> filters { get; set; }
         protected abstract IEnumerable<RequestFilter> Filters { get; }
 
         public async Task<IRequest> ProcessRequest(IRequest request)
         {
-            Logger.Info("Get request: {0}", request);
+//            Logger.Info("Get request: {0}", request);
             if (filters == null)
-                filters = Filters;
+                filters = Filters.ToList();
             try
             {
                 return await filters.Aggregate(Task.FromResult(request),

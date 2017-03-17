@@ -20,12 +20,12 @@ namespace StatisticServer.Modules
         {
             new RequestFilter(
                 HttpMethodEnum.Put, 
-                new Regex("^/servers/(?<serverId>.*?)/info$", RegexOptions.Compiled), 
+                new Regex("^/servers/(?<serverId>[^/]*)/info$", RegexOptions.Compiled), 
                 (request, match) => UpdateServerInfo(request, match.Groups["serverId"].Value)),
             
             new RequestFilter(
                 HttpMethodEnum.Put,
-                new Regex("^/servers/(?<serverId>.*?)/matches/(?<endTime>.*?)$", RegexOptions.Compiled),
+                new Regex("^/servers/(?<serverId>[^/]*)/matches/(?<endTime>.*)$", RegexOptions.Compiled),
                 (request, match) => AddMatchStatistic(request, match.Groups["serverId"].Value, DateTime.Parse(match.Groups["endTime"].Value)))
         };
 

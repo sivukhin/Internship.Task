@@ -2,7 +2,9 @@
 using System.Collections.Generic;
 using System.Net;
 using System.Text.RegularExpressions;
+using System.Threading;
 using System.Threading.Tasks;
+using DataCore;
 using HttpServerCore;
 using NLog;
 using StatisticServer.Storage;
@@ -18,7 +20,7 @@ namespace StatisticServer.Modules
         {
             new RequestFilter(
                 HttpMethodEnum.Get, 
-                new Regex("^/servers/(?<serverId>.*?)/info$", RegexOptions.Compiled), 
+                new Regex("^/servers/(?<serverId>[^/]?)/info$", RegexOptions.Compiled), 
                 (request, match) => GetServerInfo(match.Groups["serverId"].Value)),
 
             new RequestFilter(
@@ -28,7 +30,7 @@ namespace StatisticServer.Modules
 
             new RequestFilter(
                 HttpMethodEnum.Get, 
-                new Regex("^/servers/(?<serverId>.*?)/matches/(?<endTime>.*?)$", RegexOptions.Compiled), 
+                new Regex("^/servers/(?<serverId>[^/]*)/matches/(?<endTime>.*)$", RegexOptions.Compiled), 
                 (request, match) => GetMatchInfo(match.Groups["serverId"].Value, DateTime.Parse(match.Groups["endTime"].Value))),  
         };
 

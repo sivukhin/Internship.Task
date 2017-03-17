@@ -6,6 +6,5 @@ namespace HttpServerCore
     {
         void Start();
         void Stop();
-        void RegisterModule(IServerModule module);
     }
 }

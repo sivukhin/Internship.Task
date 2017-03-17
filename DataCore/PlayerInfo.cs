@@ -5,18 +5,18 @@ namespace DataCore
 {
     public class PlayerInfo
     {
-        public virtual int PlayerId { get; set; }
-        public virtual string Name { get; set; }
-        public virtual int Frags { get; set; }
-        public virtual int Kills { get; set; }
-        public virtual int Deaths { get; set; }
+        public int PlayerId { get; set; }
+        public string Name { get; set; }
+        public int Frags { get; set; }
+        public int Kills { get; set; }
+        public int Deaths { get; set; }
 
         [JsonIgnore]
-        public virtual MatchInfo BaseMatch { get; set; }
+        public MatchInfo BaseMatch { get; set; }
         [JsonIgnore]
-        public virtual double ScoreboardPercent { get; set; }
+        public double ScoreboardPercent { get; set; }
         [JsonIgnore]
-        public virtual bool AreWinner => BaseMatch.Scoreboard.First() == this;
+        public bool AreWinner => BaseMatch.Scoreboard.First() == this;
 
         private bool Equals(PlayerInfo other)
         {

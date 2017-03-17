@@ -1,4 +1,5 @@
 using System;
+using System.Threading.Tasks;
 
 namespace HttpServerCore
 {
@@ -11,5 +12,6 @@ namespace HttpServerCore
         IResponse Response { get; set; }
 
         void SendAttachedResponse();
+        Task SendAttachedResponseAsync();
     }
 }

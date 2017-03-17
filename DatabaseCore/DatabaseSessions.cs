@@ -3,75 +3,39 @@ using System.CodeDom;
 using System.IO;
 using System.Linq;
 using DataCore;
-using FluentNHibernate;
-using FluentNHibernate.Automapping;
-using FluentNHibernate.Automapping.Alterations;
-using FluentNHibernate.Cfg;
-using FluentNHibernate.Cfg.Db;
-using FluentNHibernate.Conventions.Helpers;
-using NHibernate;
-using NHibernate.Cfg;
-using NHibernate.Tool.hbm2ddl;
+using Raven.Client;
+using Raven.Client.Embedded;
+using Raven.Client.Indexes;
 
 namespace DatabaseCore
 {
-    public class AutomappingConfiguration : DefaultAutomappingConfiguration
+    public class Server_ById : AbstractIndexCreationTask<ServerInfo>
     {
-        public override bool IsId(Member member)
+        public Server_ById()
         {
-            return member.Name.EndsWith("Id");
-        }
-
-        public override bool ShouldMap(Type type)
-        {
-            return type.IsPublic;
+            Map = servers => servers.Select(s => new {ServerId = s.Id});
         }
     }
 
-    public class PlayerInfoOverride : IAutoMappingOverride<PlayerInfo>
+    public class Match_ById : AbstractIndexCreationTask<MatchInfo>
     {
-        public void Override(AutoMapping<PlayerInfo> mapping)
+        public Match_ById()
         {
-            mapping.Id(x => x.PlayerId);
-            mapping.IgnoreProperty(info => info.ScoreboardPercent);
-            mapping.IgnoreProperty(info => info.AreWinner);
+            Map = matches => matches.Select(m => new {ServerId = m.HostServer.Id, m.EndTime});
         }
     }
 
-    public class MatchInfoOverride : IAutoMappingOverride<MatchInfo>
+    public static class DatabaseConnection
     {
-        public void Override(AutoMapping<MatchInfo> mapping)
+        public static IDocumentStore GetStore()
         {
-            mapping.HasMany(info => info.Scoreboard).Cascade.SaveUpdate().Not.LazyLoad();
+            IDocumentStore store = new EmbeddableDocumentStore
+            {
+                DataDirectory = "database",
+                UseEmbeddedHttpServer = true,
+            };
+            store = store.Initialize();
+            return store;
         }
-    }
-
-    public static class DatabaseSessions
-    {
-        private static string dbFileName = "statistic_server.sqlite";
-        private static string dbFilePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, dbFileName);
-
-        public static ISessionFactory CreateSessionFactory()
-        {
-            return Fluently.Configure()
-                .Database(SQLiteConfiguration.Standard.UsingFile(dbFilePath))
-                .Mappings(configuration =>
-                {
-                    configuration.AutoMappings.Add(
-                        () =>
-                            AutoMap.AssemblyOf<PlayerInfo>(new AutomappingConfiguration())
-                            .UseOverridesFromAssemblyOf<PlayerInfoOverride>());
-                })
-                .ExposeConfiguration(BuildSchema)
-                .BuildSessionFactory();
-        }
-
-        private static void BuildSchema(Configuration configuration)
-        {
-            //TODO: Pass options from CLI 
-            if (File.Exists(dbFilePath))
-                File.Delete(dbFilePath);
-            new SchemaExport(configuration).Create(true, true);
-        }
-    }
+    }   
 }

@@ -1,24 +1,22 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Data.SQLite;
-using System.IO;
 using System.Linq;
-using System.Runtime.Serialization.Formatters;
+using System.Net;
+using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading;
+using System.Threading.Tasks;
 using DatabaseCore;
 using DataCore;
 using HttpServerCore;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Serialization;
 using NLog;
-using NLog.Layouts;
+using Raven.Client;
 using StatisticServer.Modules;
 using StatisticServer.Storage;
 
-namespace StatisticServer
+namespace RavenSandBox
 {
-
-    internal class Program
+    class Program
     {
         private static readonly Logger logger = LogManager.GetCurrentClassLogger();
         private static void Main(string[] args)
@@ -34,7 +32,7 @@ namespace StatisticServer
                     var statisticStorage = new FullStatisticStorage(storage, serverStatistics, playerStatistics,
                         reportStorage);
                     using (var server = new HttpServer(
-                        new HttpServerOptions {Prefix = "http://127.0.0.1:12345/"},
+                        new HttpServerOptions { Prefix = "http://127.0.0.1:12345/" },
                         new IServerModule[]
                         {
                             new UpdateStatisticModule(statisticStorage),
