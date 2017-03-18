@@ -35,15 +35,15 @@ namespace StatisticServer.Modules
                 (request, match) => GetMatchInfo(match.Groups["serverId"].Value, DateTime.Parse(match.Groups["endTime"].Value))),  
         };
 
-        private readonly IStatisticStorage statisticStorage;
-        public GetStatisticModule(IStatisticStorage storage)
+        private readonly IDataStatisticStorage dataStatisticStorage;
+        public GetStatisticModule(IDataStatisticStorage storage)
         {
-            statisticStorage = storage;
+            dataStatisticStorage = storage;
         }
 
         public async Task<IResponse> GetServerInfo(string serverId)
         {
-            var serverInfo = await statisticStorage.GetServer(new ServerInfo.ServerInfoId {Id = serverId});
+            var serverInfo = await dataStatisticStorage.GetServer(new ServerInfo.ServerInfoId {Id = serverId});
             if (serverInfo == null)
                 return new HttpResponse(HttpStatusCode.NotFound);
             return new JsonHttpResponse(HttpStatusCode.OK, serverInfo);
@@ -51,7 +51,7 @@ namespace StatisticServer.Modules
 
         public async Task<IResponse> GetAllServersInfo()
         {
-            var allServersInfo = await statisticStorage.GetAllServers();
+            var allServersInfo = await dataStatisticStorage.GetAllServers();
             return new JsonHttpResponse(HttpStatusCode.OK, allServersInfo.Select(server => new
             {
                 endpoint = server.Id,
@@ -61,7 +61,7 @@ namespace StatisticServer.Modules
 
         public async Task<IResponse> GetMatchInfo(string serverId, DateTime endTime)
         {
-            var matchInfo = await statisticStorage.GetMatch(new MatchInfo.MatchInfoId {ServerId = serverId, EndTime = endTime});
+            var matchInfo = await dataStatisticStorage.GetMatch(new MatchInfo.MatchInfoId {ServerId = serverId, EndTime = endTime});
             if (matchInfo == null)
                 return new HttpResponse(HttpStatusCode.NotFound);
             return new JsonHttpResponse(HttpStatusCode.OK, matchInfo);

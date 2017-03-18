@@ -5,7 +5,7 @@ using DataCore;
 
 namespace StatisticServer.Storage
 {
-    public interface IStatisticStorage : IDataRepository
+    public interface IDataStatisticStorage : IDataRepository
     {
     }
 }

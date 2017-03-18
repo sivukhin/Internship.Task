@@ -14,7 +14,7 @@ namespace StatisticServer.Tests
 {
     public abstract class BaseModuleTests
     {
-        protected IStatisticStorage storage;
+        protected IDataStatisticStorage storage;
 
         protected string Host1 = "host1-1";
         protected string Host2 = "host2-2";

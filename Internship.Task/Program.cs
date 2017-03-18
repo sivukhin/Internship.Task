@@ -21,7 +21,7 @@ using StatisticServer.Storage;
 
 namespace StatisticServer
 {
-    public class CommandLineOptions
+    public class ApplicationOptions
     {
         public string Prefix { get; set; }
         public string DatabaseDirectory { get; set; }
@@ -61,11 +61,18 @@ namespace StatisticServer
             RunApplication(options);
         }
 
-        private static void RunApplication(CommandLineOptions options)
+        private static void RunApplication(ApplicationOptions options)
         {
             logger.Info("Application started");
             ConfigureApplication();
-            Start();
+            var container = CompositionRoot(options);
+            using (var lifetimeScope = container.BeginLifetimeScope())
+            {
+                var server = lifetimeScope.Resolve<IHttpServer>();
+                server.Start();
+                Console.Error.WriteLine("Press Ctrl+C for interrupt server");
+                Thread.CurrentThread.Join();
+            }
         }
 
         private static void ConfigureApplication()
@@ -76,17 +83,20 @@ namespace StatisticServer
             };
         }
 
-        private static IContainer CompositionRoot()
+        private static IContainer CompositionRoot(ApplicationOptions options)
         {
             var builder = new ContainerBuilder();
             builder.RegisterType<PlayerStatisticStorage>().AsImplementedInterfaces();
             builder.RegisterType<ServerStatisticStorage>().AsImplementedInterfaces();
             builder.RegisterType<ReportStorage>().AsSelf();
-            builder.RegisterInstance(new RavenDbStorage(DatabaseConnection.GetStore()));
+            builder.RegisterInstance(new RavenDbStorage(DatabaseConnection.GetStore())).As<IDataRepository>();
+            builder.RegisterType<DataStatisticStorage>().As<IDataStatisticStorage>().SingleInstance();
 
             builder.RegisterAssemblyTypes(Assembly.GetAssembly(typeof(BaseModule)))
-                .Where(t => t.IsInstanceOfType(typeof(IServerModule)))
+                .Where(t => t.IsAssignableTo<IServerModule>())
                 .AsImplementedInterfaces();
+            builder.RegisterType<HttpServer>().AsImplementedInterfaces();
+            builder.RegisterInstance(new HttpServerOptions {Prefix = options.Prefix}).AsSelf();
 
             return builder.Build();
         }
@@ -98,9 +108,9 @@ namespace StatisticServer
             return result.HasErrors || result.HelpCalled;
         }
 
-        private static FluentCommandLineParser<CommandLineOptions> ConfigureParser()
+        private static FluentCommandLineParser<ApplicationOptions> ConfigureParser()
         {
-            var parser = new FluentCommandLineParser<CommandLineOptions>();
+            var parser = new FluentCommandLineParser<ApplicationOptions>();
             parser.Setup(arg => arg.Prefix)
                 .As('p', "prefix")
                 .Required()
@@ -121,31 +131,6 @@ namespace StatisticServer
             parser.SetupHelp("h", "help").Callback(text => Console.WriteLine(text));
 
             return parser;
-        }
-
-        private static void Start()
-        {
-            var serverStatistics = new ServerStatisticStorage();
-            var playerStatistics = new PlayerStatisticStorage();
-            var reportStorage = new ReportStorage(serverStatistics, playerStatistics);
-            using (var storage = new RavenDbStorage(DatabaseConnection.GetStore()))
-            {
-                var statisticStorage = new DataStatisticStorage(storage, serverStatistics, playerStatistics,
-                    reportStorage);
-                using (var server = new HttpServer(
-                    new HttpServerOptions {Prefix = "http://127.0.0.1:12345/"},
-                    new IServerModule[]
-                    {
-                        new UpdateStatisticModule(statisticStorage),
-                        new GetStatisticModule(statisticStorage),
-                        new StatsModule(serverStatistics, playerStatistics),
-                        new ReportsModule(reportStorage),
-                    }))
-                {
-                    server.Start();
-                    Thread.CurrentThread.Join();
-                }
-            }
         }
     }
 }

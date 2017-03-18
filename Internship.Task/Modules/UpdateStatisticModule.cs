@@ -29,11 +29,11 @@ namespace StatisticServer.Modules
                 (request, match) => AddMatchStatistic(request, match.Groups["serverId"].Value, DateTime.Parse(match.Groups["endTime"].Value)))
         };
 
-        private readonly IStatisticStorage statisticStorage;
+        private readonly IDataStatisticStorage dataStatisticStorage;
 
-        public UpdateStatisticModule(IStatisticStorage storage)
+        public UpdateStatisticModule(IDataStatisticStorage storage)
         {
-            statisticStorage = storage;
+            dataStatisticStorage = storage;
         }
 
         public async Task<IResponse> UpdateServerInfo(IRequest request, string serverId)
@@ -47,7 +47,7 @@ namespace StatisticServer.Modules
             {
                 throw new InvalidQueryException($"Invalid json format for update module: {request.Content}", e);
             }
-            await statisticStorage.UpdateServer(new ServerInfo.ServerInfoId { Id = serverId}, serverInfo);
+            await dataStatisticStorage.UpdateServer(new ServerInfo.ServerInfoId { Id = serverId}, serverInfo);
             return new HttpResponse(HttpStatusCode.OK);
         }
 
@@ -64,10 +64,10 @@ namespace StatisticServer.Modules
                 throw new InvalidQueryException($"Invalid json format for update module: {request.Content}", e);
             }
 
-            var serverInfo = await statisticStorage.GetServer(new ServerInfo.ServerInfoId {Id = serverId});
+            var serverInfo = await dataStatisticStorage.GetServer(new ServerInfo.ServerInfoId {Id = serverId});
             if (serverInfo == null)
                 return new HttpResponse(HttpStatusCode.BadRequest);
-            await statisticStorage.UpdateMatch(new MatchInfo.MatchInfoId {ServerId = serverId, EndTime = endTime}, matchInfo);
+            await dataStatisticStorage.UpdateMatch(new MatchInfo.MatchInfoId {ServerId = serverId, EndTime = endTime}, matchInfo);
             return new HttpResponse(HttpStatusCode.OK);
         }
     }

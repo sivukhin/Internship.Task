@@ -108,7 +108,7 @@
     <Compile Include="Modules\UpdateStatisticModule.cs" />
     <Compile Include="Storage\BaseStatisticStorage.cs" />
     <Compile Include="Storage\IDataRepository.cs" />
-    <Compile Include="Storage\IStatisticStorage.cs" />
+    <Compile Include="Storage\IDataStatisticStorage.cs" />
     <Compile Include="Storage\PlayerStatisticStorage.cs" />
     <Compile Include="Storage\RavenDBStorage.cs" />
     <Compile Include="Storage\ReportStorage.cs" />

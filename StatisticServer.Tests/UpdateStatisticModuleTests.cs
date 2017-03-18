@@ -23,7 +23,7 @@ namespace StatisticServer.Tests
         [SetUp]
         public void SetUp()
         {
-            storage = A.Fake<IStatisticStorage>();
+            storage = A.Fake<IDataStatisticStorage>();
             A.CallTo(() => storage.GetMatch(A<MatchInfo.MatchInfoId>._)).Returns((MatchInfo)null);
             A.CallTo(() => storage.GetServer(A<ServerInfo.ServerInfoId>._)).Returns((ServerInfo)null);
         }

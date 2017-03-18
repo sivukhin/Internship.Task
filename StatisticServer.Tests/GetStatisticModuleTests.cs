@@ -23,7 +23,7 @@ namespace StatisticServer.Tests
         [SetUp]
         public void SetUp()
         {
-            storage = A.Fake<IStatisticStorage>();
+            storage = A.Fake<IDataStatisticStorage>();
             registredServers = new List<ServerInfo>();
 
             A.CallTo(() => storage.GetAllServers()).Returns(registredServers);

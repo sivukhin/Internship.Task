@@ -9,7 +9,7 @@ using NLog;
 
 namespace StatisticServer.Storage
 {
-    public class DataStatisticStorage : IStatisticStorage, IDisposable
+    public class DataStatisticStorage : IDataStatisticStorage, IDisposable
     {
         private static readonly Logger logger = LogManager.GetCurrentClassLogger();
 
