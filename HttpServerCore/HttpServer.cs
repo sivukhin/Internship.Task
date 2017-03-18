@@ -91,6 +91,7 @@ namespace HttpServerCore
 
         private async void ProcessContext(HttpListenerContext context)
         {
+            logger.ConditionalTrace("Incoming request: {0}", context);
             IRequest request = new HttpRequest(context);
             foreach (var module in registredModules)
                 request = await module.ProcessRequest(request);

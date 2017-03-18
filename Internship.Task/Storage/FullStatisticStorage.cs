@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -39,6 +40,8 @@ namespace StatisticServer.Storage
 
         private async Task InitServerStatisticsProvider()
         {
+            var stopwatch = new Stopwatch().Run();
+
             logger.Info("Initialize server statistics from database");
             int processedMatches = 0, processedPlayers = 0, processedServers = 0;
             foreach (var server in await statisticStorage.GetAllServersInfo())
@@ -46,7 +49,7 @@ namespace StatisticServer.Storage
                 InsertServer(server);
                 processedServers++;
             }
-            logger.Info($"Successfully processed {processedServers} servers entries");
+            logger.Info($"Successfully processed {processedServers} servers entries (elapsed {stopwatch.ElapsedMilliseconds} ms)");
 
             foreach (var match in await statisticStorage.GetAllMatchesInfo())
             {
@@ -54,8 +57,8 @@ namespace StatisticServer.Storage
                 processedMatches++;
                 processedPlayers += match.Scoreboard.Count;
             }
-            logger.Info($"Successfully processed {processedMatches} match entries");
-            logger.Info($"Successfully processed {processedPlayers} players entries");
+            logger.Info($"Successfully processed {processedMatches} match entries (elapsed {stopwatch.ElapsedMilliseconds} ms)");
+            logger.Info($"Successfully processed {processedPlayers} players entries (elapsed {stopwatch.ElapsedMilliseconds} ms)");
         }
 
         public async Task UpdateServerInfo(string serverId, ServerInfo info)

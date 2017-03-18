@@ -16,14 +16,14 @@ namespace StatisticServer.Modules
     }
     public abstract class BaseModule : IServerModule
     {
-        protected abstract ILogger Logger { get; }
+        protected abstract Logger Logger { get; }
 
         private List<RequestFilter> filters { get; set; }
         protected abstract IEnumerable<RequestFilter> Filters { get; }
 
         public async Task<IRequest> ProcessRequest(IRequest request)
         {
-            //Logger.Info("Get request: {0}", request);
+            Logger.ConditionalTrace("Get request: {0}", request);
             if (filters == null)
                 filters = Filters.ToList();
             try

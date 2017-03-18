@@ -13,8 +13,8 @@ namespace StatisticServer.Modules
 {
     public class StatsModule : BaseModule
     {
-        private ILogger logger;
-        protected override ILogger Logger => logger ?? (logger = LogManager.GetCurrentClassLogger());
+        private Logger logger;
+        protected override Logger Logger => logger ?? (logger = LogManager.GetCurrentClassLogger());
 
         protected override IEnumerable<RequestFilter> Filters => new[]
         {

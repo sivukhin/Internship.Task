@@ -76,20 +76,20 @@ namespace StatisticServer.Storage
 
         public void Update(ServerInfo serverInfo)
         {
-            logger.Info("Update reports with server: {0}", serverInfo);
+            logger.ConditionalTrace("Update reports with server: {0}", serverInfo);
             allServers.Add(serverInfo);
             popularServers.Add(serverInfo);
         }
 
         public void Update(PlayerInfo playerInfo)
         {
-            logger.Info("Update reports with player: {0}", playerInfo);
+            logger.ConditionalTrace("Update reports with player: {0}", playerInfo);
             bestPlayers.Add(playerInfo);
         }
 
         public void Update(MatchInfo matchInfo)
         {
-            logger.Info("Update reports with match: {0}", matchInfo);
+            logger.ConditionalTrace("Update reports with match: {0}", matchInfo);
             recentMatches.Add(matchInfo);
         }
         

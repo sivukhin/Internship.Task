@@ -14,13 +14,14 @@ namespace StatisticServer.Modules
 {
     public class ReportsModule : BaseModule
     {
+        private Logger logger;
+        protected override Logger Logger => logger ?? (logger = LogManager.GetCurrentClassLogger());
+
         private readonly IAggregateReportStorage reportStorage;
         private readonly int DefaultCountParameter = 5;
         private int MinCountParameter = 0;
         private int MaxCountParameter = 50;
-        private ILogger logger;
-        protected override ILogger Logger => logger ?? (logger = LogManager.GetCurrentClassLogger());
-
+        
         public ReportsModule(IAggregateReportStorage reportStorage)
         {
             this.reportStorage = reportStorage;

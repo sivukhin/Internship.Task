@@ -25,4 +25,5 @@ match = {
 server = '10'
 timestamp = '2017-01-22T15:17:00Z'
 
-print(requests.put('http://localhost:12345/servers/{}/matches/{}'.format(server, timestamp), data=json.dumps(match)))
+def put_query():
+	return requests.put('http://127.0.0.1:12345/servers/{}/matches/{}'.format(server, timestamp), data=json.dumps(match))

@@ -3,6 +3,7 @@ using System.CodeDom;
 using System.IO;
 using System.Linq;
 using DataCore;
+using Raven.Abstractions.Replication;
 using Raven.Client;
 using Raven.Client.Embedded;
 using Raven.Client.Indexes;

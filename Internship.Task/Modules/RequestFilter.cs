@@ -32,16 +32,16 @@ namespace StatisticServer.Modules
 
         public async Task<IRequest> FilterRequest(IRequest request)
         {
-//            logger.Trace("Process request: {0}", new {Filter = this, Request = request});
+            logger.ConditionalTrace("Process request: {0}", new {Filter = this, Request = request});
 
             if (AllowedMethods != request.HttpMethod)
                 return await Task.FromResult(request);
             var match = request.MatchLocalPath(UrlPattern);
             if (match.Success)
             {
-//                logger.Trace("Accept request: {0}", new {Filter = this, Request = request});
+                logger.ConditionalTrace("Accept request: {0}", new {Filter = this, Request = request});
                 var response = await RequestTransform(request, match);
-//                logger.Trace("Generate response: {0}", new {Request = request, Response = response});
+                logger.ConditionalTrace("Generate response: {0}", new {Request = request, Response = response});
                 return request.AttachResponse(response);
             }
             return await Task.FromResult(request);
