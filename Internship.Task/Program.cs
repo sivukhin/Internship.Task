@@ -17,7 +17,6 @@ using StatisticServer.Storage;
 
 namespace StatisticServer
 {
-
     internal class Program
     {
         private static readonly Logger logger = LogManager.GetCurrentClassLogger();

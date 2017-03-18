@@ -64,7 +64,7 @@ namespace StatisticServer.Storage
         public async Task UpdateServerInfo(string serverId, ServerInfo info)
         {
             info.Id = serverId;
-            logger.Trace("Update information about server {0}", info);
+            logger.ConditionalTrace("Update information about server {0}", info);
 
             InsertServer(info);
             await statisticStorage.UpdateServerInfo(serverId, info);
@@ -77,21 +77,21 @@ namespace StatisticServer.Storage
 
         public async Task<ServerInfo> GetServerInfo(string serverId)
         {
-            logger.Trace("Retrive information about server {0}", new {ServerId = serverId});
+            logger.ConditionalTrace("Retrive information about server {0}", new {ServerId = serverId});
 
             return await statisticStorage.GetServerInfo(serverId);
         }
 
         public Task<IEnumerable<ServerInfo>> GetAllServersInfo()
         {
-            logger.Trace("Retrieve information about all servers");
+            logger.ConditionalTrace("Retrieve information about all servers");
 
             return Task.FromResult(reportStorage.AllServers());
         }
 
         public async Task UpdateMatchInfo(string serverId, DateTime endTime, MatchInfo matchInfo)
         {
-            logger.Trace("Update information about match {0}",
+            logger.ConditionalTrace("Update information about match {0}",
                 new {ServerId = serverId, EndTime = endTime, MatchInfo = matchInfo});
 
             var server = await statisticStorage.GetServerInfo(serverId);
@@ -135,14 +135,14 @@ namespace StatisticServer.Storage
 
         public async Task<MatchInfo> GetMatchInfo(string serverId, DateTime endTime)
         {
-            logger.Trace("Retrieve information about match {0}", new {ServerId = serverId, EndTime = endTime});
+            logger.ConditionalTrace("Retrieve information about match {0}", new {ServerId = serverId, EndTime = endTime});
 
             return await statisticStorage.GetMatchInfo(serverId, endTime);
         }
 
         public async Task<IEnumerable<MatchInfo>> GetAllMatchesInfo()
         {
-            logger.Trace("Retrieve information about all matches");
+            logger.ConditionalTrace("Retrieve information about all matches");
 
             return await statisticStorage.GetAllMatchesInfo();
         }

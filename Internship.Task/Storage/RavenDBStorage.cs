@@ -12,6 +12,8 @@ namespace StatisticServer.Storage
     public class RavenDbStorage : IStatisticStorage, IDisposable
     {
         private readonly IDocumentStore store;
+        private const int PageSize = 1024;
+        private const int SessionQueryLimit = 30;
 
         public RavenDbStorage(IDocumentStore store)
         {
@@ -35,27 +37,46 @@ namespace StatisticServer.Storage
             }
         }
 
-        public async Task<IEnumerable<ServerInfo>> GetAllServersInfo()
+        private async Task<List<T>> GetSomePages<T>(int offset)
         {
-            var result = new List<ServerInfo>();
+            var result = new List<T>();
             using (var session = store.OpenAsyncSession())
             {
-                var pageSize = 1024;
-                RavenQueryStatistics queryStat;
-                var firstPage = await session.Query<ServerInfo>().Statistics(out queryStat).Take(pageSize).ToListAsync();
-                var remain = queryStat.TotalResults - firstPage.Count;
-                result.AddRange(firstPage);
-                var processed = firstPage.Count;
-                while (remain > 0)
+                for (int i = 0; i < SessionQueryLimit; i++)
                 {
-                    var nextPage = await session.Query<ServerInfo>().Skip(processed).Take(pageSize).ToListAsync();
-                    remain -= nextPage.Count;
-                    processed += nextPage.Count;
-                    result.AddRange(nextPage);
+                    RavenQueryStatistics queryStat;
+                    var page = await session.Query<T>()
+                        .Statistics(out queryStat)
+                        .Skip(offset)
+                        .Take(PageSize)
+                        .ToListAsync();
+                    result.AddRange(page);
+                    offset += page.Count;
+                    if (offset == queryStat.TotalResults)
+                        break;
                 }
             }
             return result;
-            
+        }
+
+        private async Task<IEnumerable<T>> GetAllItems<T>()
+        {
+            int offset = 0;
+            var result = new List<T>();
+            while (true)
+            {
+                var pages = await GetSomePages<T>(offset);
+                result.AddRange(pages);
+                offset += pages.Count;
+                if (pages.Count == 0)
+                    break;
+            }
+            return result;
+        }
+
+        public async Task<IEnumerable<ServerInfo>> GetAllServersInfo()
+        {
+            return await GetAllItems<ServerInfo>();
         }
 
         public async Task UpdateMatchInfo(string serverId, DateTime endTime, MatchInfo matchInfo)
@@ -82,9 +103,9 @@ namespace StatisticServer.Storage
             }
         }
 
-        public Task<IEnumerable<MatchInfo>> GetAllMatchesInfo()
+        public async Task<IEnumerable<MatchInfo>> GetAllMatchesInfo()
         {
-            return Task.FromResult(new MatchInfo[] {}.AsEnumerable());
+            return (await GetAllItems<MatchInfo>()).Select(match => match.InitPlayers(match.EndTime));
         }
 
         public void Dispose()
