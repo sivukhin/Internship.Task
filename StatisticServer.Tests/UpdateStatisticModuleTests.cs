@@ -9,6 +9,7 @@ using FakeItEasy;
 using FluentAssertions;
 using HttpServerCore;
 using NUnit.Framework;
+using Raven.Imports.Newtonsoft.Json;
 using StatisticServer.Modules;
 using StatisticServer.Storage;
 
@@ -30,7 +31,7 @@ namespace StatisticServer.Tests
         [Test]
         public async Task ModuleSetNewServerInfo()
         {
-            var response = await Module.UpdateServerInfo(CreateRequest(HttpServerExtensions.Serialize(Server1)), Host1);
+            var response = await Module.UpdateServerInfo(CreateRequest(JsonConvert.SerializeObject(Server1)), Host1);
 
             response.Should().Be(new HttpResponse(HttpStatusCode.OK));
 
@@ -40,9 +41,9 @@ namespace StatisticServer.Tests
         [Test]
         public async Task ModuleUpdateServerInfo()
         {
-            await Module.UpdateServerInfo(CreateRequest(HttpServerExtensions.Serialize(Server1)), Host1);
+            await Module.UpdateServerInfo(CreateRequest(JsonConvert.SerializeObject(Server1)), Host1);
             var updateResponse = await Module
-                .UpdateServerInfo(CreateRequest(HttpServerExtensions.Serialize(Server2)), Host1);
+                .UpdateServerInfo(CreateRequest(JsonConvert.SerializeObject(Server2)), Host1);
 
             updateResponse.Should().Be(new HttpResponse(HttpStatusCode.OK));
 
@@ -63,7 +64,7 @@ namespace StatisticServer.Tests
         {
             AddServer(Host1, Server1);
             var response = await Module
-                .AddMatchStatistic(CreateRequest(HttpServerExtensions.Serialize(Server1)), Host1, DateTime1);
+                .AddMatchStatistic(CreateRequest(JsonConvert.SerializeObject(Server1)), Host1, DateTime1);
 
             A.CallTo(() => storage.UpdateMatchInfo(Host1, DateTime1, A<MatchInfo>._)).MustHaveHappened();
             response.Should().Be(new HttpResponse(HttpStatusCode.OK));

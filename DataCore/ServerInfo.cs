@@ -8,11 +8,11 @@ namespace DataCore
 {
     public class ServerInfo
     {
+        [JsonIgnore]
         public string Id { get; set; }
+
         public string Name { get; set; }
         public IList<string> GameModes { get; set; }
-
-        public ServerInfo() { }
 
         private bool Equals(ServerInfo other)
         {

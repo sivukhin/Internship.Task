@@ -11,18 +11,18 @@ namespace StatisticServer.Storage
 {
     public class FullStatisticStorage : IStatisticStorage
     {
-        private static Logger logger = LogManager.GetCurrentClassLogger();
+        private static readonly Logger logger = LogManager.GetCurrentClassLogger();
 
         private readonly IStatisticStorage statisticStorage;
         private readonly IServerStatisticStorage serverStatisticStorage;
         private readonly IPlayerStatisticStorage playerStatisticStorage;
-        private readonly IAggregateReportStorage reportStorage;
+        private readonly ReportStorage reportStorage;
 
         public FullStatisticStorage(
             IStatisticStorage statisticStorage,
             IServerStatisticStorage serverStatisticStorage, 
             IPlayerStatisticStorage playerStatisticStorage, 
-            IAggregateReportStorage reportStorage)
+            ReportStorage reportStorage)
         {
             logger.Info("Initialize full statistic storage");
 

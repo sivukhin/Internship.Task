@@ -22,6 +22,11 @@ namespace StatisticServer
         private static readonly Logger logger = LogManager.GetCurrentClassLogger();
         private static void Main(string[] args)
         {
+            JsonConvert.DefaultSettings = () => new JsonSerializerSettings
+            {
+                ContractResolver = new CamelCasePropertyNamesContractResolver()
+            };
+            
             logger.Info("Application started");
             try
             {

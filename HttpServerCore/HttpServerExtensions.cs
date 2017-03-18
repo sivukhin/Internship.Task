@@ -21,20 +21,6 @@ namespace HttpServerCore
                 ["post"] = HttpMethodEnum.Post
             };
 
-        public static string Serialize(object data)
-        {
-            var serializer = new JsonSerializer();
-            using (var memoryStream = new MemoryStream())
-            using (var streamWriter = new StreamWriter(memoryStream))
-            using (var jsonWriter = new JsonTextWriter(streamWriter))
-            {
-                serializer.Serialize(jsonWriter, data);
-                jsonWriter.Flush();
-                memoryStream.Position = 0;
-                return Encoding.UTF8.GetString(memoryStream.ToArray());
-            }
-        }
-
         public static HttpMethodEnum ToEnum(this string httpMethod)
         {
             return httpMethodMap[httpMethod.ToLower()];

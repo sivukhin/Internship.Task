@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net;
 using System.Text.RegularExpressions;
 using System.Threading;
@@ -51,7 +52,11 @@ namespace StatisticServer.Modules
         public async Task<IResponse> GetAllServersInfo()
         {
             var allServersInfo = await statisticStorage.GetAllServersInfo();
-            return new JsonHttpResponse(HttpStatusCode.OK, allServersInfo);
+            return new JsonHttpResponse(HttpStatusCode.OK, allServersInfo.Select(server => new
+            {
+                endpoint = server.Id,
+                info = server
+            }));
         }
 
         public async Task<IResponse> GetMatchInfo(string serverId, DateTime endTime)

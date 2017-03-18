@@ -13,31 +13,19 @@ using StatCore.Stats;
 
 namespace StatisticServer.Storage
 {
-    public interface IReportStorage<T>
+    public class PlayerReportResult
     {
-        void Update(T item);
+        public PlayerInfo Player { get; set; }
+        public double? KillToDeathRatio { get; set; }
     }
-
-    public interface IAggregateReportStorage : 
-        IReportStorage<ServerInfo>, 
-        IReportStorage<MatchInfo>,
-        IReportStorage<PlayerInfo>
-    {
-        IEnumerable<ServerInfo> PopularServers(int size);
-        IEnumerable<MatchInfo> RecentMatches(int size);
-        IEnumerable<PlayerInfo> BestPlayers(int size);
-        IEnumerable<ServerInfo> AllServers();
-    }
-
-
-    public class ReportStorage : IAggregateReportStorage
+    public class ReportStorage
     {
         private Logger logger = LogManager.GetCurrentClassLogger();
 
         private const int MaxReportSize = 50;
         private IStat<MatchInfo, IEnumerable<MatchInfo>> recentMatches;
         private IStat<ServerInfo, IEnumerable<ServerInfo>> popularServers;
-        private IStat<PlayerInfo, IEnumerable<PlayerInfo>> bestPlayers;
+        private IStat<PlayerInfo, IEnumerable<PlayerReportResult>> bestPlayers;
         private IStat<ServerInfo, IEnumerable<ServerInfo>> allServers;
         private readonly IServerStatisticStorage serverStatisticStorage;
         private readonly IPlayerStatisticStorage playerStatisticStorage;
@@ -64,14 +52,14 @@ namespace StatisticServer.Storage
                 var playerStat = playerStatisticStorage.GetStatistics(p.Name);
                 return playerStat.KillToDeathRatio != null && playerStat.TotalMatchesPlayed >= 10;
             })
+            .Select(p => new PlayerReportResult { Player = p, KillToDeathRatio = playerStatisticStorage.GetStatistics(p.Name).KillToDeathRatio})
             .Report(MaxReportSize, p =>
             {
-                var killToDeathRatio = playerStatisticStorage.GetStatistics(p.Name).KillToDeathRatio;
-                if (killToDeathRatio != null)
-                    return killToDeathRatio.Value;
-                throw new ArgumentException($"{nameof(killToDeathRatio)} must be not null");
+                if (p.KillToDeathRatio != null)
+                    return p.KillToDeathRatio.Value;
+                throw new ArgumentException($"{nameof(p.KillToDeathRatio)} must be not null");
             },
-            (p1, p2) => p1.PlayerId < p2.PlayerId);
+            (p1, p2) => String.Compare(p1.Player.Name, p2.Player.Name, StringComparison.Ordinal) == -1);
         }
 
         public void Update(ServerInfo serverInfo)
@@ -99,7 +87,7 @@ namespace StatisticServer.Storage
         public IEnumerable<ServerInfo> AllServers() =>
             allServers.Value.ToList();
 
-        public IEnumerable<PlayerInfo> BestPlayers(int size) =>
+        public IEnumerable<PlayerReportResult> BestPlayers(int size) =>
             bestPlayers.Value.Take(size).ToList();
 
         public IEnumerable<MatchInfo> RecentMatches(int size) =>

@@ -36,7 +36,7 @@ namespace StatisticServer.Tests
 
         protected MatchInfo Match1 => new MatchInfo
         {
-            ElapsedTime = 1.0,
+            TimeElapsed = 1.0,
             FragLimit = 10,
             GameMode = ModeA,
             Map = "map1",
@@ -50,7 +50,7 @@ namespace StatisticServer.Tests
 
         protected MatchInfo Match2 => new MatchInfo
         {
-            ElapsedTime = 2.0,
+            TimeElapsed = 2.0,
             FragLimit = 20,
             GameMode = Mode2,
             Map = "map2",

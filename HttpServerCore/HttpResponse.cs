@@ -50,7 +50,7 @@ namespace HttpServerCore
     public class JsonHttpResponse: HttpResponse
     {
         public JsonHttpResponse(HttpStatusCode statusCode, object data) :
-            base(statusCode, HttpServerExtensions.Serialize(data))
+            base(statusCode, JsonConvert.SerializeObject(data))
         {
             
         }

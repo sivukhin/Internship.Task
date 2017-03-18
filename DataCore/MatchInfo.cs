@@ -7,14 +7,19 @@ namespace DataCore
 {
     public class MatchInfo
     {
+        [JsonIgnore]
         public string Id { get; set; }
+
+        [JsonIgnore]
         public ServerInfo HostServer { get; set; }
+        [JsonIgnore]
+        public DateTime EndTime { get; set; }
+
         public string Map { get; set; }
         public string GameMode { get; set; }
         public int FragLimit { get; set; }
         public int TimeLimit { get; set; }
-        public double ElapsedTime { get; set; }
-        public DateTime EndTime { get; set; }
+        public double TimeElapsed { get; set; }
         public IList<PlayerInfo> Scoreboard { get; set; }
 
         public MatchInfo() { }

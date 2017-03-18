@@ -53,7 +53,19 @@ namespace StatisticServer.Tests
 
             var response = await Module.GetAllServersInfo();
 
-            response.ShouldBeEquivalentTo(new JsonHttpResponse(HttpStatusCode.OK, new[] {Server1, Server2}));
+            response.ShouldBeEquivalentTo(new JsonHttpResponse(HttpStatusCode.OK, new[]
+            {
+                new
+                {
+                    endpoint = Server1.Id,
+                    info = Server1
+                },
+                new
+                {
+                    endpoint = Server2.Id,
+                    info = Server2
+                }
+            }));
         }
 
         [Test]

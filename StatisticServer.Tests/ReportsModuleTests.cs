@@ -22,7 +22,7 @@ namespace StatisticServer.Tests
     {
         private IServerStatisticStorage serverStatisticStorage = new ServerStatisticStorage();
         private IPlayerStatisticStorage playerStatisticStorage = new PlayerStatisticStorage();
-        private IAggregateReportStorage reportStorage;
+        private ReportStorage reportStorage;
         private ReportsModule Module => new ReportsModule(reportStorage);
     }
 }

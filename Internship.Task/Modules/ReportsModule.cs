@@ -17,12 +17,12 @@ namespace StatisticServer.Modules
         private Logger logger;
         protected override Logger Logger => logger ?? (logger = LogManager.GetCurrentClassLogger());
 
-        private readonly IAggregateReportStorage reportStorage;
+        private readonly ReportStorage reportStorage;
         private readonly int DefaultCountParameter = 5;
         private int MinCountParameter = 0;
         private int MaxCountParameter = 50;
         
-        public ReportsModule(IAggregateReportStorage reportStorage)
+        public ReportsModule(ReportStorage reportStorage)
         {
             this.reportStorage = reportStorage;
         }
@@ -87,7 +87,12 @@ namespace StatisticServer.Modules
 
         private Task<IResponse> GetBestPlayers(int playersCount)
         {
-            IResponse response = new JsonHttpResponse(HttpStatusCode.OK, reportStorage.BestPlayers(playersCount));
+            var bestPlayers = reportStorage.BestPlayers(playersCount).Select(player => new
+            {
+                name = player.Player.Name,
+                killToDeathRatio = player.KillToDeathRatio
+            });
+            IResponse response = new JsonHttpResponse(HttpStatusCode.OK, bestPlayers);
             return Task.FromResult(response);
         }
 
@@ -99,7 +104,13 @@ namespace StatisticServer.Modules
 
         private Task<IResponse> GetRecentMatches(int matchCount)
         {
-            IResponse response = new JsonHttpResponse(HttpStatusCode.OK, reportStorage.RecentMatches(matchCount));
+            var recentMatches = reportStorage.RecentMatches(matchCount).Select(match => new
+            {
+                server = match.HostServer.Id,
+                timestamp = match.EndTime,
+                results = match
+            });
+            IResponse response = new JsonHttpResponse(HttpStatusCode.OK, recentMatches);
             return Task.FromResult(response);
         }
     }
