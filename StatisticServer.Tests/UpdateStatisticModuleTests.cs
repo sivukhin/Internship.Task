@@ -24,8 +24,8 @@ namespace StatisticServer.Tests
         public void SetUp()
         {
             storage = A.Fake<IStatisticStorage>();
-            A.CallTo(() => storage.GetMatchInfo(A<string>._, A<DateTime>._)).Returns((MatchInfo)null);
-            A.CallTo(() => storage.GetServerInfo(A<string>._)).Returns((ServerInfo)null);
+            A.CallTo(() => storage.GetMatch(A<MatchInfo.MatchInfoId>._)).Returns((MatchInfo)null);
+            A.CallTo(() => storage.GetServer(A<ServerInfo.ServerInfoId>._)).Returns((ServerInfo)null);
         }
 
         [Test]
@@ -35,7 +35,7 @@ namespace StatisticServer.Tests
 
             response.Should().Be(new HttpResponse(HttpStatusCode.OK));
 
-            A.CallTo(() => storage.UpdateServerInfo(Host1, Server1)).MustHaveHappened();
+            A.CallTo(() => storage.UpdateServer(new ServerInfo.ServerInfoId {Id = Host1}, Server1)).MustHaveHappened();
         }
 
         [Test]
@@ -47,8 +47,10 @@ namespace StatisticServer.Tests
 
             updateResponse.Should().Be(new HttpResponse(HttpStatusCode.OK));
 
-            A.CallTo(() => storage.UpdateServerInfo(Host1, Server1)).MustHaveHappened(Repeated.Exactly.Once);
-            A.CallTo(() => storage.UpdateServerInfo(Host1, Server2)).MustHaveHappened(Repeated.Exactly.Once);
+            A.CallTo(() => storage.UpdateServer(new ServerInfo.ServerInfoId {Id = Host1}, Server1))
+                .MustHaveHappened(Repeated.Exactly.Once);
+            A.CallTo(() => storage.UpdateServer(new ServerInfo.ServerInfoId {Id = Host1}, Server2))
+                .MustHaveHappened(Repeated.Exactly.Once);
         }
 
         [Test]
@@ -62,11 +64,12 @@ namespace StatisticServer.Tests
         [Test]
         public async Task ModuleAddNewMatchStatistic()
         {
-            AddServer(Host1, Server1);
+            AddServer(new ServerInfo.ServerInfoId {Id = Host1}, Server1);
             var response = await Module
                 .AddMatchStatistic(CreateRequest(JsonConvert.SerializeObject(Server1)), Host1, DateTime1);
 
-            A.CallTo(() => storage.UpdateMatchInfo(Host1, DateTime1, A<MatchInfo>._)).MustHaveHappened();
+            A.CallTo(() => storage.UpdateMatch(new MatchInfo.MatchInfoId {ServerId = Host1, EndTime = DateTime1}, A<MatchInfo>._))
+                .MustHaveHappened();
             response.Should().Be(new HttpResponse(HttpStatusCode.OK));
         }
     }

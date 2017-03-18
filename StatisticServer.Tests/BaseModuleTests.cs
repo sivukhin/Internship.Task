@@ -70,14 +70,14 @@ namespace StatisticServer.Tests
             return request;
         }
 
-        public virtual void AddServer(string serverId, ServerInfo serverInfo)
+        public virtual void AddServer(ServerInfo.ServerInfoId serverId, ServerInfo server)
         {
-            A.CallTo(() => storage.GetServerInfo(serverId)).Returns(serverInfo);
+            A.CallTo(() => storage.GetServer(serverId)).Returns(server);
         }
 
-        public void AddMatch(string serverId, DateTime endTime, MatchInfo matchInfo)
+        public void AddMatch(MatchInfo.MatchInfoId matchId, MatchInfo match)
         {
-            A.CallTo(() => storage.GetMatchInfo(serverId, endTime)).Returns(matchInfo);
+            A.CallTo(() => storage.GetMatch(matchId)).Returns(match);
         }
     }
 }

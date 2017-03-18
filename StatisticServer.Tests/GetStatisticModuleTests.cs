@@ -26,15 +26,15 @@ namespace StatisticServer.Tests
             storage = A.Fake<IStatisticStorage>();
             registredServers = new List<ServerInfo>();
 
-            A.CallTo(() => storage.GetAllServersInfo()).Returns(registredServers);
-            A.CallTo(() => storage.GetMatchInfo(A<string>._, A<DateTime>._)).Returns((MatchInfo)null);
-            A.CallTo(() => storage.GetServerInfo(A<string>._)).Returns((ServerInfo)null);
+            A.CallTo(() => storage.GetAllServers()).Returns(registredServers);
+            A.CallTo(() => storage.GetMatch(A<MatchInfo.MatchInfoId>._)).Returns((MatchInfo)null);
+            A.CallTo(() => storage.GetServer(A<ServerInfo.ServerInfoId>._)).Returns((ServerInfo)null);
         }
 
-        public override void AddServer(string serverId, ServerInfo serverInfo)
+        public override void AddServer(ServerInfo.ServerInfoId serverId, ServerInfo server)
         {
-            A.CallTo(() => storage.GetServerInfo(serverId)).Returns(serverInfo);
-            registredServers.Add(serverInfo);
+            A.CallTo(() => storage.GetServer(serverId)).Returns(server);
+            registredServers.Add(server);
         }
 
         [Test]
@@ -48,8 +48,8 @@ namespace StatisticServer.Tests
         [Test]
         public async Task ModuleReturnsAllServerInfos()
         {
-            AddServer(Host1, Server1);
-            AddServer(Host2, Server2);
+            AddServer(new ServerInfo.ServerInfoId {Id = Host1}, Server1);
+            AddServer(new ServerInfo.ServerInfoId {Id = Host2}, Server2);
 
             var response = await Module.GetAllServersInfo();
 
@@ -79,7 +79,7 @@ namespace StatisticServer.Tests
         [Test]
         public async Task ModuleReturnsServerInfo()
         {
-            AddServer(Host1, Server1);
+            AddServer(new ServerInfo.ServerInfoId {Id = Host1}, Server1);
 
             var response = await Module.GetServerInfo(Host1);
 
@@ -89,7 +89,7 @@ namespace StatisticServer.Tests
         [Test]
         public async Task ModuleReturnsNotFound_WhenNoMatchesFound()
         {
-            AddServer(Host1, Server1);
+            AddServer(new ServerInfo.ServerInfoId { Id = Host1 }, Server1);
 
             var response = await Module.GetMatchInfo(Host1, DateTime1);
 

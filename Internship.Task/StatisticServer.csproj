@@ -35,12 +35,20 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Autofac, Version=4.2.0.0, Culture=neutral, PublicKeyToken=17863af14b0044da, processorArchitecture=MSIL">
+      <HintPath>..\packages\Autofac.4.2.0\lib\net45\Autofac.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="Common.Logging, Version=3.1.0.0, Culture=neutral, PublicKeyToken=af08829b84f0328e, processorArchitecture=MSIL">
       <HintPath>..\packages\Common.Logging.3.1.0\lib\net40\Common.Logging.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Common.Logging.Core, Version=3.1.0.0, Culture=neutral, PublicKeyToken=af08829b84f0328e, processorArchitecture=MSIL">
       <HintPath>..\packages\Common.Logging.Core.3.1.0\lib\net40\Common.Logging.Core.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="FluentCommandLineParser, Version=1.4.3.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\FluentCommandLineParser.1.4.3\lib\net35\FluentCommandLineParser.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Newtonsoft.Json, Version=8.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
@@ -99,14 +107,14 @@
     <Compile Include="Modules\StatsModule.cs" />
     <Compile Include="Modules\UpdateStatisticModule.cs" />
     <Compile Include="Storage\BaseStatisticStorage.cs" />
+    <Compile Include="Storage\IDataRepository.cs" />
     <Compile Include="Storage\IStatisticStorage.cs" />
     <Compile Include="Storage\PlayerStatisticStorage.cs" />
     <Compile Include="Storage\RavenDBStorage.cs" />
     <Compile Include="Storage\ReportStorage.cs" />
-    <Compile Include="Storage\SimpleStorage.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Storage\FullStatisticStorage.cs" />
+    <Compile Include="Storage\DataStatisticStorage.cs" />
     <Compile Include="Storage\ServerStatisticStorage.cs" />
     <Compile Include="TimingExtensions.cs" />
   </ItemGroup>

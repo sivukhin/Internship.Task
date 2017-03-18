@@ -14,20 +14,15 @@ namespace DatabaseCore
     {
         public Server_ById()
         {
-            Map = servers => servers.Select(s => new {s.Id});
+            Map = servers => servers.Select(s => new ServerInfo.ServerInfoId {Id = s.Id});
         }
     }
 
     public class Match_ByIdAndTime : AbstractIndexCreationTask<MatchInfo>
     {
-        public class Result
-        {
-            public string ServerId { get; set; }
-            public DateTime EndTime { get; set; }
-        }
         public Match_ByIdAndTime()
         {
-            Map = matches => matches.Select(m => new {ServerId = m.HostServer.Id, EndTime = m.EndTime});
+            Map = matches => matches.Select(m => new MatchInfo.MatchInfoId {ServerId = m.HostServer.Id, EndTime = m.EndTime});
         }
     }
 

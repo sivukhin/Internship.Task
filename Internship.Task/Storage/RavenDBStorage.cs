@@ -9,7 +9,7 @@ using Raven.Client;
 
 namespace StatisticServer.Storage
 {
-    public class RavenDbStorage : IStatisticStorage, IDisposable
+    public class RavenDbStorage : IDataRepository
     {
         private readonly IDocumentStore store;
         private const int PageSize = 1024;
@@ -20,20 +20,20 @@ namespace StatisticServer.Storage
             this.store = store;
         }
 
-        public async Task UpdateServerInfo(string serverId, ServerInfo info)
+        public async Task UpdateServer(ServerInfo.ServerInfoId serverId, ServerInfo server)
         {
             using (var session = store.OpenAsyncSession())
             {
-                await session.StoreAsync(info);
+                await session.StoreAsync(server);
                 await session.SaveChangesAsync();
             }
         }
 
-        public async Task<ServerInfo> GetServerInfo(string serverId)
+        public async Task<ServerInfo> GetServer(ServerInfo.ServerInfoId serverId)
         {
             using (var session = store.OpenAsyncSession())
             {
-                return await session.Query<ServerInfo, Server_ById>().Where(s => s.Id == serverId).SingleOrDefaultAsync();
+                return await session.Query<ServerInfo, Server_ById>().Where(s => s.Id == serverId.Id).SingleOrDefaultAsync();
             }
         }
 
@@ -74,36 +74,36 @@ namespace StatisticServer.Storage
             return result;
         }
 
-        public async Task<IEnumerable<ServerInfo>> GetAllServersInfo()
+        public async Task<IEnumerable<ServerInfo>> GetAllServers()
         {
             return await GetAllItems<ServerInfo>();
         }
 
-        public async Task UpdateMatchInfo(string serverId, DateTime endTime, MatchInfo matchInfo)
+        public async Task UpdateMatch(MatchInfo.MatchInfoId matchId, MatchInfo match)
         {
             using (var session = store.OpenAsyncSession())
             {
-                var existed = await GetMatchInfo(serverId, endTime);
+                var existed = await GetMatch(match.GetIndex());
                 if (existed != null)
-                    matchInfo.Id = existed.Id;
-                await session.StoreAsync(matchInfo);
+                    match.Id = existed.Id;
+                await session.StoreAsync(match);
                 await session.SaveChangesAsync();
             }
         }
 
-        public async Task<MatchInfo> GetMatchInfo(string serverId, DateTime endTime)
+        public async Task<MatchInfo> GetMatch(MatchInfo.MatchInfoId matchId)
         {
             using (var session = store.OpenAsyncSession())
             {
                 return await session
-                    .Query<Match_ByIdAndTime.Result, Match_ByIdAndTime>()
-                    .Where(m => m.ServerId == serverId && m.EndTime == endTime)
+                    .Query<MatchInfo.MatchInfoId, Match_ByIdAndTime>()
+                    .Where(m => m.ServerId == matchId.ServerId && m.EndTime == matchId.EndTime)
                     .OfType<MatchInfo>()
                     .FirstOrDefaultAsync();
             }
         }
 
-        public async Task<IEnumerable<MatchInfo>> GetAllMatchesInfo()
+        public async Task<IEnumerable<MatchInfo>> GetAllMatches()
         {
             return (await GetAllItems<MatchInfo>()).Select(match => match.InitPlayers(match.EndTime));
         }

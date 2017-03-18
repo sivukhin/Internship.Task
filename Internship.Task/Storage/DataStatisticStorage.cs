@@ -9,17 +9,17 @@ using NLog;
 
 namespace StatisticServer.Storage
 {
-    public class FullStatisticStorage : IStatisticStorage
+    public class DataStatisticStorage : IStatisticStorage, IDisposable
     {
         private static readonly Logger logger = LogManager.GetCurrentClassLogger();
 
-        private readonly IStatisticStorage statisticStorage;
+        private readonly IDataRepository statisticStorage;
         private readonly IServerStatisticStorage serverStatisticStorage;
         private readonly IPlayerStatisticStorage playerStatisticStorage;
         private readonly ReportStorage reportStorage;
 
-        public FullStatisticStorage(
-            IStatisticStorage statisticStorage,
+        public DataStatisticStorage(
+            IDataRepository statisticStorage,
             IServerStatisticStorage serverStatisticStorage, 
             IPlayerStatisticStorage playerStatisticStorage, 
             ReportStorage reportStorage)
@@ -44,14 +44,14 @@ namespace StatisticServer.Storage
 
             logger.Info("Initialize server statistics from database");
             int processedMatches = 0, processedPlayers = 0, processedServers = 0;
-            foreach (var server in await statisticStorage.GetAllServersInfo())
+            foreach (var server in await statisticStorage.GetAllServers())
             {
                 InsertServer(server);
                 processedServers++;
             }
             logger.Info($"Successfully processed {processedServers} servers entries (elapsed {stopwatch.ElapsedMilliseconds} ms)");
 
-            foreach (var match in await statisticStorage.GetAllMatchesInfo())
+            foreach (var match in await statisticStorage.GetAllMatches())
             {
                 InsertMatch(match);
                 processedMatches++;
@@ -61,13 +61,12 @@ namespace StatisticServer.Storage
             logger.Info($"Successfully processed {processedPlayers} players entries (elapsed {stopwatch.ElapsedMilliseconds} ms)");
         }
 
-        public async Task UpdateServerInfo(string serverId, ServerInfo info)
+        public async Task UpdateServer(ServerInfo.ServerInfoId serverId, ServerInfo server)
         {
-            info.Id = serverId;
-            logger.ConditionalTrace("Update information about server {0}", info);
+            logger.ConditionalTrace("Update information about server {0}", server);
 
-            InsertServer(info);
-            await statisticStorage.UpdateServerInfo(serverId, info);
+            InsertServer(server);
+            await statisticStorage.UpdateServer(serverId, server);
         }
 
         private void InsertServer(ServerInfo info)
@@ -75,34 +74,34 @@ namespace StatisticServer.Storage
             Task.Factory.StartNew(() => reportStorage.Update(info));
         }
 
-        public async Task<ServerInfo> GetServerInfo(string serverId)
+        public async Task<ServerInfo> GetServer(ServerInfo.ServerInfoId serverId)
         {
             logger.ConditionalTrace("Retrive information about server {0}", new {ServerId = serverId});
 
-            return await statisticStorage.GetServerInfo(serverId);
+            return await statisticStorage.GetServer(serverId);
         }
 
-        public Task<IEnumerable<ServerInfo>> GetAllServersInfo()
+        public Task<IEnumerable<ServerInfo>> GetAllServers()
         {
             logger.ConditionalTrace("Retrieve information about all servers");
 
             return Task.FromResult(reportStorage.AllServers());
         }
 
-        public async Task UpdateMatchInfo(string serverId, DateTime endTime, MatchInfo matchInfo)
+        public async Task UpdateMatch(MatchInfo.MatchInfoId matchId, MatchInfo match)
         {
             logger.ConditionalTrace("Update information about match {0}",
-                new {ServerId = serverId, EndTime = endTime, MatchInfo = matchInfo});
+                new {MatchId = match.GetIndex(), MatchInfo = match});
 
-            var server = await statisticStorage.GetServerInfo(serverId);
+            var server = await statisticStorage.GetServer(new ServerInfo.ServerInfoId {Id = matchId.ServerId});
             if (server == null)
                 return;
-            matchInfo.HostServer = server;
-            var oldMatchInfo = await statisticStorage.GetMatchInfo(serverId, endTime);
+            match.HostServer = server;
+            var oldMatchInfo = await statisticStorage.GetMatch(match.GetIndex());
             if (oldMatchInfo != null)
-                DeleteMatch(oldMatchInfo.InitPlayers(endTime));
-            InsertMatch(matchInfo);
-            await statisticStorage.UpdateMatchInfo(serverId, endTime, matchInfo);
+                DeleteMatch(oldMatchInfo.InitPlayers(match.GetIndex().EndTime));
+            InsertMatch(match);
+            await statisticStorage.UpdateMatch(matchId, match);
         }
 
         private void DeleteMatch(MatchInfo matchInfo)
@@ -133,18 +132,23 @@ namespace StatisticServer.Storage
                 });
         }
 
-        public async Task<MatchInfo> GetMatchInfo(string serverId, DateTime endTime)
+        public async Task<MatchInfo> GetMatch(MatchInfo.MatchInfoId matchId)
         {
-            logger.ConditionalTrace("Retrieve information about match {0}", new {ServerId = serverId, EndTime = endTime});
+            logger.ConditionalTrace("Retrieve information about match {0}", new {MatchId = matchId});
 
-            return await statisticStorage.GetMatchInfo(serverId, endTime);
+            return await statisticStorage.GetMatch(matchId);
         }
 
-        public async Task<IEnumerable<MatchInfo>> GetAllMatchesInfo()
+        public async Task<IEnumerable<MatchInfo>> GetAllMatches()
         {
             logger.ConditionalTrace("Retrieve information about all matches");
 
-            return await statisticStorage.GetAllMatchesInfo();
+            return await statisticStorage.GetAllMatches();
+        }
+
+        public void Dispose()
+        {
+            statisticStorage.Dispose();
         }
     }
 }

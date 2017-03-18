@@ -43,7 +43,7 @@ namespace StatisticServer.Modules
 
         public async Task<IResponse> GetServerInfo(string serverId)
         {
-            var serverInfo = await statisticStorage.GetServerInfo(serverId);
+            var serverInfo = await statisticStorage.GetServer(new ServerInfo.ServerInfoId {Id = serverId});
             if (serverInfo == null)
                 return new HttpResponse(HttpStatusCode.NotFound);
             return new JsonHttpResponse(HttpStatusCode.OK, serverInfo);
@@ -51,7 +51,7 @@ namespace StatisticServer.Modules
 
         public async Task<IResponse> GetAllServersInfo()
         {
-            var allServersInfo = await statisticStorage.GetAllServersInfo();
+            var allServersInfo = await statisticStorage.GetAllServers();
             return new JsonHttpResponse(HttpStatusCode.OK, allServersInfo.Select(server => new
             {
                 endpoint = server.Id,
@@ -61,7 +61,7 @@ namespace StatisticServer.Modules
 
         public async Task<IResponse> GetMatchInfo(string serverId, DateTime endTime)
         {
-            var matchInfo = await statisticStorage.GetMatchInfo(serverId, endTime);
+            var matchInfo = await statisticStorage.GetMatch(new MatchInfo.MatchInfoId {ServerId = serverId, EndTime = endTime});
             if (matchInfo == null)
                 return new HttpResponse(HttpStatusCode.NotFound);
             return new JsonHttpResponse(HttpStatusCode.OK, matchInfo);

@@ -47,7 +47,7 @@ namespace StatisticServer.Modules
             {
                 throw new InvalidQueryException($"Invalid json format for update module: {request.Content}", e);
             }
-            await statisticStorage.UpdateServerInfo(serverId, serverInfo);
+            await statisticStorage.UpdateServer(new ServerInfo.ServerInfoId { Id = serverId}, serverInfo);
             return new HttpResponse(HttpStatusCode.OK);
         }
 
@@ -64,10 +64,10 @@ namespace StatisticServer.Modules
                 throw new InvalidQueryException($"Invalid json format for update module: {request.Content}", e);
             }
 
-            var serverInfo = await statisticStorage.GetServerInfo(serverId);
+            var serverInfo = await statisticStorage.GetServer(new ServerInfo.ServerInfoId {Id = serverId});
             if (serverInfo == null)
                 return new HttpResponse(HttpStatusCode.BadRequest);
-            await statisticStorage.UpdateMatchInfo(serverId, endTime, matchInfo);
+            await statisticStorage.UpdateMatch(new MatchInfo.MatchInfoId {ServerId = serverId, EndTime = endTime}, matchInfo);
             return new HttpResponse(HttpStatusCode.OK);
         }
     }

@@ -7,6 +7,14 @@ namespace DataCore
 {
     public class MatchInfo
     {
+        public class MatchInfoId
+        {
+            public string ServerId { get; set; }
+            public DateTime EndTime { get; set; }
+        }
+
+        public MatchInfoId GetIndex() => new MatchInfoId {ServerId = HostServer.Id, EndTime = EndTime};
+
         [JsonIgnore]
         public string Id { get; set; }
 

@@ -8,6 +8,13 @@ namespace DataCore
 {
     public class ServerInfo
     {
+        public class ServerInfoId
+        {
+            public string Id { get; set; }
+        }
+
+        public ServerInfoId GetIndex() => new ServerInfoId {Id = Id};
+
         [JsonIgnore]
         public string Id { get; set; }
 
