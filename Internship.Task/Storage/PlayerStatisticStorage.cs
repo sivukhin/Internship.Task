@@ -89,6 +89,7 @@ namespace StatisticServer.Storage
 
         public PlayerStatistics GetStatistics(string playerName)
         {
+            playerName = playerName.ToLower(CultureInfo.InvariantCulture);
             return new PlayerStatistics
             {
                 MaximumMatchesPerDay = maximumMatchesPerDay[playerName],

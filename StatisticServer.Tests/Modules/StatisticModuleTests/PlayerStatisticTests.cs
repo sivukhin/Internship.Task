@@ -154,15 +154,15 @@ namespace StatisticServer.Tests.Modules.StatisticModuleTests
             await StatisticStorage.UpdateServer(Server2.GetIndex(), Server2);
             var matches = new[]
             {
-                GenerateMatch(Server2, Day1, scoreboard: new[] {Player1, Player2}),
-                GenerateMatch(Server1, Day2, scoreboard: new[] {Player1}),
-                GenerateMatch(Server2, Day1, scoreboard: new[] {Player2, Player1}),
-                GenerateMatch(Server2, Day1, scoreboard: new[] {Player1, Player2}),
+                GenerateMatch(Server2, new DateTime(2017, 1, 1, 12, 00, 00, DateTimeKind.Utc), scoreboard: new[] {Player1, Player2}),
+                GenerateMatch(Server1, new DateTime(2017, 1, 1, 13, 00, 00, DateTimeKind.Utc), scoreboard: new[] {Player1}),
+                GenerateMatch(Server2, new DateTime(2017, 1, 2, 14, 00, 00, DateTimeKind.Utc), scoreboard: new[] {Player2, Player1}),
+                GenerateMatch(Server2, new DateTime(2017, 1, 1, 15, 00, 00, DateTimeKind.Utc), scoreboard: new[] {Player1, Player2}),
             };
             foreach (var match in matches)
                 await StatisticStorage.UpdateMatch(match.GetIndex(), match);
             await WaitForTasks();
-
+            
             PlayerStatisticStorage.GetStatistics(Player1.Name).MaximumMatchesPerDay.Should().Be(3);
             PlayerStatisticStorage.GetStatistics(Player2.Name).MaximumMatchesPerDay.Should().Be(2);
         }
@@ -174,17 +174,17 @@ namespace StatisticServer.Tests.Modules.StatisticModuleTests
             await StatisticStorage.UpdateServer(Server2.GetIndex(), Server2);
             var matches = new[]
             {
-                GenerateMatch(Server2, Day1, scoreboard: new[] {Player1, Player2}),
-                GenerateMatch(Server1, Day2, scoreboard: new[] {Player1}),
-                GenerateMatch(Server2, Day1, scoreboard: new[] {Player1}),
-                GenerateMatch(Server2, Day1, scoreboard: new[] {Player1, Player2}),
+                GenerateMatch(Server2, new DateTime(2017, 1, 1, 12, 00, 00, DateTimeKind.Utc), scoreboard: new[] {Player1, Player2}),
+                GenerateMatch(Server1, new DateTime(2017, 1, 8, 13, 00, 00, DateTimeKind.Utc), scoreboard: new[] {Player1}),
+                GenerateMatch(Server2, new DateTime(2017, 1, 2, 14, 00, 00, DateTimeKind.Utc), scoreboard: new[] {Player2, Player1}),
+                GenerateMatch(Server2, new DateTime(2017, 1, 1, 15, 00, 00, DateTimeKind.Utc), scoreboard: new[] {Player1, Player2}),
             };
             foreach (var match in matches)
                 await StatisticStorage.UpdateMatch(match.GetIndex(), match);
             await WaitForTasks();
 
-            PlayerStatisticStorage.GetStatistics(Player1.Name).AverageMatchesPerDay.Should().Be(1.5);
-            PlayerStatisticStorage.GetStatistics(Player2.Name).AverageMatchesPerDay.Should().Be(2);
+            PlayerStatisticStorage.GetStatistics(Player1.Name).AverageMatchesPerDay.Should().Be(0.5);
+            PlayerStatisticStorage.GetStatistics(Player2.Name).AverageMatchesPerDay.Should().Be(1.5);
         }
 
         [Test]
@@ -205,6 +205,29 @@ namespace StatisticServer.Tests.Modules.StatisticModuleTests
 
             PlayerStatisticStorage.GetStatistics(Player1.Name).LastMatchPlayed.Should().Be(Day3);
             PlayerStatisticStorage.GetStatistics(Player2.Name).LastMatchPlayed.Should().Be(Day4);
+        }
+
+        [Test]
+        public async Task KillToDeathRatioTest()
+        {
+            await StatisticStorage.UpdateServer(Server1.GetIndex(), Server1);
+            var matches = new[]
+            {
+                GenerateMatch(Server1, Day1, scoreboard: new[]
+                {
+                    GeneratePlayer("A", kills:2, deaths:1), GeneratePlayer("B", kills:3, deaths:0)
+                }),
+                GenerateMatch(Server1, Day2, scoreboard: new[]
+                {
+                    GeneratePlayer("A", kills:4, deaths:3)
+                }),
+            };
+            foreach (var match in matches)
+                await StatisticStorage.UpdateMatch(match.GetIndex(), match);
+            await WaitForTasks();
+
+            PlayerStatisticStorage.GetStatistics("A").KillToDeathRatio.Should().Be(1.5);
+            PlayerStatisticStorage.GetStatistics("B").KillToDeathRatio.Should().Be(null);
         }
     }
 }
