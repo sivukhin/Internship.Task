@@ -4,13 +4,12 @@ using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 using FluentAssertions;
-using FluentNHibernate.Utils;
 using HttpServerCore;
 using NUnit.Framework;
 using Raven.Imports.Newtonsoft.Json;
 using Raven.Tests.Helpers;
 
-namespace StatisticServer.Tests
+namespace StatisticServer.Tests.Modules.ReporstModuleTests
 {
     [TestFixture]
     class RecentMatchesReportsTests : ReportsMoudleBaseTests
@@ -18,7 +17,7 @@ namespace StatisticServer.Tests
         [Test]
         public async Task RecentMatches_ReturnAllMatches_IfLessThanCount()
         {
-            await statisticStorage.UpdateMatch(Match1.GetIndex(), Match1.InitPlayers(Match1.EndTime));
+            await StatisticStorage.UpdateMatch(Match1.GetIndex(), Match1.InitPlayers(Match1.EndTime));
             await WaitForTasks();
 
             var response = await module.ProcessRequest(CreateRequest("", "/reports/recent-matches/5"));
@@ -33,7 +32,7 @@ namespace StatisticServer.Tests
         [Test]
         public async Task RecentMatches_ReturnEmptyCollection_IfInvalidCountValue()
         {
-            await statisticStorage.UpdateMatch(Match1.GetIndex(), Match1.InitPlayers(Match1.EndTime));
+            await StatisticStorage.UpdateMatch(Match1.GetIndex(), Match1.InitPlayers(Match1.EndTime));
             await WaitForTasks();
 
             var response = await module.ProcessRequest(CreateRequest("", "/reports/recent-matches/one"));
@@ -44,8 +43,8 @@ namespace StatisticServer.Tests
         [Test]
         public async Task RecentMatches_ReturnNotMoreThanCountEntries()
         {
-            await statisticStorage.UpdateMatch(Match1.GetIndex(), Match1.InitPlayers(Match1.EndTime));
-            await statisticStorage.UpdateMatch(Match2.GetIndex(), Match2.InitPlayers(Match2.EndTime));
+            await StatisticStorage.UpdateMatch(Match1.GetIndex(), Match1.InitPlayers(Match1.EndTime));
+            await StatisticStorage.UpdateMatch(Match2.GetIndex(), Match2.InitPlayers(Match2.EndTime));
             await WaitForTasks();
 
             var response = await module.ProcessRequest(CreateRequest("", "/reports/recent-matches/1"));
@@ -63,7 +62,7 @@ namespace StatisticServer.Tests
         {
             foreach (var match in GenerateMatches(10, i => GenerateMatch(Server1, new DateTime(i))))
             {
-                await statisticStorage.UpdateMatch(match.GetIndex(), match.InitPlayers(match.EndTime));
+                await StatisticStorage.UpdateMatch(match.GetIndex(), match.InitPlayers(match.EndTime));
             }
             await Task.Delay(100);
 
@@ -75,7 +74,7 @@ namespace StatisticServer.Tests
         [Test]
         public async Task RecentMatches_AcceptNonCanonicalRoute()
         {
-            await statisticStorage.UpdateMatch(Match1.GetIndex(), Match1.InitPlayers(Match1.EndTime));
+            await StatisticStorage.UpdateMatch(Match1.GetIndex(), Match1.InitPlayers(Match1.EndTime));
             await WaitForTasks();
 
             var response = await module.ProcessRequest(CreateRequest("", "/reports/recent-matches/"));
@@ -90,7 +89,7 @@ namespace StatisticServer.Tests
         [Test]
         public async Task RecentMatches_MinimumCountValue_Is0()
         {
-            await statisticStorage.UpdateMatch(Match1.GetIndex(), Match1.InitPlayers(Match1.EndTime));
+            await StatisticStorage.UpdateMatch(Match1.GetIndex(), Match1.InitPlayers(Match1.EndTime));
             await WaitForTasks();
 
             var response = await module.ProcessRequest(CreateRequest("", "/reports/recent-matches/-1"));
@@ -103,7 +102,7 @@ namespace StatisticServer.Tests
         {
             foreach (var match in GenerateMatches(100, i => GenerateMatch(Server1, new DateTime(i))))
             {
-                await statisticStorage.UpdateMatch(match.GetIndex(), match.InitPlayers(match.EndTime));
+                await StatisticStorage.UpdateMatch(match.GetIndex(), match.InitPlayers(match.EndTime));
             }
             await WaitForTasks();
 
@@ -122,7 +121,7 @@ namespace StatisticServer.Tests
                 Server1, new DateTime(random.Next(100000)), $"map{i + 1}"));
             foreach (var match in generated)
             {
-                await statisticStorage.UpdateMatch(match.GetIndex(), match.InitPlayers(match.EndTime));
+                await StatisticStorage.UpdateMatch(match.GetIndex(), match.InitPlayers(match.EndTime));
             }
             await WaitForTasks();
 
@@ -137,9 +136,9 @@ namespace StatisticServer.Tests
 
         protected override async Task PutInitialiData()
         {
-            await statisticStorage.UpdateServer(Server1.GetIndex(), Server1);
-            await statisticStorage.UpdateServer(Server2.GetIndex(), Server2);
-            RavenTestBase.WaitForIndexing(documentStore);
+            await StatisticStorage.UpdateServer(Server1.GetIndex(), Server1);
+            await StatisticStorage.UpdateServer(Server2.GetIndex(), Server2);
+            RavenTestBase.WaitForIndexing(DocumentStore);
         }
     }
 }

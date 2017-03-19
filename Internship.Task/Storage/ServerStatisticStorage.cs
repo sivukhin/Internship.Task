@@ -23,16 +23,40 @@ namespace StatisticServer.Storage
     public interface IServerStatisticStorage
     {
         ServerStatistic GetStatistics(string serverId);
-        void Add(MatchInfo player);
-        void Delete(MatchInfo player);
+        void Add(MatchInfo match);
+        void Delete(MatchInfo match);
+    }
+
+    public interface IGlobalServerStatisticStorage
+    {
+        DateTime FirstDayWithMatch { get; }
+        DateTime LastDayWithMatch { get; }
+        void Add(MatchInfo match);
+        void Delete(MatchInfo match);
+    }
+
+    public class GlobalServerStatisticStorage : BaseStatisticStorage<MatchInfo>, IGlobalServerStatisticStorage
+    {
+        private readonly IStat<MatchInfo, DateTime> firstDayWithMatch = Info.Min(match => match.EndTime.Date);
+        private readonly IStat<MatchInfo, DateTime> lastDayWithMatch = Info.Max(match => match.EndTime.Date);
+
+        public DateTime FirstDayWithMatch => firstDayWithMatch.Value;
+        public DateTime LastDayWithMatch => lastDayWithMatch.Value;
     }
 
     public class ServerStatisticStorage : BaseStatisticStorage<MatchInfo>, IServerStatisticStorage
     {
+        private readonly IGlobalServerStatisticStorage globalStatistic;
+
         private static GroupedStat<MatchInfo, T, string> CreateStat<T>
             (Func<DataIdentity<MatchInfo>, IStat<MatchInfo, T>> statFactory)
         {
             return new GroupedStat<MatchInfo, T, string>(server => server.HostServer.Id, () => statFactory(Info));
+        }
+
+        public ServerStatisticStorage(IGlobalServerStatisticStorage globalStatistic)
+        {
+            this.globalStatistic = globalStatistic;
         }
 
         private readonly GroupedStat<MatchInfo, int, string> totalMatchesPlayed =
@@ -40,10 +64,6 @@ namespace StatisticServer.Storage
 
         private readonly GroupedStat<MatchInfo, int, string> maximumMatchesPerDay =
             CreateStat(match => match.Split(info => info.EndTime.Date, splitted => splitted.Count()).Max());
-
-        private readonly IStat<MatchInfo, DateTime> firstDayWithMatch = Info.Min(match => match.EndTime.Date);
-
-        private readonly IStat<MatchInfo, DateTime> lastDayWithMatch = Info.Max(match => match.EndTime.Date);
 
         private readonly GroupedStat<MatchInfo, int, string> maximumPopulation =
             CreateStat(match => match.Max(info => info.Scoreboard.Count));
@@ -59,7 +79,7 @@ namespace StatisticServer.Storage
 
         public double AverageMatchesPerDay(string serverId)
         {
-            return 1.0 * totalMatchesPlayed[serverId] / ((lastDayWithMatch.Value - firstDayWithMatch.Value).Days + 1);
+            return 1.0 * totalMatchesPlayed[serverId] / ((globalStatistic.LastDayWithMatch - globalStatistic.FirstDayWithMatch).Days + 1);
         }
 
         public ServerStatistic GetStatistics(string serverId)

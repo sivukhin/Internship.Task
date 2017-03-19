@@ -34,7 +34,7 @@ namespace StatisticServer.Tests
         protected ServerInfo Server1 => new ServerInfo {Id = Host1, Name = "server1", GameModes = new List<string> {ModeA, ModeB}};
         protected ServerInfo Server2 => new ServerInfo {Id = Host2, Name = "server2", GameModes = new List<string> {Mode1, Mode2, Mode3}};
         protected PlayerInfo Player1 => new PlayerInfo {Deaths = 1, Frags = 5, Kills = 5, Name = "player1"};
-        protected PlayerInfo Player2 => new PlayerInfo { Deaths = 0, Frags = 10, Kills = 10, Name = "player2" };
+        protected PlayerInfo Player2 => new PlayerInfo {Deaths = 0, Frags = 10, Kills = 10, Name = "player2"};
 
         protected MatchInfo Match1 => new MatchInfo
         {
@@ -106,6 +106,23 @@ namespace StatisticServer.Tests
                 Id = endpoint,
                 GameModes = gameModes,
                 Name = name
+            };
+        }
+
+        protected PlayerInfo GeneratePlayer(
+            string name, 
+            MatchInfo baseMatch = null,
+            int deaths = 1,
+            int frags = 1,
+            int kills = 1)
+        {
+            return new PlayerInfo
+            {
+                Name = name,
+                BaseMatch = baseMatch,
+                Deaths = deaths,
+                Frags = frags,
+                Kills = kills,
             };
         }
 

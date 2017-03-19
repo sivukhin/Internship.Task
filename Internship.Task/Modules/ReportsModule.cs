@@ -18,13 +18,15 @@ namespace StatisticServer.Modules
         protected override Logger Logger => logger ?? (logger = LogManager.GetCurrentClassLogger());
 
         private readonly IReportStorage reportStorage;
+        private readonly IGlobalServerStatisticStorage globalStatisticStorage;
         private readonly int DefaultCountParameter = 5;
         private int MinCountParameter = 0;
         private int MaxCountParameter = 50;
         
-        public ReportsModule(IReportStorage reportStorage)
+        public ReportsModule(IReportStorage reportStorage, IGlobalServerStatisticStorage globalStatisticStorage)
         {
             this.reportStorage = reportStorage;
+            this.globalStatisticStorage = globalStatisticStorage;
         }
 
         protected override IEnumerable<RequestFilter> Filters => new[]
@@ -79,7 +81,7 @@ namespace StatisticServer.Modules
             {
                 endpoint = server.Server.Id,
                 name = server.Server.Name,
-                averageMatchesPerDay = server.AverageMatchesPerDay
+                averageMatchesPerDay = server.AverageMatchesPerDay(globalStatisticStorage)
             }));
             return Task.FromResult(response);
         }

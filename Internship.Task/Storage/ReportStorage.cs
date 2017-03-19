@@ -33,7 +33,12 @@ namespace StatisticServer.Storage
     public class ServerReportResult
     {
         public ServerInfo Server { get; set; }
-        public double AverageMatchesPerDay { get; set; }
+        public double TotalMatchesPlayed { get; set; }
+
+        public double AverageMatchesPerDay(IGlobalServerStatisticStorage globalStatisticStorage)
+        {
+            return TotalMatchesPlayed / ((globalStatisticStorage.LastDayWithMatch - globalStatisticStorage.FirstDayWithMatch).Days + 1);
+        }
     }
 
     public class ReportStorage : IReportStorage
@@ -47,11 +52,16 @@ namespace StatisticServer.Storage
         private IStat<ServerInfo, IEnumerable<ServerInfo>> allServers;
         private readonly IServerStatisticStorage serverStatisticStorage;
         private readonly IPlayerStatisticStorage playerStatisticStorage;
+        private readonly IGlobalServerStatisticStorage globalStatisticStorage;
 
-        public ReportStorage(IServerStatisticStorage serverStatisticStorage, IPlayerStatisticStorage playerStatisticStorage)
+        public ReportStorage(
+            IServerStatisticStorage serverStatisticStorage, 
+            IPlayerStatisticStorage playerStatisticStorage, 
+            IGlobalServerStatisticStorage globalStatisticStorage)
         {
             this.serverStatisticStorage = serverStatisticStorage;
             this.playerStatisticStorage = playerStatisticStorage;
+            this.globalStatisticStorage = globalStatisticStorage;
             InitReports();
         }
 
@@ -60,16 +70,16 @@ namespace StatisticServer.Storage
             logger.Info("Initialize reports");
 
             recentMatches = new DataIdentity<MatchInfo>()
-                .Report(MaxReportSize, m => m.EndTime, (m1, m2) => m1.EndTime < m2.EndTime);
+                .Report(MaxReportSize, m => m.EndTime, (m1, m2) => m1.EndTime.CompareTo(m2.EndTime) < 0);
 
             popularServers = new DataIdentity<ServerInfo>()
                 .Select(s => new ServerReportResult
                 {
                     Server = s,
-                    AverageMatchesPerDay = serverStatisticStorage.GetStatistics(s.Id)?.AverageMatchesPerDay ?? 0
+                    TotalMatchesPlayed = serverStatisticStorage.GetStatistics(s.Id)?.TotalMatchesPlayed ?? 0
                 })
                 .Report(MaxReportSize,
-                    s => s.AverageMatchesPerDay,
+                    s => s.TotalMatchesPlayed,
                     (s1, s2) => string.Compare(s1.Server.Id, s2.Server.Id, StringComparison.Ordinal) < 0);
 
             allServers = new DataIdentity<ServerInfo>()

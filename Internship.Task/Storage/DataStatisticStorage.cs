@@ -14,12 +14,14 @@ namespace StatisticServer.Storage
         private static readonly Logger logger = LogManager.GetCurrentClassLogger();
 
         private readonly IDataRepository statisticStorage;
+        private readonly IGlobalServerStatisticStorage globalStatisticStorage;
         private readonly IServerStatisticStorage serverStatisticStorage;
         private readonly IPlayerStatisticStorage playerStatisticStorage;
         private readonly IReportStorage reportStorage;
 
         public DataStatisticStorage(
             IDataRepository statisticStorage,
+            IGlobalServerStatisticStorage globalStatisticStorage,
             IServerStatisticStorage serverStatisticStorage, 
             IPlayerStatisticStorage playerStatisticStorage, 
             IReportStorage reportStorage)
@@ -27,6 +29,7 @@ namespace StatisticServer.Storage
             logger.Info("Initialize full statistic storage");
 
             this.statisticStorage = statisticStorage;
+            this.globalStatisticStorage = globalStatisticStorage;
             this.serverStatisticStorage = serverStatisticStorage;
             this.playerStatisticStorage = playerStatisticStorage;
             this.reportStorage = reportStorage;
@@ -106,6 +109,7 @@ namespace StatisticServer.Storage
 
         private void DeleteMatch(MatchInfo matchInfo)
         {
+            globalStatisticStorage.Delete(matchInfo);
             serverStatisticStorage.Delete(matchInfo);
             foreach (var player in matchInfo.Scoreboard)
                 playerStatisticStorage.Delete(player);
@@ -120,6 +124,7 @@ namespace StatisticServer.Storage
 
         private void InsertMatch(MatchInfo matchInfo)
         {
+            globalStatisticStorage.Add(matchInfo);
             serverStatisticStorage.Add(matchInfo);
             foreach (var player in matchInfo.Scoreboard)
                 playerStatisticStorage.Add(player);
