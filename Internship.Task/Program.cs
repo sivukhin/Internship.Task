@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Net;
 using System.Reflection;
+using System.Text.RegularExpressions;
 using System.Threading;
 using Autofac;
 using Fclp;
@@ -31,6 +33,21 @@ namespace StatisticServer
         public bool InMemory { get; set; }
 
         public bool UnitTesting { get; set; }
+
+        private void ValidatePrefix()
+        {
+            var wellFormedUri = new Regex("[*+]").Replace(Prefix, "localhost");
+            if (!Uri.IsWellFormedUriString(wellFormedUri, UriKind.Absolute))
+                throw new ArgumentException(
+                    "Incorrect Uri Prefix. " +
+                    "Go to the https://msdn.microsoft.com/en-us/library/windows/desktop/aa364698(v=vs.85).aspx " +
+                    "for pretty good specification of valid Uri prefix");
+        }
+
+        public void Validate()
+        {
+            ValidatePrefix();
+        }
     }
 
     internal class Program
@@ -62,6 +79,7 @@ namespace StatisticServer
             if (ShouldTerminate(result))
                 return;
             var options = parser.Object;
+            options.Validate();
             RunApplication(options);
         }
 
