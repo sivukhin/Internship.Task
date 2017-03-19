@@ -29,7 +29,7 @@ server_data = {
 }
 
 server = '100'
-timestamp = '2017-01-22T15:17:00Z'
+timestamp = '2017-01-22T15:18:00Z'
 
 def put_query():
 	return requests.put('http://127.0.0.1:12345/servers/{}/matches/{}'.format(server, timestamp), data=json.dumps(match))
