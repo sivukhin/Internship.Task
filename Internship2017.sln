@@ -17,8 +17,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StatCore", "StatCore\StatCo
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StatCore.Tests", "StatCore.Tests\StatCore.Tests.csproj", "{9D1B45E0-94F6-43E6-A0EC-94BA3FA92EF0}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RavenSandBox", "RavenSandBox\RavenSandBox.csproj", "{C4C8F336-BB91-47A6-82C3-C6CE8F09ED62}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -83,14 +81,6 @@ Global
 		{9D1B45E0-94F6-43E6-A0EC-94BA3FA92EF0}.Release|Any CPU.Build.0 = Release|Any CPU
 		{9D1B45E0-94F6-43E6-A0EC-94BA3FA92EF0}.Release|x86.ActiveCfg = Release|Any CPU
 		{9D1B45E0-94F6-43E6-A0EC-94BA3FA92EF0}.Release|x86.Build.0 = Release|Any CPU
-		{C4C8F336-BB91-47A6-82C3-C6CE8F09ED62}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{C4C8F336-BB91-47A6-82C3-C6CE8F09ED62}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{C4C8F336-BB91-47A6-82C3-C6CE8F09ED62}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{C4C8F336-BB91-47A6-82C3-C6CE8F09ED62}.Debug|x86.Build.0 = Debug|Any CPU
-		{C4C8F336-BB91-47A6-82C3-C6CE8F09ED62}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{C4C8F336-BB91-47A6-82C3-C6CE8F09ED62}.Release|Any CPU.Build.0 = Release|Any CPU
-		{C4C8F336-BB91-47A6-82C3-C6CE8F09ED62}.Release|x86.ActiveCfg = Release|Any CPU
-		{C4C8F336-BB91-47A6-82C3-C6CE8F09ED62}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
