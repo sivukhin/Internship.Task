@@ -3,6 +3,7 @@ using System.CodeDom;
 using System.IO;
 using System.Linq;
 using DataCore;
+using NLog;
 using Raven.Abstractions.Replication;
 using Raven.Client;
 using Raven.Client.Embedded;
@@ -28,9 +29,10 @@ namespace StatisticServer.Storage
 
     public static class RaveDbStore
     {
+        private static readonly ILogger logger = LogManager.GetCurrentClassLogger();
         public static IDocumentStore GetStore(ApplicationOptions options)
         {
-            IDocumentStore store;
+            EmbeddableDocumentStore store;
             if (options.InMemory)
             {
                 store = new EmbeddableDocumentStore
@@ -48,10 +50,14 @@ namespace StatisticServer.Storage
                     UseEmbeddedHttpServer = options.AdminHttpServer
                 };
             }
-            store = store.Initialize();
-            new Server_ById().Execute(store);
-            new Match_ByIdAndTime().Execute(store);
-            return store;
+            if (options.AdminHttpServer)
+                logger.Info($"Started RavenDb server on {store.Configuration.ServerUrl}. " +
+                            $"Enabled admin http server: {options.AdminHttpServer}");
+
+            var initializedStore = store.Initialize();
+            new Server_ById().Execute(initializedStore);
+            new Match_ByIdAndTime().Execute(initializedStore);
+            return initializedStore;
         }
     }
 }
