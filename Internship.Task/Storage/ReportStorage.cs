@@ -13,12 +13,23 @@ using StatCore.Stats;
 
 namespace StatisticServer.Storage
 {
+    public interface IReportStorage
+    {
+        void Update(MatchInfo match);
+        void Update(ServerInfo server);
+        void Update(PlayerInfo player);
+        
+        IEnumerable<ServerInfo> AllServers();
+        IEnumerable<ServerInfo> PopularServers(int size);
+        IEnumerable<PlayerReportResult> BestPlayers(int size);
+        IEnumerable<MatchInfo> RecentMatches(int size);
+    }
     public class PlayerReportResult
     {
         public PlayerInfo Player { get; set; }
         public double? KillToDeathRatio { get; set; }
     }
-    public class ReportStorage
+    public class ReportStorage : IReportStorage
     {
         private Logger logger = LogManager.GetCurrentClassLogger();
 

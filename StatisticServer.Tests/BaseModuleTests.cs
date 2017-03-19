@@ -29,6 +29,8 @@ namespace StatisticServer.Tests
         protected string ModeA = "B";
         protected string ModeB = "A";
 
+        protected string HttpPrefix = "http://127.0.0.1:12345";
+
         protected ServerInfo Server1 => new ServerInfo {Id = Host1, Name = "server1", GameModes = new List<string> {ModeA, ModeB}};
         protected ServerInfo Server2 => new ServerInfo {Id = Host2, Name = "server2", GameModes = new List<string> {Mode1, Mode2, Mode3}};
         protected PlayerInfo Player1 => new PlayerInfo {Deaths = 1, Frags = 5, Kills = 5, Name = "player1"};
@@ -36,6 +38,7 @@ namespace StatisticServer.Tests
 
         protected MatchInfo Match1 => new MatchInfo
         {
+            HostServer = Server1,
             TimeElapsed = 1.0,
             FragLimit = 10,
             GameMode = ModeA,
@@ -45,11 +48,13 @@ namespace StatisticServer.Tests
                 Player2,
                 Player1
             },
-            TimeLimit = 10
+            TimeLimit = 10,
+            EndTime = DateTime1
         };
 
         protected MatchInfo Match2 => new MatchInfo
         {
+            HostServer = Server2,
             TimeElapsed = 2.0,
             FragLimit = 20,
             GameMode = Mode2,
@@ -58,13 +63,39 @@ namespace StatisticServer.Tests
             {
                 Player1
             },
-            TimeLimit = 40
+            TimeLimit = 40,
+            EndTime = DateTime2
         };
 
-        public IRequest CreateRequest(string content, string uri = "", HttpMethodEnum method = HttpMethodEnum.Get)
+        protected MatchInfo GenerateMatch(
+            ServerInfo hostServer, 
+            DateTime endTime,
+            string map = "map1",
+            IEnumerable<PlayerInfo> scoreboard = null,
+            double timeElapsed = 1.0, 
+            int fragLimit = 1, 
+            string gameMode = "A",
+            int timeLimit = 10)
+        {
+            if (scoreboard == null)
+                scoreboard = new List<PlayerInfo> {Player1};
+            return new MatchInfo
+            {
+                HostServer = hostServer,
+                TimeElapsed = timeElapsed,
+                FragLimit = fragLimit,
+                GameMode = gameMode,
+                Map = map,
+                Scoreboard = scoreboard.ToList(),
+                TimeLimit = timeLimit,
+                EndTime = endTime
+            };
+        }
+
+        public IRequest CreateRequest(string content, string route = "", HttpMethodEnum method = HttpMethodEnum.Get)
         {
             var request = A.Fake<IRequest>();
-            A.CallTo(() => request.Url).Returns(new Uri(uri));
+            A.CallTo(() => request.Url).Returns(new Uri(HttpPrefix + route));
             A.CallTo(() => request.Content).Returns(content);
             A.CallTo(() => request.HttpMethod).Returns(method);
             return request;
@@ -79,5 +110,18 @@ namespace StatisticServer.Tests
         {
             A.CallTo(() => storage.GetMatch(matchId)).Returns(match);
         }
+
+        protected List<MatchInfo> GenerateMatches(int count, Func<int, MatchInfo> generator)
+        {
+            var result = new List<MatchInfo>();
+            for (int i = 0; i < count; i++)
+            {
+                var match = generator(i);
+                match = match.InitPlayers(match.EndTime);
+                result.Add(match);
+            }
+            return result;
+        }
     }
 }
+    

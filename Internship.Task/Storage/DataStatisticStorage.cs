@@ -16,13 +16,13 @@ namespace StatisticServer.Storage
         private readonly IDataRepository statisticStorage;
         private readonly IServerStatisticStorage serverStatisticStorage;
         private readonly IPlayerStatisticStorage playerStatisticStorage;
-        private readonly ReportStorage reportStorage;
+        private readonly IReportStorage reportStorage;
 
         public DataStatisticStorage(
             IDataRepository statisticStorage,
             IServerStatisticStorage serverStatisticStorage, 
             IPlayerStatisticStorage playerStatisticStorage, 
-            ReportStorage reportStorage)
+            IReportStorage reportStorage)
         {
             logger.Info("Initialize full statistic storage");
 

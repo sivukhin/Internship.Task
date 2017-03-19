@@ -29,6 +29,8 @@ namespace StatisticServer
         public bool AdminHttpServer { get; set; }
         public bool EnableLogs { get; set; }
         public bool InMemory { get; set; }
+
+        public bool UnitTesting { get; set; }
     }
 
     internal class Program
@@ -92,8 +94,8 @@ namespace StatisticServer
             var builder = new ContainerBuilder();
             builder.RegisterType<PlayerStatisticStorage>().AsImplementedInterfaces();
             builder.RegisterType<ServerStatisticStorage>().AsImplementedInterfaces();
-            builder.RegisterType<ReportStorage>().AsSelf();
-            builder.RegisterInstance(new RavenDbStorage(RaveDbStore.GetStore(options))).As<IDataRepository>();
+            builder.RegisterType<ReportStorage>().AsImplementedInterfaces();
+            builder.RegisterInstance(new RavenDbStorage(RavenDbStore.GetStore(options))).As<IDataRepository>();
             builder.RegisterType<DataStatisticStorage>().As<IDataStatisticStorage>().SingleInstance();
 
             builder.RegisterAssemblyTypes(Assembly.GetAssembly(typeof(BaseModule)))

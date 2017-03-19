@@ -17,12 +17,12 @@ namespace StatisticServer.Modules
         private Logger logger;
         protected override Logger Logger => logger ?? (logger = LogManager.GetCurrentClassLogger());
 
-        private readonly ReportStorage reportStorage;
+        private readonly IReportStorage reportStorage;
         private readonly int DefaultCountParameter = 5;
         private int MinCountParameter = 0;
         private int MaxCountParameter = 50;
         
-        public ReportsModule(ReportStorage reportStorage)
+        public ReportsModule(IReportStorage reportStorage)
         {
             this.reportStorage = reportStorage;
         }
@@ -30,15 +30,15 @@ namespace StatisticServer.Modules
         protected override IEnumerable<RequestFilter> Filters => new[]
         {
             new RequestFilter(HttpMethodEnum.Get, 
-                new Regex(@"^/reports/recent-matches(/?<count>.*)?$", RegexOptions.Compiled), 
+                new Regex(@"^/reports/recent-matches(/(?<count>.+)?)?$", RegexOptions.Compiled), 
                 HandleRecentMatchesQuery), 
             new RequestFilter(
                 HttpMethodEnum.Get, 
-                new Regex(@"^/reports/best-players(/?<count>.*)?$", RegexOptions.Compiled), 
+                new Regex(@"^/reports/best-players(/(?<count>.+)?)?$", RegexOptions.Compiled), 
                 HandleBestPlayersQuery), 
             new RequestFilter(
                 HttpMethodEnum.Get, 
-                new Regex(@"^/reports/popular-servers(/?<count>.*)?$", RegexOptions.Compiled), 
+                new Regex(@"^/reports/popular-servers(/(?<count>.+)?)?$", RegexOptions.Compiled), 
                 HandlePopularServersQuery), 
         };
 

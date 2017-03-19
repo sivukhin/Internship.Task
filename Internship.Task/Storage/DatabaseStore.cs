@@ -1,33 +1,29 @@
-﻿using System;
-using System.CodeDom;
-using System.IO;
-using System.Linq;
+﻿using System.Linq;
 using DataCore;
 using NLog;
-using Raven.Abstractions.Replication;
 using Raven.Client;
 using Raven.Client.Embedded;
 using Raven.Client.Indexes;
 
 namespace StatisticServer.Storage
 {
-    public class Server_ById : AbstractIndexCreationTask<ServerInfo>
+    public class ServerById : AbstractIndexCreationTask<ServerInfo>
     {
-        public Server_ById()
+        public ServerById()
         {
             Map = servers => servers.Select(s => new ServerInfo.ServerInfoId { Id = s.Id });
         }
     }
 
-    public class Match_ByIdAndTime : AbstractIndexCreationTask<MatchInfo>
+    public class MatchByIdAndTime : AbstractIndexCreationTask<MatchInfo>
     {
-        public Match_ByIdAndTime()
+        public MatchByIdAndTime()
         {
             Map = matches => matches.Select(m => new MatchInfo.MatchInfoId { ServerId = m.HostServer.Id, EndTime = m.EndTime });
         }
     }
 
-    public static class RaveDbStore
+    public static class RavenDbStore
     {
         private static readonly ILogger logger = LogManager.GetCurrentClassLogger();
         public static IDocumentStore GetStore(ApplicationOptions options)
@@ -39,7 +35,11 @@ namespace StatisticServer.Storage
                 {
                     RunInMemory = true,
                     UseEmbeddedHttpServer = options.AdminHttpServer,
-                    Configuration = {Storage = {Voron = {AllowOn32Bits = true}}}
+                    Configuration =
+                    {
+                        Storage = {Voron = {AllowOn32Bits = true}},
+                        RunInUnreliableYetFastModeThatIsNotSuitableForProduction = options.UnitTesting
+                    }
                 };
             }
             else
@@ -55,8 +55,8 @@ namespace StatisticServer.Storage
                             $"Enabled admin http server: {options.AdminHttpServer}");
 
             var initializedStore = store.Initialize();
-            new Server_ById().Execute(initializedStore);
-            new Match_ByIdAndTime().Execute(initializedStore);
+            new ServerById().Execute(initializedStore);
+            new MatchByIdAndTime().Execute(initializedStore);
             return initializedStore;
         }
     }

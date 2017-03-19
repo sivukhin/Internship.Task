@@ -31,7 +31,7 @@ namespace StatisticServer.Storage
         {
             using (var session = store.OpenAsyncSession())
             {
-                return await session.Query<ServerInfo, Server_ById>().Where(s => s.Id == serverId.Id).SingleOrDefaultAsync();
+                return await session.Query<ServerInfo, ServerById>().Where(s => s.Id == serverId.Id).SingleOrDefaultAsync();
             }
         }
 
@@ -94,7 +94,7 @@ namespace StatisticServer.Storage
             using (var session = store.OpenAsyncSession())
             {
                 return await session
-                    .Query<MatchInfo.MatchInfoId, Match_ByIdAndTime>()
+                    .Query<MatchInfo.MatchInfoId, MatchByIdAndTime>()
                     .Where(m => m.ServerId == matchId.ServerId && m.EndTime == matchId.EndTime)
                     .OfType<MatchInfo>()
                     .FirstOrDefaultAsync();
