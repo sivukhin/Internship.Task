@@ -1,21 +1,12 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Data.SQLite;
-using System.IO;
-using System.Linq;
 using System.Reflection;
-using System.Runtime.Serialization.Formatters;
 using System.Threading;
 using Autofac;
-using Autofac.Builder;
-using DatabaseCore;
-using DataCore;
 using Fclp;
 using HttpServerCore;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 using NLog;
-using NLog.Layouts;
 using StatisticServer.Modules;
 using StatisticServer.Storage;
 
@@ -23,10 +14,21 @@ namespace StatisticServer
 {
     public class ApplicationOptions
     {
+        public const string DefaultDatabaseDirectory = "database";
+
         public string Prefix { get; set; }
-        public string DatabaseDirectory { get; set; }
-        public bool ServerAdminHttpServer { get; set; }
+
+        private string databaseDirectiory;
+
+        public string DatabaseDirectory
+        {
+            get { return databaseDirectiory ?? DefaultDatabaseDirectory; }
+            set { databaseDirectiory = value; }
+        }
+
+        public bool AdminHttpServer { get; set; }
         public bool EnableLogs { get; set; }
+        public bool InMemory { get; set; }
     }
 
     internal class Program
@@ -63,8 +65,8 @@ namespace StatisticServer
 
         private static void RunApplication(ApplicationOptions options)
         {
+            ConfigureApplication(options);
             logger.Info("Application started");
-            ConfigureApplication();
             var container = CompositionRoot(options);
             using (var lifetimeScope = container.BeginLifetimeScope())
             {
@@ -75,12 +77,14 @@ namespace StatisticServer
             }
         }
 
-        private static void ConfigureApplication()
+        private static void ConfigureApplication(ApplicationOptions options)
         {
             JsonConvert.DefaultSettings = () => new JsonSerializerSettings
             {
                 ContractResolver = new CamelCasePropertyNamesContractResolver()
             };
+            if (!options.EnableLogs)
+                LogManager.Configuration.FindTargetByName("ColoredConsole").Dispose();
         }
 
         private static IContainer CompositionRoot(ApplicationOptions options)
@@ -89,7 +93,7 @@ namespace StatisticServer
             builder.RegisterType<PlayerStatisticStorage>().AsImplementedInterfaces();
             builder.RegisterType<ServerStatisticStorage>().AsImplementedInterfaces();
             builder.RegisterType<ReportStorage>().AsSelf();
-            builder.RegisterInstance(new RavenDbStorage(DatabaseConnection.GetStore())).As<IDataRepository>();
+            builder.RegisterInstance(new RavenDbStorage(RaveDbStore.GetStore(options))).As<IDataRepository>();
             builder.RegisterType<DataStatisticStorage>().As<IDataStatisticStorage>().SingleInstance();
 
             builder.RegisterAssemblyTypes(Assembly.GetAssembly(typeof(BaseModule)))
@@ -118,8 +122,8 @@ namespace StatisticServer
             parser.Setup(arg => arg.DatabaseDirectory)
                 .As('d', "database")
                 .SetDefault("database")
-                .WithDescription("Set database directory");
-            parser.Setup(arg => arg.ServerAdminHttpServer)
+                .WithDescription($"Set database directory. Default directory: '{ApplicationOptions.DefaultDatabaseDirectory}'");
+            parser.Setup(arg => arg.AdminHttpServer)
                 .As("admin_http")
                 .SetDefault(false)
                 .WithDescription("Enable RavenDB default embedded http server");
@@ -127,6 +131,10 @@ namespace StatisticServer
                 .As("logs")
                 .SetDefault(false)
                 .WithDescription("Enable verbose console logging");
+            parser.Setup(arg => arg.InMemory)
+                .As("in_mem")
+                .SetDefault(false)
+                .WithDescription("Run RavenDB in memory");
 
             parser.SetupHelp("h", "help").Callback(text => Console.WriteLine(text));
 

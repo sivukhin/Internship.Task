@@ -1,17 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
-using DatabaseCore;
-using DataCore;
-using FakeItEasy;
-using FluentAssertions;
-using HttpServerCore;
-using NHibernate;
-using NUnit.Framework;
+﻿using NUnit.Framework;
 using StatisticServer.Modules;
 using StatisticServer.Storage;
 

@@ -1,9 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Text.RegularExpressions;
 using System.Threading.Tasks;
-using DatabaseCore;
 using DataCore;
 using Raven.Client;
 
@@ -22,6 +19,7 @@ namespace StatisticServer.Storage
 
         public async Task UpdateServer(ServerInfo.ServerInfoId serverId, ServerInfo server)
         {
+            server.Id = serverId.Id;
             using (var session = store.OpenAsyncSession())
             {
                 await session.StoreAsync(server);

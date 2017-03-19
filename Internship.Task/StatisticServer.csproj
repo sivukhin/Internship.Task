@@ -107,6 +107,7 @@
     <Compile Include="Modules\StatsModule.cs" />
     <Compile Include="Modules\UpdateStatisticModule.cs" />
     <Compile Include="Storage\BaseStatisticStorage.cs" />
+    <Compile Include="Storage\DatabaseStore.cs" />
     <Compile Include="Storage\IDataRepository.cs" />
     <Compile Include="Storage\IDataStatisticStorage.cs" />
     <Compile Include="Storage\PlayerStatisticStorage.cs" />
@@ -134,10 +135,6 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\DatabaseCore\DatabaseCore.csproj">
-      <Project>{AB926B40-D6E8-4FF5-97F7-D06BEE013476}</Project>
-      <Name>DatabaseCore</Name>
-    </ProjectReference>
     <ProjectReference Include="..\DataCore\DataCore.csproj">
       <Project>{2F4D5C39-9F99-4B04-8B45-FB04879F4C56}</Project>
       <Name>DataCore</Name>

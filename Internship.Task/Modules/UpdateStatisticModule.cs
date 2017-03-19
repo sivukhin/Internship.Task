@@ -47,7 +47,7 @@ namespace StatisticServer.Modules
             {
                 throw new InvalidQueryException($"Invalid json format for update module: {request.Content}", e);
             }
-            await dataStatisticStorage.UpdateServer(new ServerInfo.ServerInfoId { Id = serverId}, serverInfo);
+            await dataStatisticStorage.UpdateServer(new ServerInfo.ServerInfoId {Id = serverId}, serverInfo);
             return new HttpResponse(HttpStatusCode.OK);
         }
 

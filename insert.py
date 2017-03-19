@@ -22,9 +22,18 @@ match = {
 		}
 	]
 }
-server = '10'
+
+server_data = {
+	"name": "] My Worst!!! Server [",
+	"gameModes": [ "DM", "TDM", "KEK", "PEK" ]
+}
+
+server = 'server-10'
 timestamp = '2017-01-22T15:17:00Z'
 
 def put_query():
 	return requests.put('http://127.0.0.1:12345/servers/{}/matches/{}'.format(server, timestamp), data=json.dumps(match))
-put_query()
+	
+def put_server():
+	requests.put('http://127.0.0.1:12345/servers/{}/info'.format(server), data=json.dumps(server_data))
+put_server()
