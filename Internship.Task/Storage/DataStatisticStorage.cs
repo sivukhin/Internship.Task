@@ -65,8 +65,8 @@ namespace StatisticServer.Storage
         {
             logger.ConditionalTrace("Update information about server {0}", server);
 
-            InsertServer(server);
             await statisticStorage.UpdateServer(serverId, server);
+            InsertServer(server);
         }
 
         private void InsertServer(ServerInfo info)

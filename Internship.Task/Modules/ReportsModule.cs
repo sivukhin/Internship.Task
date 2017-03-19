@@ -75,7 +75,12 @@ namespace StatisticServer.Modules
 
         private Task<IResponse> GetPopularServers(int serversCount)
         {
-            IResponse response = new JsonHttpResponse(HttpStatusCode.OK, reportStorage.PopularServers(serversCount));
+            IResponse response = new JsonHttpResponse(HttpStatusCode.OK, reportStorage.PopularServers(serversCount).Select(server => new
+            {
+                endpoint = server.Server.Id,
+                name = server.Server.Name,
+                averageMatchesPerDay = server.AverageMatchesPerDay
+            }));
             return Task.FromResult(response);
         }
 

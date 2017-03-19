@@ -20,7 +20,7 @@ namespace StatisticServer.Storage
         void Update(PlayerInfo player);
         
         IEnumerable<ServerInfo> AllServers();
-        IEnumerable<ServerInfo> PopularServers(int size);
+        IEnumerable<ServerReportResult> PopularServers(int size);
         IEnumerable<PlayerReportResult> BestPlayers(int size);
         IEnumerable<MatchInfo> RecentMatches(int size);
     }
@@ -29,13 +29,20 @@ namespace StatisticServer.Storage
         public PlayerInfo Player { get; set; }
         public double? KillToDeathRatio { get; set; }
     }
+
+    public class ServerReportResult
+    {
+        public ServerInfo Server { get; set; }
+        public double AverageMatchesPerDay { get; set; }
+    }
+
     public class ReportStorage : IReportStorage
     {
         private Logger logger = LogManager.GetCurrentClassLogger();
 
         private const int MaxReportSize = 50;
         private IStat<MatchInfo, IEnumerable<MatchInfo>> recentMatches;
-        private IStat<ServerInfo, IEnumerable<ServerInfo>> popularServers;
+        private IStat<ServerInfo, IEnumerable<ServerReportResult>> popularServers;
         private IStat<PlayerInfo, IEnumerable<PlayerReportResult>> bestPlayers;
         private IStat<ServerInfo, IEnumerable<ServerInfo>> allServers;
         private readonly IServerStatisticStorage serverStatisticStorage;
@@ -52,11 +59,21 @@ namespace StatisticServer.Storage
         {
             logger.Info("Initialize reports");
 
-            recentMatches = new DataIdentity<MatchInfo>().Report(MaxReportSize, m => m.EndTime, (m1, m2) => m1.EndTime < m2.EndTime);
-            popularServers = new DataIdentity<ServerInfo>().Report(MaxReportSize,
-                s => serverStatisticStorage.GetStatistics(s.Name).AverageMatchesPerDay,
-                (s1, s2) => string.Compare(s1.Id, s2.Id, StringComparison.Ordinal) == -1);
-            allServers = new DataIdentity<ServerInfo>().Report(s => s.Id, (s1, s2) => String.Compare(s1.Id, s2.Id, StringComparison.Ordinal) == -1);
+            recentMatches = new DataIdentity<MatchInfo>()
+                .Report(MaxReportSize, m => m.EndTime, (m1, m2) => m1.EndTime < m2.EndTime);
+
+            popularServers = new DataIdentity<ServerInfo>()
+                .Select(s => new ServerReportResult
+                {
+                    Server = s,
+                    AverageMatchesPerDay = serverStatisticStorage.GetStatistics(s.Id)?.AverageMatchesPerDay ?? 0
+                })
+                .Report(MaxReportSize,
+                    s => s.AverageMatchesPerDay,
+                    (s1, s2) => string.Compare(s1.Server.Id, s2.Server.Id, StringComparison.Ordinal) < 0);
+
+            allServers = new DataIdentity<ServerInfo>()
+                .Report(s => s.Id, (s1, s2) => String.Compare(s1.Id, s2.Id, StringComparison.Ordinal) < 0);
 
             bestPlayers = new DataIdentity<PlayerInfo>().Where(p =>
             {
@@ -70,7 +87,7 @@ namespace StatisticServer.Storage
                     return p.KillToDeathRatio.Value;
                 throw new ArgumentException($"{nameof(p.KillToDeathRatio)} must be not null");
             },
-            (p1, p2) => String.Compare(p1.Player.Name, p2.Player.Name, StringComparison.Ordinal) == -1);
+            (p1, p2) => String.Compare(p1.Player.Name, p2.Player.Name, StringComparison.Ordinal) < 0);
         }
 
         public void Update(ServerInfo serverInfo)
@@ -92,7 +109,7 @@ namespace StatisticServer.Storage
             recentMatches.Add(matchInfo);
         }
         
-        public IEnumerable<ServerInfo> PopularServers(int size) =>
+        public IEnumerable<ServerReportResult> PopularServers(int size) =>
             popularServers.Value.Take(size).ToList();
 
         public IEnumerable<ServerInfo> AllServers() =>

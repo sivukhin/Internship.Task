@@ -92,6 +92,23 @@ namespace StatisticServer.Tests
             };
         }
 
+        protected ServerInfo GenerateServer(
+            string endpoint,
+            string name = null,
+            List<string> gameModes = null)
+        {
+            if (name == null)
+                name = $"server-{endpoint}";
+            if (gameModes == null)
+                gameModes = new List<string> {"A"};
+            return new ServerInfo
+            {
+                Id = endpoint,
+                GameModes = gameModes,
+                Name = name
+            };
+        }
+
         public IRequest CreateRequest(string content, string route = "", HttpMethodEnum method = HttpMethodEnum.Get)
         {
             var request = A.Fake<IRequest>();
@@ -121,6 +138,23 @@ namespace StatisticServer.Tests
                 result.Add(match);
             }
             return result;
+        }
+
+        protected List<ServerInfo> GenerateServers(int count, Func<int, ServerInfo> generator)
+        {
+            var result = new List<ServerInfo>();
+            for (int i = 0; i < count; i++)
+            {
+                var server = generator(i);
+                result.Add(server);
+            }
+            return result;
+        }
+
+        //TODO: description for this function?
+        protected async Task WaitForTasks(int timeout = 100)
+        {
+            await Task.Delay(timeout);
         }
     }
 }

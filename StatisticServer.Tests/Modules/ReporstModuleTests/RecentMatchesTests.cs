@@ -7,56 +7,21 @@ using FluentAssertions;
 using FluentNHibernate.Utils;
 using HttpServerCore;
 using NUnit.Framework;
-using Raven.Client;
-using Raven.Tests.Helpers;
-using StatisticServer.Modules;
-using StatisticServer.Storage;
 using Raven.Imports.Newtonsoft.Json;
+using Raven.Tests.Helpers;
 
 namespace StatisticServer.Tests
 {
     [TestFixture]
-    class RecentMatchesReportsTests : BaseModuleTests
+    class RecentMatchesReportsTests : ReportsMoudleBaseTests
     {
-        private IServerStatisticStorage serverStatisticStorage;
-        private IPlayerStatisticStorage playerStatisticStorage;
-        private IReportStorage reportStorage;
-        private IDataRepository dataRepository;
-        private IDataStatisticStorage statisticStorage;
-        private IDocumentStore documentStore;
-        private ReportsModule module;
-
-        [SetUp]
-        public async Task Setup()
-        {
-            serverStatisticStorage = new ServerStatisticStorage();
-            playerStatisticStorage = new PlayerStatisticStorage();
-            reportStorage = new ReportStorage(serverStatisticStorage, playerStatisticStorage);
-            documentStore = RavenDbStore.GetStore(new ApplicationOptions
-            {
-                InMemory = true,
-                UnitTesting = true
-            });
-            dataRepository = new RavenDbStorage(documentStore);
-            statisticStorage = new DataStatisticStorage(
-                dataRepository,
-                serverStatisticStorage,
-                playerStatisticStorage,
-                reportStorage);
-            module = new ReportsModule(reportStorage);
-
-            await statisticStorage.UpdateServer(Server1.GetIndex(), Server1);
-            await statisticStorage.UpdateServer(Server2.GetIndex(), Server2);
-            RavenTestBase.WaitForIndexing(documentStore);
-        }
-
         [Test]
-        public async Task RecentMatches_ReturnSingleMatch()
+        public async Task RecentMatches_ReturnAllMatches_IfLessThanCount()
         {
             await statisticStorage.UpdateMatch(Match1.GetIndex(), Match1.InitPlayers(Match1.EndTime));
-            await Task.Delay(100);
+            await WaitForTasks();
 
-            var response = await module.ProcessRequest(CreateRequest("", "/reports/recent-matches"));
+            var response = await module.ProcessRequest(CreateRequest("", "/reports/recent-matches/5"));
 
             var expected = new[]
             {
@@ -69,7 +34,7 @@ namespace StatisticServer.Tests
         public async Task RecentMatches_ReturnEmptyCollection_IfInvalidCountValue()
         {
             await statisticStorage.UpdateMatch(Match1.GetIndex(), Match1.InitPlayers(Match1.EndTime));
-            await Task.Delay(100);
+            await WaitForTasks();
 
             var response = await module.ProcessRequest(CreateRequest("", "/reports/recent-matches/one"));
 
@@ -81,7 +46,7 @@ namespace StatisticServer.Tests
         {
             await statisticStorage.UpdateMatch(Match1.GetIndex(), Match1.InitPlayers(Match1.EndTime));
             await statisticStorage.UpdateMatch(Match2.GetIndex(), Match2.InitPlayers(Match2.EndTime));
-            await Task.Delay(100);
+            await WaitForTasks();
 
             var response = await module.ProcessRequest(CreateRequest("", "/reports/recent-matches/1"));
 
@@ -94,7 +59,7 @@ namespace StatisticServer.Tests
         }
 
         [Test]
-        public async Task RecentMatches_DefaultCountParameter_Is5()
+        public async Task RecentMatches_DefaultCountValue_Is5()
         {
             foreach (var match in GenerateMatches(10, i => GenerateMatch(Server1, new DateTime(i))))
             {
@@ -111,7 +76,7 @@ namespace StatisticServer.Tests
         public async Task RecentMatches_AcceptNonCanonicalRoute()
         {
             await statisticStorage.UpdateMatch(Match1.GetIndex(), Match1.InitPlayers(Match1.EndTime));
-            await Task.Delay(100);
+            await WaitForTasks();
 
             var response = await module.ProcessRequest(CreateRequest("", "/reports/recent-matches/"));
 
@@ -123,10 +88,10 @@ namespace StatisticServer.Tests
         }
 
         [Test]
-        public async Task RecentMatches_MinimumCountParameter_Is0()
+        public async Task RecentMatches_MinimumCountValue_Is0()
         {
             await statisticStorage.UpdateMatch(Match1.GetIndex(), Match1.InitPlayers(Match1.EndTime));
-            await Task.Delay(100);
+            await WaitForTasks();
 
             var response = await module.ProcessRequest(CreateRequest("", "/reports/recent-matches/-1"));
 
@@ -134,13 +99,13 @@ namespace StatisticServer.Tests
         }
 
         [Test]
-        public async Task RecentMatches_MaximumCountParameter_Is50()
+        public async Task RecentMatches_MaximumCountValue_Is50()
         {
             foreach (var match in GenerateMatches(100, i => GenerateMatch(Server1, new DateTime(i))))
             {
                 await statisticStorage.UpdateMatch(match.GetIndex(), match.InitPlayers(match.EndTime));
             }
-            await Task.Delay(100);
+            await WaitForTasks();
 
             var response = await module.ProcessRequest(CreateRequest("", "/reports/recent-matches/100"));
 
@@ -159,7 +124,7 @@ namespace StatisticServer.Tests
             {
                 await statisticStorage.UpdateMatch(match.GetIndex(), match.InitPlayers(match.EndTime));
             }
-            await Task.Delay(100);
+            await WaitForTasks();
 
             var response = await module.ProcessRequest(CreateRequest("", $"/reports/recent-matches/{queryCount}"));
 
@@ -168,6 +133,13 @@ namespace StatisticServer.Tests
                 .OrderByDescending(m => m.timestamp).Take(queryCount).ToArray();
             
             response.Response.Should().Be(new JsonHttpResponse(HttpStatusCode.OK, expected));
+        }
+
+        protected override async Task PutInitialiData()
+        {
+            await statisticStorage.UpdateServer(Server1.GetIndex(), Server1);
+            await statisticStorage.UpdateServer(Server2.GetIndex(), Server2);
+            RavenTestBase.WaitForIndexing(documentStore);
         }
     }
 }

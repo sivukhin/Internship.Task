@@ -109,8 +109,10 @@
   <ItemGroup>
     <Compile Include="BaseModuleTests.cs" />
     <Compile Include="GetStatisticModuleTests.cs" />
+    <Compile Include="Modules\ReporstModuleTests\PopularServerTests.cs" />
+    <Compile Include="Modules\ReporstModuleTests\ReportsMoudleBaseTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="ReportsModuleTests.cs" />
+    <Compile Include="Modules\ReporstModuleTests\RecentMatchesTests.cs" />
     <Compile Include="UpdateStatisticModuleTests.cs" />
   </ItemGroup>
   <ItemGroup>

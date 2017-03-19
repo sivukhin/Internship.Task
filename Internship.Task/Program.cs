@@ -94,7 +94,7 @@ namespace StatisticServer
             var builder = new ContainerBuilder();
             builder.RegisterType<PlayerStatisticStorage>().AsImplementedInterfaces();
             builder.RegisterType<ServerStatisticStorage>().AsImplementedInterfaces();
-            builder.RegisterType<ReportStorage>().AsImplementedInterfaces();
+            builder.RegisterType<ReportStorage>().AsImplementedInterfaces().SingleInstance();
             builder.RegisterInstance(new RavenDbStorage(RavenDbStore.GetStore(options))).As<IDataRepository>();
             builder.RegisterType<DataStatisticStorage>().As<IDataStatisticStorage>().SingleInstance();
 

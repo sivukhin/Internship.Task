@@ -66,12 +66,12 @@ namespace StatCore
             itemSet.Add(Tuple.Create(newFeature, item));
         }
 
-        public virtual void Add(T item)
+        public void Add(T item)
         {
             TryUpdate(item);
         }
 
-        public virtual void Delete(T item)
+        public void Delete(T item)
         {
             TryUpdate(item);
         }
