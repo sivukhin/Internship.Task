@@ -1,7 +1,6 @@
 using System.Threading.Tasks;
 using NUnit.Framework;
 using Raven.Client;
-using Raven.Tests.Helpers;
 using StatisticServer.Modules;
 using StatisticServer.Storage;
 

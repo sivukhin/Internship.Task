@@ -13,10 +13,6 @@ namespace StatisticServer.Tests.Modules.StatisticModuleTests
     [TestFixture]
     class ServerStatisticTests : BaseModuleTests
     {
-        public static DateTime Day1 = new DateTime(2017, 2, 1, 12, 00, 00);
-        public static DateTime Day2 = new DateTime(2017, 2, 2, 12, 00, 00);
-        public static DateTime Day3 = new DateTime(2017, 2, 3, 12, 00, 00);
-        public static DateTime Day4 = new DateTime(2017, 2, 4, 12, 00, 00);
         [SetUp]
         public override void Setup()
         {

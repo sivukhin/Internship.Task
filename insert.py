@@ -2,7 +2,7 @@ import requests
 import json
 
 match = {
-	"map": "AAAAA",
+	"map": "TimeChanged!!!",
 	"gameMode": "DM",
 	"fragLimit": 20,
 	"timeLimit": 20,

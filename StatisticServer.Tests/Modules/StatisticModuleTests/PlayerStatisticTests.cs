@@ -162,11 +162,11 @@ namespace StatisticServer.Tests.Modules.StatisticModuleTests
             foreach (var match in matches)
                 await StatisticStorage.UpdateMatch(match.GetIndex(), match);
             await WaitForTasks();
-            
+
             PlayerStatisticStorage.GetStatistics(Player1.Name).MaximumMatchesPerDay.Should().Be(3);
             PlayerStatisticStorage.GetStatistics(Player2.Name).MaximumMatchesPerDay.Should().Be(2);
         }
-
+            
         [Test]
         public async Task AverageMatchesPerDayTest()
         {

@@ -6,7 +6,6 @@ using FluentAssertions;
 using HttpServerCore;
 using NUnit.Framework;
 using Raven.Imports.Newtonsoft.Json;
-using Raven.Tests.Helpers;
 using StatisticServer.Modules;
 using StatisticServer.Storage;
 

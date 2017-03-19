@@ -8,7 +8,6 @@ using HttpServerCore;
 using NUnit.Framework;
 using Raven.Imports.Newtonsoft.Json;
 using Raven.Imports.Newtonsoft.Json.Linq;
-using Raven.Tests.Helpers;
 
 namespace StatisticServer.Tests.Modules.ReporstModuleTests
 {
@@ -146,6 +145,9 @@ namespace StatisticServer.Tests.Modules.ReporstModuleTests
             await StatisticStorage.UpdateMatch(Match1.GetIndex(), Match1);
         }
 
-        protected override async Task PutInitialiData() { }
+        protected override Task PutInitialiData()
+        {
+            return Task.FromResult(0);
+        }
     }
 }

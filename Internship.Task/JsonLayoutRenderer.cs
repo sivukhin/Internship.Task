@@ -1,7 +1,7 @@
 ﻿using System.Text;
-using Newtonsoft.Json;
 using NLog;
 using NLog.LayoutRenderers;
+using Raven.Imports.Newtonsoft.Json;
 
 namespace StatisticServer
 {
