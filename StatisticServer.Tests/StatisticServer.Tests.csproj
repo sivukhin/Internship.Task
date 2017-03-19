@@ -112,7 +112,7 @@
     <Compile Include="Modules\ReporstModuleTests\BestPlayersTests.cs" />
     <Compile Include="Modules\ReporstModuleTests\PopularServerTests.cs" />
     <Compile Include="Modules\ReporstModuleTests\ReportsModuleBaseTests.cs" />
-    <Compile Include="Modules\StatisticModuleTests\PlayerStatisticTests.cs" />
+    <Compile Include="Modules\StatisticModuleTests\ServerStatisticTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Modules\ReporstModuleTests\RecentMatchesTests.cs" />
     <Compile Include="Modules\UpdateStatisticModuleTests.cs" />
