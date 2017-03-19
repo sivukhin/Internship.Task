@@ -66,7 +66,7 @@ namespace StatisticServer.Tests.Modules
             await StatisticStorage.UpdateServer(Server1.GetIndex(), Server1);
             var response = await Module.ProcessRequest(CreateRequest(
                 JsonConvert.SerializeObject(Match1),
-                $"/servers/{Match1.HostServer.Id}/matches/{Match1.EndTime}",
+                $"/servers/{Match1.HostServer.Id}/matches/{Match1.EndTime.ToUtcFormat()}",
                 HttpMethodEnum.Put));
 
             response.Response.Should().Be(new HttpResponse(HttpStatusCode.OK));
@@ -81,11 +81,11 @@ namespace StatisticServer.Tests.Modules
             await StatisticStorage.UpdateServer(Server1.GetIndex(), Server1);
             await Module.ProcessRequest(CreateRequest(
                 JsonConvert.SerializeObject(Match1),
-                $"/servers/{Match1.HostServer.Id}/matches/{Match1.EndTime}",
+                $"/servers/{Match1.HostServer.Id}/matches/{Match1.EndTime.ToUtcFormat()}",
                 HttpMethodEnum.Put));
             var response = await Module.ProcessRequest(CreateRequest(
                 JsonConvert.SerializeObject(Match2),
-                $"/servers/{Match1.HostServer.Id}/matches/{Match1.EndTime}",
+                $"/servers/{Match1.HostServer.Id}/matches/{Match1.EndTime.ToUtcFormat()}",
                 HttpMethodEnum.Put));
             var combined = Match2;
             combined.HostServer = Match1.HostServer;

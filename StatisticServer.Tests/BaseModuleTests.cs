@@ -53,14 +53,14 @@ namespace StatisticServer.Tests
         protected string Host1 = "host1-1";
         protected string Host2 = "host2-2";
 
-        protected DateTime Day1 => new DateTime(2017, 1, 1, 12, 00, 00);
-        protected DateTime Day2 => new DateTime(2017, 1, 2, 12, 00, 00);
-        protected DateTime Day3 => new DateTime(2017, 1, 3, 12, 00, 00);
-        protected DateTime Day4 => new DateTime(2017, 1, 4, 12, 00, 00);
+        protected DateTime Day1 => new DateTime(2017, 1, 1, 12, 00, 00, DateTimeKind.Utc);
+        protected DateTime Day2 => new DateTime(2017, 1, 2, 12, 00, 00, DateTimeKind.Utc);
+        protected DateTime Day3 => new DateTime(2017, 1, 3, 12, 00, 00, DateTimeKind.Utc);
+        protected DateTime Day4 => new DateTime(2017, 1, 4, 12, 00, 00, DateTimeKind.Utc);
 
 
-        protected DateTime DateTime1 => new DateTime(2016, 1, 1);
-        protected DateTime DateTime2 => new DateTime(2017, 1, 1);
+        protected DateTime DateTime1 => new DateTime(2016, 1, 1, 12, 00, 00, DateTimeKind.Utc);
+        protected DateTime DateTime2 => new DateTime(2017, 1, 1, 12, 00, 00, DateTimeKind.Utc);
 
         protected string Mode1 = "1";
         protected string Mode2 = "2";

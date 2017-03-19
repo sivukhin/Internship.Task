@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -36,7 +37,7 @@ namespace StatisticServer.Storage
         private static GroupedStat<PlayerInfo, T, string> CreateStat<T>
             (Func<DataIdentity<PlayerInfo>, IStat<PlayerInfo, T>> statFactory)
         {
-            return new GroupedStat<PlayerInfo, T, string>(player => player.Name, () => statFactory(Info));
+            return new GroupedStat<PlayerInfo, T, string>(player => player.Name.ToLower(CultureInfo.InvariantCulture), () => statFactory(Info));
         }
 
         private readonly GroupedStat<PlayerInfo, int, string> totalMatchesPlayed =
@@ -67,10 +68,10 @@ namespace StatisticServer.Storage
             CreateStat(player => player.Split(info => info.BaseMatch.EndTime.Date, splitted => splitted.Count()).Max());
 
         private readonly GroupedStat<PlayerInfo, DateTime, string> firstMatchPlayed =
-            CreateStat(player => player.Min(info => info.BaseMatch.EndTime.Date));
+            CreateStat(player => player.Min(info => info.BaseMatch.EndTime));
 
         private readonly GroupedStat<PlayerInfo, DateTime, string> lastMatchPlayed =
-            CreateStat(player => player.Max(info => info.BaseMatch.EndTime.Date));
+            CreateStat(player => player.Max(info => info.BaseMatch.EndTime));
 
         private double? KillToDeathRatio(string playerName)
         {

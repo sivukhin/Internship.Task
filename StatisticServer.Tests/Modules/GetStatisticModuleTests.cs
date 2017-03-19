@@ -75,7 +75,7 @@ namespace StatisticServer.Tests.Modules
         {
             await StatisticStorage.UpdateServer(Server1.GetIndex(), Server1);
 
-            var response = await Module.ProcessRequest(CreateRequest("", $"/servers/{Server1.Id}/matches/{DateTime1}"));
+            var response = await Module.ProcessRequest(CreateRequest("", $"/servers/{Server1.Id}/matches/{DateTime1.ToUtcFormat()}"));
 
             response.Response.Should().Be(new HttpResponse(HttpStatusCode.NotFound));
         }
@@ -83,7 +83,7 @@ namespace StatisticServer.Tests.Modules
         [Test]
         public async Task ModuleReturnsNotFound_WhenNoServersFound()
         {
-            var response = await Module.ProcessRequest(CreateRequest("", $"/servers/{Host1}/matches/{DateTime1}"));
+            var response = await Module.ProcessRequest(CreateRequest("", $"/servers/{Host1}/matches/{DateTime1.ToUtcFormat()}"));
 
             response.Response.Should().Be(new HttpResponse(HttpStatusCode.NotFound));
         }
@@ -94,7 +94,7 @@ namespace StatisticServer.Tests.Modules
             await StatisticStorage.UpdateServer(Server1.GetIndex(), Server1);
             await StatisticStorage.UpdateMatch(Match1.GetIndex(), Match1.InitPlayers(Match1.EndTime));
             
-            var response = await Module.ProcessRequest(CreateRequest("", $"/servers/{Match1.HostServer.Id}/matches/{Match1.EndTime}"));
+            var response = await Module.ProcessRequest(CreateRequest("", $"/servers/{Match1.HostServer.Id}/matches/{Match1.EndTime.ToUtcFormat()}"));
 
             response.Response.Should().Be(new JsonHttpResponse(HttpStatusCode.OK, Match1));
         }

@@ -50,7 +50,20 @@ namespace StatisticServer.Modules
             var statistics = playerStatistics.GetStatistics(playerName);
             if (statistics.TotalMatchesPlayed == 0)
                 return Task.FromResult<IResponse>(new HttpResponse(HttpStatusCode.NotFound));
-            return Task.FromResult<IResponse>(new JsonHttpResponse(HttpStatusCode.OK, statistics));
+            
+            return Task.FromResult<IResponse>(new JsonHttpResponse(HttpStatusCode.OK, new
+            {
+                statistics.TotalMatchesPlayed,
+                statistics.AverageMatchesPerDay,
+                statistics.AverageScoreboardPercent,
+                statistics.FavoriteGameMode,
+                statistics.FavoriteServer,
+                lastMatchPlayed = statistics.LastMatchPlayed.ToUtcFormat(),
+                statistics.MaximumMatchesPerDay,
+                statistics.TotalMatchesWon,
+                statistics.UniqueServers,
+                statistics.KillToDeathRatio,
+            }));
         }
     }
 }
