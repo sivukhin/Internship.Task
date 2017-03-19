@@ -24,6 +24,14 @@ namespace DataCore
 
         public MatchInfoId GetIndex() => new MatchInfoId {ServerId = HostServer.Id, EndTime = EndTime};
 
+        private double ScoreboardPercentCalculator(int place)
+        {
+            if (Scoreboard.Count == 1)
+                return 100;
+            double percentBelow = 1 - place * 1.0 / (Scoreboard.Count - 1);
+            return 100 * percentBelow;
+        }
+
         public virtual MatchInfo InitPlayers(DateTime endTime)
         {
             EndTime = endTime;
@@ -31,7 +39,7 @@ namespace DataCore
             {
                 Scoreboard[i].BaseMatch = this;
                 Scoreboard[i].AreWinner = i == 0;
-                Scoreboard[i].ScoreboardPercent = Scoreboard.Count == 1 ? 100 : 100.0 * i / (Scoreboard.Count - 1);
+                Scoreboard[i].ScoreboardPercent = ScoreboardPercentCalculator(i);
             }
             return this;
         }

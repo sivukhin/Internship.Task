@@ -40,7 +40,7 @@ namespace StatisticServer.Modules
         private Task<IResponse> GetFullServerStatistic(string serverId)
         {
             var statistics = serverStatistics.GetStatistics(serverId);
-            if (statistics == null)
+            if (statistics.TotalMatchesPlayed == 0)
                 return Task.FromResult<IResponse>(new HttpResponse(HttpStatusCode.NotFound));
             return Task.FromResult<IResponse>(new JsonHttpResponse(HttpStatusCode.OK, statistics));
         }
@@ -48,7 +48,7 @@ namespace StatisticServer.Modules
         private Task<IResponse> GetFullPlayerStatstic(string playerName)
         {
             var statistics = playerStatistics.GetStatistics(playerName);
-            if (statistics == null)
+            if (statistics.TotalMatchesPlayed == 0)
                 return Task.FromResult<IResponse>(new HttpResponse(HttpStatusCode.NotFound));
             return Task.FromResult<IResponse>(new JsonHttpResponse(HttpStatusCode.OK, statistics));
         }

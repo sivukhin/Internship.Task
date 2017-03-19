@@ -114,7 +114,7 @@ namespace StatCore
             Func<TMid, TSplit> selector,
             Func<DataIdentity<TMid>, IStat<TMid, TOut>> statFactory)
         {
-            return connection.ConnectTo(new DataSplitter<TMid, TSplit, TOut>(selector, statFactory));
+            return new DataSplitter<TIn, TMid, TSplit, TOut>(connection, selector, statFactory);
         }
 
         public static IStat<TIn, IEnumerable<TOut>> Top<TIn, TOut>(

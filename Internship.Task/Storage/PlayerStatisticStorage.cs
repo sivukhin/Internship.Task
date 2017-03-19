@@ -52,7 +52,7 @@ namespace StatisticServer.Storage
             CreateStat(player => player.Sum(info => info.Deaths));
 
         private readonly GroupedStat<PlayerInfo, string, string> favoriteServer =
-            CreateStat(player => player.Select(info => info.BaseMatch.HostServer.Name).Favorite());
+            CreateStat(player => player.Select(info => info.BaseMatch.HostServer.Id).Favorite());
 
         private readonly GroupedStat<PlayerInfo, int, string> uniqueServers =
             CreateStat(player => player.Split(info => info.BaseMatch.HostServer.Id, splitted => splitted.Existence()).Count());
@@ -88,8 +88,6 @@ namespace StatisticServer.Storage
 
         public PlayerStatistics GetStatistics(string playerName)
         {
-            if (totalMatchesPlayed[playerName] == 0)
-                return null;
             return new PlayerStatistics
             {
                 MaximumMatchesPerDay = maximumMatchesPerDay[playerName],

@@ -26,7 +26,7 @@ namespace StatisticServer.Modules
             new RequestFilter(
                 HttpMethodEnum.Put,
                 new Regex("^/servers/(?<serverId>[^/]*)/matches/(?<endTime>.*)$", RegexOptions.Compiled),
-                (request, match) => AddMatchStatistic(request, match.Groups["serverId"].Value, match.Groups["endTime"].Value.ParseUtc()))
+                (request, match) => AddMatchStatistic(request, match.Groups["serverId"].Value, DateTime.Parse(match.Groups["endTime"].Value)))
         };
 
         private readonly IDataStatisticStorage dataStatisticStorage;

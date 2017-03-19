@@ -19,5 +19,10 @@ namespace StatisticServer
         {
             return DateTime.Parse(dateTimeString).ToUniversalTime();
         }
+
+        public static string ToUtcFormat(this DateTime dateTime)
+        {
+            return dateTime.ToUniversalTime().ToString("yyyy'-'MM'-'dd'T'HH':'mm':'ss'.'fff'Z'");
+        }
     }
 }

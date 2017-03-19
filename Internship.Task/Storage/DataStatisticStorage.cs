@@ -104,7 +104,7 @@ namespace StatisticServer.Storage
 
             var oldMatchInfo = await statisticStorage.GetMatch(match.GetIndex());
             if (oldMatchInfo != null)
-                DeleteMatch(oldMatchInfo.InitPlayers(match.GetIndex().EndTime));
+                DeleteMatch(oldMatchInfo.InitPlayers(oldMatchInfo.EndTime));
             await statisticStorage.UpdateMatch(matchId, match);
             InsertMatch(match);
         }
@@ -115,13 +115,7 @@ namespace StatisticServer.Storage
             serverStatisticStorage.Delete(matchInfo);
             foreach (var player in matchInfo.Scoreboard)
                 playerStatisticStorage.Delete(player);
-            Task.Factory.StartNew(() => reportStorage.Update(matchInfo))
-                .ContinueWith(_ => reportStorage.Update(matchInfo.HostServer))
-                .ContinueWith(_ =>
-                {
-                    foreach (var player in matchInfo.Scoreboard)
-                        reportStorage.Update(player);
-                });
+            UpdateReports(matchInfo);
         }
 
         private void InsertMatch(MatchInfo matchInfo)
@@ -130,13 +124,18 @@ namespace StatisticServer.Storage
             serverStatisticStorage.Add(matchInfo);
             foreach (var player in matchInfo.Scoreboard)
                 playerStatisticStorage.Add(player);
+            UpdateReports(matchInfo);
+        }
+
+        private void UpdateReports(MatchInfo matchInfo)
+        {
             Task.Factory.StartNew(() => reportStorage.Update(matchInfo))
-                .ContinueWith(_ => reportStorage.Update(matchInfo.HostServer))
-                .ContinueWith(_ =>
-                {
-                    foreach (var player in matchInfo.Scoreboard)
-                        reportStorage.Update(player);
-                });
+                            .ContinueWith(_ => reportStorage.Update(matchInfo.HostServer))
+                            .ContinueWith(_ =>
+                            {
+                                foreach (var player in matchInfo.Scoreboard)
+                                    reportStorage.Update(player);
+                            });
         }
 
         public async Task<MatchInfo> GetMatch(MatchInfo.MatchInfoId matchId)
