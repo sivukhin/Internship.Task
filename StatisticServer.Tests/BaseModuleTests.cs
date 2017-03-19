@@ -106,14 +106,14 @@ namespace StatisticServer.Tests
             DateTime endTime,
             string map = "map1",
             IEnumerable<PlayerInfo> scoreboard = null,
+            string gameMode = "A",
             double timeElapsed = 1.0, 
             int fragLimit = 1, 
-            string gameMode = "A",
             int timeLimit = 10)
         {
             if (scoreboard == null)
                 scoreboard = new List<PlayerInfo> {Player1};
-            return new MatchInfo
+            var match = new MatchInfo
             {
                 HostServer = hostServer,
                 TimeElapsed = timeElapsed,
@@ -124,6 +124,7 @@ namespace StatisticServer.Tests
                 TimeLimit = timeLimit,
                 EndTime = endTime
             };
+            return match.InitPlayers(match.EndTime);
         }
 
         protected ServerInfo GenerateServer(

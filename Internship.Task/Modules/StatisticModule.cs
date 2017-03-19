@@ -11,7 +11,7 @@ using StatisticServer.Storage;
 
 namespace StatisticServer.Modules
 {
-    public class StatsModule : BaseModule
+    public class StatisticModule : BaseModule
     {
         private Logger logger;
         protected override Logger Logger => logger ?? (logger = LogManager.GetCurrentClassLogger());
@@ -31,7 +31,7 @@ namespace StatisticServer.Modules
         private readonly IServerStatisticStorage serverStatistics;
         private readonly IPlayerStatisticStorage playerStatistics;
 
-        public StatsModule(IServerStatisticStorage serverStatistics, IPlayerStatisticStorage playerStatistics)
+        public StatisticModule(IServerStatisticStorage serverStatistics, IPlayerStatisticStorage playerStatistics)
         {
             this.serverStatistics = serverStatistics;
             this.playerStatistics = playerStatistics;

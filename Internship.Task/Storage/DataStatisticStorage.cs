@@ -100,6 +100,8 @@ namespace StatisticServer.Storage
             if (server == null)
                 return;
             match.HostServer = server;
+            match = match.InitPlayers(match.EndTime);
+
             var oldMatchInfo = await statisticStorage.GetMatch(match.GetIndex());
             if (oldMatchInfo != null)
                 DeleteMatch(oldMatchInfo.InitPlayers(match.GetIndex().EndTime));

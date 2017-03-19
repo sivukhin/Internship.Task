@@ -104,7 +104,7 @@
     <Compile Include="Modules\GetStatisticModule.cs" />
     <Compile Include="Modules\ReportsModule.cs" />
     <Compile Include="Modules\RequestFilter.cs" />
-    <Compile Include="Modules\StatsModule.cs" />
+    <Compile Include="Modules\StatisticModule.cs" />
     <Compile Include="Modules\UpdateStatisticModule.cs" />
     <Compile Include="Storage\BaseStatisticStorage.cs" />
     <Compile Include="Storage\RavenDbStore.cs" />
