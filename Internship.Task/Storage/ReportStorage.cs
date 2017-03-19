@@ -130,7 +130,7 @@ namespace StatisticServer.Storage
                     return p.KillToDeathRatio.Value;
                 throw new ArgumentException($"{nameof(p.KillToDeathRatio)} must be not null");
             },
-            (p1, p2) => string.Compare(p1.Player.Name, p2.Player.Name, StringComparison.Ordinal));
+            (p1, p2) => p1.Player.GetIndex().CompareTo(p2.Player.GetIndex()));
         }
 
         public void Update(ServerInfo serverInfo)

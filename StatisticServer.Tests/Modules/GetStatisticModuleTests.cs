@@ -34,7 +34,6 @@ namespace StatisticServer.Tests.Modules
         {
             await StatisticStorage.UpdateServer(Server1.GetIndex(), Server1);
             await StatisticStorage.UpdateServer(Server2.GetIndex(), Server2);
-            RavenTestBase.WaitForIndexing(DocumentStore);
 
             var response = await Module.ProcessRequest(CreateRequest("", "/servers/info"));
 
@@ -65,7 +64,6 @@ namespace StatisticServer.Tests.Modules
         public async Task ModuleReturnsServerInfo()
         {
             await StatisticStorage.UpdateServer(Server1.GetIndex(), Server1);
-            RavenTestBase.WaitForIndexing(DocumentStore);
 
             var response = await Module.ProcessRequest(CreateRequest("", $"/servers/{Server1.Id}/info"));
 
@@ -76,7 +74,6 @@ namespace StatisticServer.Tests.Modules
         public async Task ModuleReturnsNotFound_WhenNoMatchesFound()
         {
             await StatisticStorage.UpdateServer(Server1.GetIndex(), Server1);
-            RavenTestBase.WaitForIndexing(DocumentStore);
 
             var response = await Module.ProcessRequest(CreateRequest("", $"/servers/{Server1.Id}/matches/{DateTime1}"));
 
@@ -95,9 +92,7 @@ namespace StatisticServer.Tests.Modules
         public async Task ModuleReturnsMatchInfo()
         {
             await StatisticStorage.UpdateServer(Server1.GetIndex(), Server1);
-            RavenTestBase.WaitForIndexing(DocumentStore);
             await StatisticStorage.UpdateMatch(Match1.GetIndex(), Match1.InitPlayers(Match1.EndTime));
-            RavenTestBase.WaitForIndexing(DocumentStore);
             
             var response = await Module.ProcessRequest(CreateRequest("", $"/servers/{Match1.HostServer.Id}/matches/{Match1.EndTime}"));
 

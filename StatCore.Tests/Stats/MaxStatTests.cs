@@ -23,8 +23,6 @@ namespace StatCore.Tests.Stats
                 .Returns(3).SetName("AddItems"),
             ParamsTestCaseData.Create(Event<int>.Add(2), Event<int>.Add(1), Event<int>.Delete(2))
                 .Returns(1).SetName("DeleteItems"),
-            ParamsTestCaseData.Create(Event<int>.Add(10), Event<int>.Delete(3))
-                .Returns(10).SetName("NotDeleteNonExistingItems"),
             ParamsTestCaseData.Create(Event<int>.Add(10), Event<int>.Delete(10))
                 .Returns(0).SetName("ReturnDefault_WhenAllElementsDeleted")
         };

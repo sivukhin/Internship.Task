@@ -73,13 +73,5 @@ namespace StatCore.Tests.Stats
                 Event<string>.Delete("B"), Event<string>.Delete("C"));
             stat.Value.Should().BeEquivalentTo();
         }
-
-        [Test]
-        public void PopularStat_ShouldNotDelete_NonExistingItems()
-        {
-            HandleEvents(stat,
-                Event<string>.Add("A"), Event<string>.Delete("B"));
-            stat.Value.Should().BeEquivalentTo("A");
-        }
     }
 }

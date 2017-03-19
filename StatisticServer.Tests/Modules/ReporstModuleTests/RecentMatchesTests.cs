@@ -138,7 +138,6 @@ namespace StatisticServer.Tests.Modules.ReporstModuleTests
         {
             await StatisticStorage.UpdateServer(Server1.GetIndex(), Server1);
             await StatisticStorage.UpdateServer(Server2.GetIndex(), Server2);
-            RavenTestBase.WaitForIndexing(DocumentStore);
         }
     }
 }

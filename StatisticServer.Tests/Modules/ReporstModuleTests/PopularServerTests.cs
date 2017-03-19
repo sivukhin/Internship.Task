@@ -36,7 +36,6 @@ namespace StatisticServer.Tests.Modules.ReporstModuleTests
         {
             await StatisticStorage.UpdateServer(Server1.GetIndex(), Server1);
             await StatisticStorage.UpdateServer(Server2.GetIndex(), Server2);
-            RavenTestBase.WaitForIndexing(DocumentStore);
             await StatisticStorage.UpdateMatch(Match2.GetIndex(), Match2.InitPlayers(Match2.EndTime));
             await WaitForTasks();
 
@@ -57,7 +56,6 @@ namespace StatisticServer.Tests.Modules.ReporstModuleTests
         {
             foreach (var server in GenerateServers(10, i => GenerateServer(i.ToString())))
                 await StatisticStorage.UpdateServer(server.GetIndex(), server);
-            RavenTestBase.WaitForIndexing(DocumentStore);
             await WaitForTasks();
 
             var response = await Module.ProcessRequest(CreateRequest("", "/reports/popular-servers"));
@@ -70,7 +68,6 @@ namespace StatisticServer.Tests.Modules.ReporstModuleTests
         {
             foreach (var server in GenerateServers(10, i => GenerateServer(i.ToString())))
                 await StatisticStorage.UpdateServer(server.GetIndex(), server);
-            RavenTestBase.WaitForIndexing(DocumentStore);
             await WaitForTasks();
 
             var response = await Module.ProcessRequest(CreateRequest("", "/reports/popular-servers/"));
@@ -82,7 +79,6 @@ namespace StatisticServer.Tests.Modules.ReporstModuleTests
         public async Task PopularServers_MinimalCountValue_Is0()
         {
             await StatisticStorage.UpdateServer(Server1.GetIndex(), Server1);
-            RavenTestBase.WaitForIndexing(DocumentStore);
             await WaitForTasks();
 
             var response = await Module.ProcessRequest(CreateRequest("", "/reports/popular-servers/-1"));
@@ -116,7 +112,6 @@ namespace StatisticServer.Tests.Modules.ReporstModuleTests
         {
             foreach (var server in GenerateServers(100, i => GenerateServer(i.ToString())))
                 await StatisticStorage.UpdateServer(server.GetIndex(), server);
-            RavenTestBase.WaitForIndexing(DocumentStore);
             var match1 = GenerateMatch(GenerateServer("1"), DateTime.Today);
             var match2 = GenerateMatch(GenerateServer("1"), DateTime.Today.Subtract(TimeSpan.FromDays(1)));
             var match3 = GenerateMatch(GenerateServer("2"), DateTime.Today.Add(TimeSpan.FromDays(2)));
@@ -147,11 +142,8 @@ namespace StatisticServer.Tests.Modules.ReporstModuleTests
         public async Task PopularServers_AfterUpdate()
         {
             await StatisticStorage.UpdateServer(Server1.GetIndex(), Server1);
-            RavenTestBase.WaitForIndexing(DocumentStore);
             await StatisticStorage.UpdateMatch(Match1.GetIndex(), Match1);
-            RavenTestBase.WaitForIndexing(DocumentStore);
             await StatisticStorage.UpdateMatch(Match1.GetIndex(), Match1);
-            RavenTestBase.WaitForIndexing(DocumentStore);
         }
 
         protected override async Task PutInitialiData() { }
