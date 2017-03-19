@@ -22,9 +22,7 @@ namespace StatCore.Stats
 
         public void Delete(T item)
         {
-            //TODO: is it neccessary check?
-            if (values.Contains(item))
-                values.Remove(item);
+            values.Remove(item);
         }
 
         public IEnumerable<T> Value => values.TakeLast(maxSize);

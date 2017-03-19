@@ -2,7 +2,7 @@ import requests
 import json
 
 match = {
-	"map": "DM-NSYNC-ByeBye",
+	"map": "AAAAA",
 	"gameMode": "DM",
 	"fragLimit": 20,
 	"timeLimit": 20,
@@ -28,12 +28,12 @@ server_data = {
 	"gameModes": [ "DM", "TDM", "KEK", "PEK" ]
 }
 
-server = 'server-10'
+server = '100'
 timestamp = '2017-01-22T15:17:00Z'
 
 def put_query():
 	return requests.put('http://127.0.0.1:12345/servers/{}/matches/{}'.format(server, timestamp), data=json.dumps(match))
 	
 def put_server():
-	requests.put('http://127.0.0.1:12345/servers/{}/info'.format(server), data=json.dumps(server_data))
-put_server()
+	return requests.put('http://127.0.0.1:12345/servers/{}/info'.format(server), data=json.dumps(server_data))
+# put_query()

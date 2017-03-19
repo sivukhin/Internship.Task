@@ -20,7 +20,7 @@ namespace StatisticServer.Tests.Modules.ReporstModuleTests
             await StatisticStorage.UpdateMatch(Match1.GetIndex(), Match1.InitPlayers(Match1.EndTime));
             await WaitForTasks();
 
-            var response = await module.ProcessRequest(CreateRequest("", "/reports/recent-matches/5"));
+            var response = await Module.ProcessRequest(CreateRequest("", "/reports/recent-matches/5"));
 
             var expected = new[]
             {
@@ -35,7 +35,7 @@ namespace StatisticServer.Tests.Modules.ReporstModuleTests
             await StatisticStorage.UpdateMatch(Match1.GetIndex(), Match1.InitPlayers(Match1.EndTime));
             await WaitForTasks();
 
-            var response = await module.ProcessRequest(CreateRequest("", "/reports/recent-matches/one"));
+            var response = await Module.ProcessRequest(CreateRequest("", "/reports/recent-matches/one"));
 
             response.Response.Should().Be(new JsonHttpResponse(HttpStatusCode.OK, new object[] {}));
         }
@@ -47,7 +47,7 @@ namespace StatisticServer.Tests.Modules.ReporstModuleTests
             await StatisticStorage.UpdateMatch(Match2.GetIndex(), Match2.InitPlayers(Match2.EndTime));
             await WaitForTasks();
 
-            var response = await module.ProcessRequest(CreateRequest("", "/reports/recent-matches/1"));
+            var response = await Module.ProcessRequest(CreateRequest("", "/reports/recent-matches/1"));
 
             var expected = new[]
             {
@@ -66,7 +66,7 @@ namespace StatisticServer.Tests.Modules.ReporstModuleTests
             }
             await Task.Delay(100);
 
-            var response = await module.ProcessRequest(CreateRequest("", "/reports/recent-matches"));
+            var response = await Module.ProcessRequest(CreateRequest("", "/reports/recent-matches"));
             var matches = JsonConvert.DeserializeObject<List<object>>(response.Response.Content);
             matches.Should().HaveCount(5);
         }
@@ -77,7 +77,7 @@ namespace StatisticServer.Tests.Modules.ReporstModuleTests
             await StatisticStorage.UpdateMatch(Match1.GetIndex(), Match1.InitPlayers(Match1.EndTime));
             await WaitForTasks();
 
-            var response = await module.ProcessRequest(CreateRequest("", "/reports/recent-matches/"));
+            var response = await Module.ProcessRequest(CreateRequest("", "/reports/recent-matches/"));
 
             var expected = new[]
             {
@@ -92,7 +92,7 @@ namespace StatisticServer.Tests.Modules.ReporstModuleTests
             await StatisticStorage.UpdateMatch(Match1.GetIndex(), Match1.InitPlayers(Match1.EndTime));
             await WaitForTasks();
 
-            var response = await module.ProcessRequest(CreateRequest("", "/reports/recent-matches/-1"));
+            var response = await Module.ProcessRequest(CreateRequest("", "/reports/recent-matches/-1"));
 
             response.Response.Should().Be(new JsonHttpResponse(HttpStatusCode.OK, new object[] {}));
         }
@@ -106,7 +106,7 @@ namespace StatisticServer.Tests.Modules.ReporstModuleTests
             }
             await WaitForTasks();
 
-            var response = await module.ProcessRequest(CreateRequest("", "/reports/recent-matches/100"));
+            var response = await Module.ProcessRequest(CreateRequest("", "/reports/recent-matches/100"));
 
             var matches = JsonConvert.DeserializeObject<List<object>>(response.Response.Content);
             matches.Should().HaveCount(50);
@@ -125,7 +125,7 @@ namespace StatisticServer.Tests.Modules.ReporstModuleTests
             }
             await WaitForTasks();
 
-            var response = await module.ProcessRequest(CreateRequest("", $"/reports/recent-matches/{queryCount}"));
+            var response = await Module.ProcessRequest(CreateRequest("", $"/reports/recent-matches/{queryCount}"));
 
             var expected = generated
                 .Select(m => new {server = m.HostServer.Id, timestamp = m.EndTime, results = m})

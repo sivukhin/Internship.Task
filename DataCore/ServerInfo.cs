@@ -8,9 +8,13 @@ namespace DataCore
 {
     public class ServerInfo
     {
-        public class ServerInfoId
+        public class ServerInfoId : IComparable<ServerInfoId>
         {
             public string Id { get; set; }
+            public int CompareTo(ServerInfoId other)
+            {
+                return String.Compare(Id, other.Id, StringComparison.Ordinal);
+            }
         }
 
         public ServerInfoId GetIndex() => new ServerInfoId {Id = Id};

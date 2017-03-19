@@ -45,15 +45,25 @@ namespace StatCore
 
         public virtual void Add(TIn item)
         {
-            GetGroup(item).Add(item);
+            lock (groupStats)
+                GetGroup(item).Add(item);
         }
 
         public virtual void Delete(TIn item)
         {
-            GetGroup(item).Delete(item);
+            lock (groupStats)
+                GetGroup(item).Delete(item);
         }
 
-        public TOut this[TGroup group] =>
-            (groupStats.ContainsKey(group) ? groupStats[group] : stat()).Value;
+        public TOut this[TGroup group]
+        {
+            get
+            {
+                lock (groupStats)
+                {
+                    return (groupStats.ContainsKey(group) ? groupStats[group] : stat()).Value;
+                }
+            }
+        }
     }
 }

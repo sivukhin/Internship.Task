@@ -2,12 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
-using System.Text;
 using System.Threading.Tasks;
-using DataCore;
 using FluentAssertions;
 using HttpServerCore;
-using NUnit.Framework.Internal;
 using NUnit.Framework;
 using Raven.Imports.Newtonsoft.Json;
 using Raven.Imports.Newtonsoft.Json.Linq;
@@ -25,7 +22,7 @@ namespace StatisticServer.Tests.Modules.ReporstModuleTests
             await StatisticStorage.UpdateServer(Server2.GetIndex(), Server2);
             await WaitForTasks();
 
-            var response = await module.ProcessRequest(CreateRequest("", "/reports/popular-servers/5"));
+            var response = await Module.ProcessRequest(CreateRequest("", "/reports/popular-servers/5"));
             var typeDefinition = new {endpoint = "", name = "", averageMatchesPerDay = 0.0};
             var expected = new[] {Server1, Server2}.Select(s => new {endpoint = s.Id, name = s.Name, averageMatchesPerDay = 0.0});
             var servers = JsonConvert.DeserializeObject<List<JObject>>(response.Response.Content)
@@ -43,7 +40,7 @@ namespace StatisticServer.Tests.Modules.ReporstModuleTests
             await StatisticStorage.UpdateMatch(Match2.GetIndex(), Match2.InitPlayers(Match2.EndTime));
             await WaitForTasks();
 
-            var response = await module.ProcessRequest(CreateRequest("", "/reports/popular-servers/1"));
+            var response = await Module.ProcessRequest(CreateRequest("", "/reports/popular-servers/1"));
             response.Response.Should().Be(new JsonHttpResponse(HttpStatusCode.OK, new[]
             {
                 new
@@ -63,7 +60,7 @@ namespace StatisticServer.Tests.Modules.ReporstModuleTests
             RavenTestBase.WaitForIndexing(DocumentStore);
             await WaitForTasks();
 
-            var response = await module.ProcessRequest(CreateRequest("", "/reports/popular-servers"));
+            var response = await Module.ProcessRequest(CreateRequest("", "/reports/popular-servers"));
             var servers = JsonConvert.DeserializeObject<List<object>>(response.Response.Content);
             servers.Should().HaveCount(5);
         }
@@ -76,7 +73,7 @@ namespace StatisticServer.Tests.Modules.ReporstModuleTests
             RavenTestBase.WaitForIndexing(DocumentStore);
             await WaitForTasks();
 
-            var response = await module.ProcessRequest(CreateRequest("", "/reports/popular-servers/"));
+            var response = await Module.ProcessRequest(CreateRequest("", "/reports/popular-servers/"));
             var servers = JsonConvert.DeserializeObject<List<object>>(response.Response.Content);
             servers.Should().HaveCount(5);
         }
@@ -88,7 +85,7 @@ namespace StatisticServer.Tests.Modules.ReporstModuleTests
             RavenTestBase.WaitForIndexing(DocumentStore);
             await WaitForTasks();
 
-            var response = await module.ProcessRequest(CreateRequest("", "/reports/popular-servers/-1"));
+            var response = await Module.ProcessRequest(CreateRequest("", "/reports/popular-servers/-1"));
 
             response.Response.Should().Be(new JsonHttpResponse(HttpStatusCode.OK, new object[] { }));
         }
@@ -100,7 +97,7 @@ namespace StatisticServer.Tests.Modules.ReporstModuleTests
                 await StatisticStorage.UpdateServer(server.GetIndex(), server);
             await WaitForTasks();
 
-            var response = await module.ProcessRequest(CreateRequest("", "/reports/popular-servers/100"));
+            var response = await Module.ProcessRequest(CreateRequest("", "/reports/popular-servers/100"));
 
             var servers = JsonConvert.DeserializeObject<List<object>>(response.Response.Content);
             servers.Should().HaveCount(50);
@@ -109,7 +106,7 @@ namespace StatisticServer.Tests.Modules.ReporstModuleTests
         [Test]
         public async Task PopularServers_ReturnEmptyCollection_IfInvalidCountValue()
         {
-            var response = await module.ProcessRequest(CreateRequest("", "/reports/popular-servers/one"));
+            var response = await Module.ProcessRequest(CreateRequest("", "/reports/popular-servers/one"));
 
             response.Response.Should().Be(new JsonHttpResponse(HttpStatusCode.OK, new object[] {}));
         }
@@ -128,7 +125,7 @@ namespace StatisticServer.Tests.Modules.ReporstModuleTests
             await StatisticStorage.UpdateMatch(match3.GetIndex(), match3.InitPlayers(match3.EndTime));
             await WaitForTasks();
 
-            var response = await module.ProcessRequest(CreateRequest("", "/reports/popular-servers/2"));
+            var response = await Module.ProcessRequest(CreateRequest("", "/reports/popular-servers/2"));
             var expected = new[]
             {
                 new
@@ -147,6 +144,15 @@ namespace StatisticServer.Tests.Modules.ReporstModuleTests
             response.Response.Should().Be(new JsonHttpResponse(HttpStatusCode.OK, expected));
         }
 
+        public async Task PopularServers_AfterUpdate()
+        {
+            await StatisticStorage.UpdateServer(Server1.GetIndex(), Server1);
+            RavenTestBase.WaitForIndexing(DocumentStore);
+            await StatisticStorage.UpdateMatch(Match1.GetIndex(), Match1);
+            RavenTestBase.WaitForIndexing(DocumentStore);
+            await StatisticStorage.UpdateMatch(Match1.GetIndex(), Match1);
+            RavenTestBase.WaitForIndexing(DocumentStore);
+        }
 
         protected override async Task PutInitialiData() { }
     }

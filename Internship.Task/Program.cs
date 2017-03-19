@@ -92,10 +92,15 @@ namespace StatisticServer
         private static IContainer CompositionRoot(ApplicationOptions options)
         {
             var builder = new ContainerBuilder();
-            builder.RegisterType<PlayerStatisticStorage>().AsImplementedInterfaces();
-            builder.RegisterType<ServerStatisticStorage>().AsImplementedInterfaces();
+            builder.RegisterType<PlayerStatisticStorage>().AsImplementedInterfaces().SingleInstance();
+            builder.RegisterType<ServerStatisticStorage>().AsImplementedInterfaces().SingleInstance();
             builder.RegisterType<ReportStorage>().AsImplementedInterfaces().SingleInstance();
-            builder.RegisterInstance(new RavenDbStorage(RavenDbStore.GetStore(options))).As<IDataRepository>();
+            builder.RegisterType<GlobalServerStatisticStorage>().AsImplementedInterfaces().SingleInstance();
+
+            builder.RegisterInstance(new RavenDbStorage(RavenDbStore.GetStore(options)))
+                .As<IDataRepository>()
+                .SingleInstance();
+
             builder.RegisterType<DataStatisticStorage>().As<IDataStatisticStorage>().SingleInstance();
 
             builder.RegisterAssemblyTypes(Assembly.GetAssembly(typeof(BaseModule)))

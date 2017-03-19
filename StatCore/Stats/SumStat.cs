@@ -10,7 +10,9 @@ namespace StatCore.Stats
     public class SumStat<TIn> : IStat<TIn, int>
     {
         private int count;
-        private Func<TIn, int> selector;
+        private readonly Func<TIn, int> selector;
+        private readonly object sumLock = new object();
+
         public SumStat(Func<TIn, int> selector)
         {
             this.selector = selector;
@@ -19,14 +21,20 @@ namespace StatCore.Stats
         }
         public void Add(TIn item)
         {
-            Value += selector(item);
-            count++;
+            lock (sumLock)
+            {
+                Value += selector(item);
+                count++;
+            }
         }
 
         public void Delete(TIn item)
         {
-            Value -= selector(item);
-            count--;
+            lock (sumLock)
+            {
+                Value -= selector(item);
+                count--;
+            }
         }
 
         public int Value { get; private set; }

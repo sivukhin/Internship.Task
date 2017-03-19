@@ -134,10 +134,25 @@ namespace StatCore
         }
 
         public static IStat<TIn, IEnumerable<TOut>> Report<TIn, TOut, TFeature>(this IConnectableStat<TIn, TOut> connection,
+            int maxSize,
+            Func<TOut, TFeature> featureSelector,
+            Func<TOut, TOut, int> comparer) where TFeature : IComparable
+        {
+            return connection.ConnectTo(new Report<TOut, TFeature>(maxSize, featureSelector, comparer));
+        }
+
+        public static IStat<TIn, IEnumerable<TOut>> Report<TIn, TOut, TFeature>(this IConnectableStat<TIn, TOut> connection,
             Func<TOut, TFeature> featureSelector,
             Func<TOut, TOut, bool> lessComparer) where TFeature : IComparable
         {
             return connection.ConnectTo(new Report<TOut, TFeature>(featureSelector, lessComparer));
+        }
+
+        public static IStat<TIn, IEnumerable<TOut>> Report<TIn, TOut, TFeature>(this IConnectableStat<TIn, TOut> connection,
+            Func<TOut, TFeature> featureSelector,
+            Func<TOut, TOut, int> comparer) where TFeature : IComparable
+        {
+            return connection.ConnectTo(new Report<TOut, TFeature>(featureSelector, comparer));
         }
     }
 }

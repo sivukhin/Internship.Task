@@ -7,20 +7,54 @@ using DataCore;
 using FakeItEasy;
 using HttpServerCore;
 using NUnit.Framework;
+using Raven.Client;
 using StatisticServer.Modules;
 using StatisticServer.Storage;
 
 namespace StatisticServer.Tests
 {
-    public abstract class BaseModuleTests
+    public abstract class BaseModuleTests : BaseModuleTestsComponents
+    {
+        protected IGlobalServerStatisticStorage GlobalStatisticStorage;
+        protected IServerStatisticStorage ServerStatisticStorage;
+        protected IPlayerStatisticStorage PlayerStatisticStorage;
+        protected IReportStorage ReportStorage;
+        protected IDataRepository DataRepository;
+        protected IDataStatisticStorage StatisticStorage;
+        protected IDocumentStore DocumentStore;
+        protected IServerModule Module { get; set; }
+
+        [SetUp]
+        public virtual void Setup()
+        {
+            GlobalStatisticStorage = new GlobalServerStatisticStorage();
+            ServerStatisticStorage = new ServerStatisticStorage(GlobalStatisticStorage);
+            PlayerStatisticStorage = new PlayerStatisticStorage();
+            ReportStorage = new ReportStorage(ServerStatisticStorage, PlayerStatisticStorage);
+            DocumentStore = RavenDbStore.GetStore(new ApplicationOptions
+            {
+                InMemory = true,
+                UnitTesting = true
+            });
+            DataRepository = new RavenDbStorage(DocumentStore);
+            StatisticStorage = new DataStatisticStorage(
+                DataRepository,
+                GlobalStatisticStorage,
+                ServerStatisticStorage,
+                PlayerStatisticStorage,
+                ReportStorage);
+        }
+    }
+
+    public abstract class BaseModuleTestsComponents
     {
         protected IDataStatisticStorage storage;
 
         protected string Host1 = "host1-1";
         protected string Host2 = "host2-2";
 
-        protected DateTime DateTime1 => new DateTime(2016);
-        protected DateTime DateTime2 => new DateTime(2017);
+        protected DateTime DateTime1 => new DateTime(2016, 1, 1);
+        protected DateTime DateTime2 => new DateTime(2017, 1, 1);
 
         protected string Mode1 = "1";
         protected string Mode2 = "2";

@@ -22,7 +22,7 @@ namespace StatisticServer.Tests.Modules.ReporstModuleTests
                 await StatisticStorage.UpdateMatch(match.GetIndex(), match.InitPlayers(match.EndTime));
             await WaitForTasks();
 
-            var response = await module.ProcessRequest(CreateRequest("", "/reports/best-players"));
+            var response = await Module.ProcessRequest(CreateRequest("", "/reports/best-players"));
             response.Response.Should().Be(new JsonHttpResponse(HttpStatusCode.OK, new object[] {}));
         }
 
@@ -33,7 +33,7 @@ namespace StatisticServer.Tests.Modules.ReporstModuleTests
                 await StatisticStorage.UpdateMatch(match.GetIndex(), match.InitPlayers(match.EndTime));
             await WaitForTasks();
 
-            var response = await module.ProcessRequest(CreateRequest("", "/reports/best-players"));
+            var response = await Module.ProcessRequest(CreateRequest("", "/reports/best-players"));
             var expected = new[]
             {
                 new
@@ -52,7 +52,7 @@ namespace StatisticServer.Tests.Modules.ReporstModuleTests
                 await StatisticStorage.UpdateMatch(match.GetIndex(), match.InitPlayers(match.EndTime));
             await WaitForTasks();
 
-            var response = await module.ProcessRequest(CreateRequest("", "/reports/best-players"));
+            var response = await Module.ProcessRequest(CreateRequest("", "/reports/best-players"));
             response.Response.Should().Be(new JsonHttpResponse(HttpStatusCode.OK, new object[] {}));
         }
 
@@ -64,7 +64,7 @@ namespace StatisticServer.Tests.Modules.ReporstModuleTests
             {
                 await StatisticStorage.UpdateMatch(match.GetIndex(), match.InitPlayers(match.EndTime));
             }
-            var response = await module.ProcessRequest(CreateRequest("", "/reports/best-players/"));
+            var response = await Module.ProcessRequest(CreateRequest("", "/reports/best-players/"));
             var players = JsonConvert.DeserializeObject<List<object>>(response.Response.Content);
             players.Should().HaveCount(5);
         }
@@ -77,7 +77,7 @@ namespace StatisticServer.Tests.Modules.ReporstModuleTests
             {
                 await StatisticStorage.UpdateMatch(match.GetIndex(), match.InitPlayers(match.EndTime));
             }
-            var response = await module.ProcessRequest(CreateRequest("", "/reports/best-players"));
+            var response = await Module.ProcessRequest(CreateRequest("", "/reports/best-players"));
             var players = JsonConvert.DeserializeObject<List<object>>(response.Response.Content);
             players.Should().HaveCount(5);
         }
@@ -90,7 +90,7 @@ namespace StatisticServer.Tests.Modules.ReporstModuleTests
             {
                 await StatisticStorage.UpdateMatch(match.GetIndex(), match.InitPlayers(match.EndTime));
             }
-            var response = await module.ProcessRequest(CreateRequest("", "/reports/best-players/100"));
+            var response = await Module.ProcessRequest(CreateRequest("", "/reports/best-players/100"));
             var players = JsonConvert.DeserializeObject<List<object>>(response.Response.Content);
             players.Should().HaveCount(50);
         }
@@ -103,7 +103,7 @@ namespace StatisticServer.Tests.Modules.ReporstModuleTests
             {
                 await StatisticStorage.UpdateMatch(match.GetIndex(), match.InitPlayers(match.EndTime));
             }
-            var response = await module.ProcessRequest(CreateRequest("", "/reports/best-players/-1"));
+            var response = await Module.ProcessRequest(CreateRequest("", "/reports/best-players/-1"));
             response.Response.Should().Be(new JsonHttpResponse(HttpStatusCode.OK, new object[] {}));
         }
 
@@ -115,7 +115,7 @@ namespace StatisticServer.Tests.Modules.ReporstModuleTests
             {
                 await StatisticStorage.UpdateMatch(match.GetIndex(), match.InitPlayers(match.EndTime));
             }
-            var response = await module.ProcessRequest(CreateRequest("", "/reports/best-players/20"));
+            var response = await Module.ProcessRequest(CreateRequest("", "/reports/best-players/20"));
             var players = JsonConvert.DeserializeObject<List<object>>(response.Response.Content);
             players.Should().HaveCount(10);
         }

@@ -1,8 +1,10 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Newtonsoft.Json;
 using StatCore.Stats;
 
 namespace StatCore
@@ -11,16 +13,15 @@ namespace StatCore
     {
         private readonly int maxSize;
         private readonly Func<T, TFeature> featureSelector;
-        private readonly IComparer<T> comparer;
-        private readonly Dictionary<T, TFeature> features;
+        private readonly ConcurrentDictionary<T, TFeature> features;
         private readonly ConcurrentSortedSet<Tuple<TFeature, T>> itemSet;
+        private readonly object reportLock = new object();
 
         public Report(int maxSize, Func<T, TFeature> featureSelector, IComparer<T> comparer)
         {
             this.maxSize = maxSize;
             this.featureSelector = featureSelector;
-            this.comparer = comparer;
-            features = new Dictionary<T, TFeature>();
+            features = new ConcurrentDictionary<T, TFeature>();
             itemSet = new ConcurrentSortedSet<Tuple<TFeature, T>>(Comparer<Tuple<TFeature, T>>.Create((x, y) =>
             {
                 var firstComponent = x.Item1.CompareTo(y.Item1);
@@ -47,6 +48,11 @@ namespace StatCore
 
         }
 
+        public Report(Func<T, TFeature> featureSelector, Func<T, T, int> comparer) :
+            this(-1, featureSelector, comparer)
+        {
+        }
+
         public Report(Func<T, TFeature> featureSelector, Func<T, T, bool> lessComparer) :
             this(-1, featureSelector, lessComparer)
         {
@@ -54,16 +60,19 @@ namespace StatCore
 
         private void TryUpdate(T item)
         {
-            var newFeature = featureSelector(item);
-            if (features.ContainsKey(item))
+            lock (reportLock)
             {
-                var oldFeature = features[item];
-                if (oldFeature.Equals(newFeature))
-                    return;
-                itemSet.Remove(Tuple.Create(oldFeature, item));
+                var newFeature = featureSelector(item);
+                if (features.ContainsKey(item))
+                {
+                    var oldFeature = features[item];
+                    if (oldFeature.Equals(newFeature))
+                        return;
+                    itemSet.Remove(Tuple.Create(oldFeature, item));
+                }
+                features[item] = newFeature;
+                itemSet.Add(Tuple.Create(newFeature, item));
             }
-            features[item] = newFeature;
-            itemSet.Add(Tuple.Create(newFeature, item));
         }
 
         public void Add(T item)

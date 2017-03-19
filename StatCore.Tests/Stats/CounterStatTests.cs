@@ -1,5 +1,6 @@
 ﻿using FluentAssertions;
 using NUnit.Framework;
+using StatCore.Stats;
 
 namespace StatCore.Tests.Stats
 {

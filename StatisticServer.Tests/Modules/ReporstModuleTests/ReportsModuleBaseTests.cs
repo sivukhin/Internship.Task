@@ -9,37 +9,12 @@ namespace StatisticServer.Tests
 {
     abstract class ReportsMoudleBaseTests : BaseModuleTests
     {
-        protected IGlobalServerStatisticStorage GlobalStatisticStorage;
-        protected IServerStatisticStorage ServerStatisticStorage;
-        protected IPlayerStatisticStorage PlayerStatisticStorage;
-        protected IReportStorage ReportStorage;
-        protected IDataRepository DataRepository;
-        protected IDataStatisticStorage StatisticStorage;
-        protected IDocumentStore DocumentStore;
-        protected ReportsModule module;
-
         [SetUp]
-        public async Task Setup()
+        public override void Setup()
         {
-            GlobalStatisticStorage = new GlobalServerStatisticStorage();
-            ServerStatisticStorage = new ServerStatisticStorage(GlobalStatisticStorage);
-            PlayerStatisticStorage = new PlayerStatisticStorage();
-            ReportStorage = new ReportStorage(ServerStatisticStorage, PlayerStatisticStorage, GlobalStatisticStorage);
-            DocumentStore = RavenDbStore.GetStore(new ApplicationOptions
-            {
-                InMemory = true,
-                UnitTesting = true
-            });
-            DataRepository = new RavenDbStorage(DocumentStore);
-            StatisticStorage = new DataStatisticStorage(
-                DataRepository,
-                GlobalStatisticStorage,
-                ServerStatisticStorage,
-                PlayerStatisticStorage,
-                ReportStorage);
-            module = new ReportsModule(ReportStorage, GlobalStatisticStorage);
-
-            await PutInitialiData();
+            base.Setup();
+            Module = new ReportsModule(ReportStorage, GlobalStatisticStorage);
+            PutInitialiData().Wait();
         }
 
         protected abstract Task PutInitialiData();

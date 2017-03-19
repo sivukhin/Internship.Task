@@ -14,12 +14,14 @@ namespace StatCore.Stats
 
         public void Add(TTarget item)
         {
-            value += selector(item);
+            lock(value)
+                value += selector(item);
         }
 
         public void Delete(TTarget item)
         {
-            value -= selector(item);
+            lock(value)
+                value -= selector(item);
         }
 
         public double Value => value.Value;

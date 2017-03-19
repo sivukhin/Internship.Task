@@ -7,10 +7,17 @@ namespace DataCore
 {
     public class MatchInfo
     {
-        public class MatchInfoId
+        public class MatchInfoId : IComparable<MatchInfoId>
         {
             public string ServerId { get; set; }
             public DateTime EndTime { get; set; }
+
+            public int CompareTo(MatchInfoId other)
+            {
+                if (ServerId.Equals(other.ServerId))
+                    return EndTime.CompareTo(other.EndTime);
+                return String.Compare(ServerId, other.ServerId, StringComparison.Ordinal);
+            }
         }
 
         public MatchInfoId GetIndex() => new MatchInfoId {ServerId = HostServer.Id, EndTime = EndTime};

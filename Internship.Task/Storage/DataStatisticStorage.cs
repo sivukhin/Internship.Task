@@ -94,7 +94,7 @@ namespace StatisticServer.Storage
         public async Task UpdateMatch(MatchInfo.MatchInfoId matchId, MatchInfo match)
         {
             logger.ConditionalTrace("Update information about match {0}",
-                new {MatchId = match.GetIndex(), MatchInfo = match});
+                new {MatchId = matchId, MatchInfo = match});
 
             var server = await statisticStorage.GetServer(new ServerInfo.ServerInfoId {Id = matchId.ServerId});
             if (server == null)
@@ -103,8 +103,8 @@ namespace StatisticServer.Storage
             var oldMatchInfo = await statisticStorage.GetMatch(match.GetIndex());
             if (oldMatchInfo != null)
                 DeleteMatch(oldMatchInfo.InitPlayers(match.GetIndex().EndTime));
-            InsertMatch(match);
             await statisticStorage.UpdateMatch(matchId, match);
+            InsertMatch(match);
         }
 
         private void DeleteMatch(MatchInfo matchInfo)

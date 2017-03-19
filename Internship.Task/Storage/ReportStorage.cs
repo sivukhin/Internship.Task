@@ -28,6 +28,24 @@ namespace StatisticServer.Storage
     {
         public PlayerInfo Player { get; set; }
         public double? KillToDeathRatio { get; set; }
+
+        protected bool Equals(PlayerReportResult other)
+        {
+            return Equals(Player, other.Player);
+        }
+
+        public override bool Equals(object obj)
+        {
+            if (ReferenceEquals(null, obj)) return false;
+            if (ReferenceEquals(this, obj)) return true;
+            if (obj.GetType() != this.GetType()) return false;
+            return Equals((PlayerReportResult)obj);
+        }
+
+        public override int GetHashCode()
+        {
+            return Player?.GetHashCode() ?? 0;
+        }
     }
 
     public class ServerReportResult
@@ -38,6 +56,24 @@ namespace StatisticServer.Storage
         public double AverageMatchesPerDay(IGlobalServerStatisticStorage globalStatisticStorage)
         {
             return TotalMatchesPlayed / ((globalStatisticStorage.LastDayWithMatch - globalStatisticStorage.FirstDayWithMatch).Days + 1);
+        }
+
+        protected bool Equals(ServerReportResult other)
+        {
+            return Equals(Server, other.Server);
+        }
+
+        public override bool Equals(object obj)
+        {
+            if (ReferenceEquals(null, obj)) return false;
+            if (ReferenceEquals(this, obj)) return true;
+            if (obj.GetType() != this.GetType()) return false;
+            return Equals((ServerReportResult)obj);
+        }
+
+        public override int GetHashCode()
+        {
+            return Server?.GetHashCode() ?? 0;
         }
     }
 
@@ -52,16 +88,13 @@ namespace StatisticServer.Storage
         private IStat<ServerInfo, IEnumerable<ServerInfo>> allServers;
         private readonly IServerStatisticStorage serverStatisticStorage;
         private readonly IPlayerStatisticStorage playerStatisticStorage;
-        private readonly IGlobalServerStatisticStorage globalStatisticStorage;
 
         public ReportStorage(
             IServerStatisticStorage serverStatisticStorage, 
-            IPlayerStatisticStorage playerStatisticStorage, 
-            IGlobalServerStatisticStorage globalStatisticStorage)
+            IPlayerStatisticStorage playerStatisticStorage)
         {
             this.serverStatisticStorage = serverStatisticStorage;
             this.playerStatisticStorage = playerStatisticStorage;
-            this.globalStatisticStorage = globalStatisticStorage;
             InitReports();
         }
 
@@ -70,7 +103,7 @@ namespace StatisticServer.Storage
             logger.Info("Initialize reports");
 
             recentMatches = new DataIdentity<MatchInfo>()
-                .Report(MaxReportSize, m => m.EndTime, (m1, m2) => m1.EndTime.CompareTo(m2.EndTime) < 0);
+                .Report(MaxReportSize, m => m.EndTime, (m1, m2) => m1.GetIndex().CompareTo(m2.GetIndex()));
 
             popularServers = new DataIdentity<ServerInfo>()
                 .Select(s => new ServerReportResult
@@ -80,10 +113,10 @@ namespace StatisticServer.Storage
                 })
                 .Report(MaxReportSize,
                     s => s.TotalMatchesPlayed,
-                    (s1, s2) => string.Compare(s1.Server.Id, s2.Server.Id, StringComparison.Ordinal) < 0);
+                    (s1, s2) => string.Compare(s1.Server.Id, s2.Server.Id, StringComparison.Ordinal));
 
             allServers = new DataIdentity<ServerInfo>()
-                .Report(s => s.Id, (s1, s2) => String.Compare(s1.Id, s2.Id, StringComparison.Ordinal) < 0);
+                .Report(s => s.Id, (s1, s2) => string.Compare(s1.Id, s2.Id, StringComparison.Ordinal));
 
             bestPlayers = new DataIdentity<PlayerInfo>().Where(p =>
             {
@@ -97,7 +130,7 @@ namespace StatisticServer.Storage
                     return p.KillToDeathRatio.Value;
                 throw new ArgumentException($"{nameof(p.KillToDeathRatio)} must be not null");
             },
-            (p1, p2) => String.Compare(p1.Player.Name, p2.Player.Name, StringComparison.Ordinal) < 0);
+            (p1, p2) => string.Compare(p1.Player.Name, p2.Player.Name, StringComparison.Ordinal));
         }
 
         public void Update(ServerInfo serverInfo)
